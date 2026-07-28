@@ -918,8 +918,7 @@
         }
 
         /* ============================================================
-           MEMBER CARD — ดีไซน์พรีเมียม ขนาดใกล้บัตรจริง
-           ปรับให้สมจริงบนมือถือ
+           MEMBER CARD — ดีไซน์พรีเมียม
            ============================================================ */
         .member-card-preview {
             background: linear-gradient(145deg, #0f172a, #1e293b);
@@ -940,7 +939,6 @@
             min-height: 200px;
         }
 
-        /* พื้นหลังไล่ระดับและลายเส้นพรีเมียม */
         .member-card-preview::before {
             content: '';
             position: absolute;
@@ -1182,7 +1180,7 @@
         }
 
         /* ============================================================
-           STATUS BANNER (Profile)
+           STATUS BANNER (Profile) — ปรับให้กระชับขึ้น
            ============================================================ */
         .status-banner {
             padding: 14px 20px;
@@ -1236,7 +1234,7 @@
         }
 
         /* ============================================================
-           TOP 5
+           TOP 5 (ซ่อนไว้ แต่อยู่ใน DOM เผื่อเรียกใช้)
            ============================================================ */
         .top5-list {
             list-style: none;
@@ -1905,7 +1903,6 @@
                 min-width: 0;
             }
 
-            /* ปรับบัตรบนมือถือ */
             .member-card-preview {
                 max-width: 100%;
                 padding: 16px 18px;
@@ -2214,64 +2211,39 @@
         </header>
 
         <!-- ============================================================
-        PAGE: DASHBOARD
+        PAGE: DASHBOARD (Admin) — ปรับตามที่ขอ
         ============================================================ -->
         <div id="page-dashboard" class="page-section active">
 
+            <!-- เอา sActive และ sNoPay ออก -->
             <div class="stats-grid" id="statsGrid">
                 <div class="stat-card" onclick="showCardDetail('total')">
-                    <div class="stat-top">
-                        <div class="stat-icon blue"><i class="fas fa-users"></i></div>
-                    </div>
+                    <div class="stat-top"><div class="stat-icon blue"><i class="fas fa-users"></i></div></div>
                     <div class="stat-number" id="sTotal">-</div>
                     <div class="stat-label">สมาชิกทั้งหมด</div>
                 </div>
-                <div class="stat-card" onclick="showCardDetail('active')">
-                    <div class="stat-top">
-                        <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
-                    </div>
-                    <div class="stat-number" id="sActive">-</div>
-                    <div class="stat-label">กำลังใช้งาน</div>
-                </div>
                 <div class="stat-card" onclick="showCardDetail('expired')">
-                    <div class="stat-top">
-                        <div class="stat-icon red"><i class="fas fa-user-slash"></i></div>
-                    </div>
+                    <div class="stat-top"><div class="stat-icon red"><i class="fas fa-user-slash"></i></div></div>
                     <div class="stat-number" id="sExpired">-</div>
                     <div class="stat-label">หมดอายุ</div>
                 </div>
                 <div class="stat-card" onclick="showCardDetail('expiring')">
-                    <div class="stat-top">
-                        <div class="stat-icon amber"><i class="fas fa-clock"></i></div>
-                    </div>
+                    <div class="stat-top"><div class="stat-icon amber"><i class="fas fa-clock"></i></div></div>
                     <div class="stat-number" id="sExpiring">-</div>
                     <div class="stat-label">ใกล้หมดอายุ</div>
                 </div>
-                <div class="stat-card" onclick="showCardDetail('nopay')">
-                    <div class="stat-top">
-                        <div class="stat-icon purple"><i class="fas fa-exclamation-triangle"></i></div>
-                    </div>
-                    <div class="stat-number" id="sNoPay">-</div>
-                    <div class="stat-label">ยังไม่ชำระ</div>
-                </div>
                 <div class="stat-card" onclick="showCardDetail('checkin')">
-                    <div class="stat-top">
-                        <div class="stat-icon green"><i class="fas fa-clipboard-check"></i></div>
-                    </div>
+                    <div class="stat-top"><div class="stat-icon green"><i class="fas fa-clipboard-check"></i></div></div>
                     <div class="stat-number" id="sCheckins">-</div>
                     <div class="stat-label">เข้าวันนี้</div>
                 </div>
                 <div class="stat-card" onclick="showCardDetail('revenue')">
-                    <div class="stat-top">
-                        <div class="stat-icon blue"><i class="fas fa-money-bill-wave"></i></div>
-                    </div>
+                    <div class="stat-top"><div class="stat-icon blue"><i class="fas fa-money-bill-wave"></i></div></div>
                     <div class="stat-number" id="sRevenue"><span class="currency">฿</span>-</div>
                     <div class="stat-label">รายได้เดือนนี้</div>
                 </div>
                 <div class="stat-card" onclick="showCardDetail('new')">
-                    <div class="stat-top">
-                        <div class="stat-icon purple"><i class="fas fa-user-plus"></i></div>
-                    </div>
+                    <div class="stat-top"><div class="stat-icon purple"><i class="fas fa-user-plus"></i></div></div>
                     <div class="stat-number" id="sNewMembers">-</div>
                     <div class="stat-label">สมาชิกใหม่เดือนนี้</div>
                 </div>
@@ -2306,15 +2278,17 @@
                 </div>
             </div>
 
+            <!-- ตารางการชำระเงินเดือนนี้ เพิ่มคอลัมน์ชื่อ -->
             <div class="card-panel">
                 <div class="card-header">
                     <h3><i class="fas fa-receipt"></i> การชำระเงินเดือนนี้ <span class="badge" id="dashPaymentBadge">0</span></h3>
                     <span style="font-weight:600;font-size:14px;" id="dashPaymentTotal">รวม: 0 ฿</span>
+                    <button class="btn btn-success btn-sm" onclick="exportPaymentsCSV()"><i class="fas fa-file-csv"></i> CSV</button>
                 </div>
                 <div class="table-wrap">
                     <table>
-                        <thead><tr><th>#</th><th>รหัสสมาชิก</th><th>จำนวน</th><th>วันที่</th><th>หมดอายุ</th></tr></thead>
-                        <tbody id="dashPaymentTableBody"><tr><td colspan="5" class="empty-row">ไม่มีข้อมูล</td></tr></tbody>
+                        <thead><tr><th>#</th><th>รหัสสมาชิก</th><th>ชื่อ</th><th>จำนวน</th><th>วันที่</th><th>หมดอายุ</th></tr></thead>
+                        <tbody id="dashPaymentTableBody"><tr><td colspan="6" class="empty-row">ไม่มีข้อมูล</td></tr></tbody>
                     </table>
                 </div>
             </div>
@@ -2430,7 +2404,7 @@
         </div>
 
         <!-- ============================================================
-        PAGE: ANALYTICS
+        PAGE: ANALYTICS (เพิ่ม KPI ความเสี่ยงแล้ว)
         ============================================================ -->
         <div id="page-analytics" class="page-section">
             <div class="flex-center" style="justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
@@ -2508,17 +2482,12 @@
         </div>
 
         <!-- ============================================================
-        PAGE: PROFILE — ปรับปรุงบัตรให้สมจริงบนมือถือ
+        PAGE: PROFILE — ปรับตามที่ขอ
         ============================================================ -->
         <div id="page-profile" class="page-section">
 
-            <!-- Member Stats 8 cards -->
+            <!-- Member Stats 6 cards (ตัด expiry และ top5) -->
             <div class="member-stats-grid" id="memberStatsGrid">
-                <div class="stat-card" onclick="showCardDetail('member_expiry')">
-                    <div class="stat-top"><div class="stat-icon red"><i class="fas fa-calendar-times"></i></div></div>
-                    <div class="stat-number" id="mStatExpiry">-</div>
-                    <div class="stat-label">วันหมดอายุ</div>
-                </div>
                 <div class="stat-card" onclick="showCardDetail('member_revenue')">
                     <div class="stat-top"><div class="stat-icon blue"><i class="fas fa-coins"></i></div></div>
                     <div class="stat-number" id="mStatRevenue">-</div>
@@ -2535,31 +2504,26 @@
                     <div class="stat-label">เวลาคนเข้าใช้มากสุด</div>
                 </div>
                 <div class="stat-card" onclick="showCardDetail('member_percent')">
-                    <div class="stat-top"><div class="stat-icon green"><i class="fas fa-percent"></i></div></div>
+                    <div class="stat-top"><div class="stat-icon green"><i class="fas fa-users"></i></div></div>
                     <div class="stat-number" id="mStatPercent">-</div>
-                    <div class="stat-label">% เข้าวันนี้</div>
-                </div>
-                <div class="stat-card" onclick="showCardDetail('member_top5')">
-                    <div class="stat-top"><div class="stat-icon amber"><i class="fas fa-trophy"></i></div></div>
-                    <div class="stat-number" id="mStatTop5">-</div>
-                    <div class="stat-label">อันดับ Top 5</div>
+                    <div class="stat-label">เช็คอินวันนี้</div>
                 </div>
                 <div class="stat-card" onclick="showCardDetail('member_daysleft')">
                     <div class="stat-top"><div class="stat-icon blue"><i class="fas fa-hourglass-half"></i></div></div>
                     <div class="stat-number" id="mStatDaysLeft">-</div>
                     <div class="stat-label">เหลือวันต่ออายุ</div>
                 </div>
-                <div class="stat-card" onclick="showCardDetail('member_checkin_today')">
-                    <div class="stat-top"><div class="stat-icon green"><i class="fas fa-clipboard-check"></i></div></div>
-                    <div class="stat-number" id="mStatCheckinToday">-</div>
-                    <div class="stat-label">เช็คอินวันนี้</div>
+                <div class="stat-card" onclick="showCardDetail('member_points')">
+                    <div class="stat-top"><div class="stat-icon green"><i class="fas fa-star"></i></div></div>
+                    <div class="stat-number" id="mStatPoints">-</div>
+                    <div class="stat-label">แต้มสะสม</div>
                 </div>
             </div>
 
-            <!-- Status Banner -->
+            <!-- Status Banner — ตัดข้อความเกะกะออก -->
             <div id="memberStatusBanner"></div>
 
-            <!-- Profile Card + Member Card Preview (ปรับให้สมจริง) -->
+            <!-- Profile Card + Member Card Preview -->
             <div class="card-panel relative" id="profileCard">
                 <div class="expired-overlay" id="profileExpiredOverlay">
                     <i class="fas fa-lock"></i>
@@ -2579,14 +2543,10 @@
                     </div>
                 </div>
 
-                <!-- บัตรสมาชิก ดีไซน์พรีเมียม ใช้งานบนมือถือได้ดี -->
                 <div style="display:flex; justify-content:center; margin-top:8px;">
                     <div class="member-card-preview" id="memberCardPreview">
                         <div class="mc-header">
-                            <div class="mc-brand">
-                                <i class="fas fa-dumbbell"></i>
-                                <span>Pro Gym</span>
-                            </div>
+                            <div class="mc-brand"><i class="fas fa-dumbbell"></i><span>Pro Gym</span></div>
                             <span class="mc-badge" id="previewType">-</span>
                         </div>
                         <div class="mc-body">
@@ -2611,7 +2571,6 @@
                     </div>
                 </div>
 
-                <!-- ปุ่มจัดการบัตร -->
                 <div class="card-actions-row">
                     <button class="btn btn-primary btn-sm" onclick="downloadQR()"><i class="fas fa-qrcode"></i> QR</button>
                     <button class="btn btn-primary btn-sm" onclick="printMemberCard()"><i class="fas fa-print"></i> พิมพ์</button>
@@ -2619,8 +2578,8 @@
                 </div>
             </div>
 
-            <!-- Top 5 -->
-            <div class="card-panel" id="memberExtraPanel">
+            <!-- Top 5 ถูกซ่อนไว้ แต่ยังมีอยู่เผื่อเรียกใช้ผ่าน modal -->
+            <div class="card-panel" id="memberExtraPanel" style="display:none;">
                 <h3 style="font-size:17px;font-weight:600;"><i class="fas fa-trophy"></i> ฉายา & อันดับ Top 5</h3>
                 <div id="memberTop5Container"><p class="text-muted text-sm"><i class="fas fa-spinner fa-spin"></i> กำลังโหลด...</p></div>
             </div>
@@ -2770,7 +2729,7 @@
     <div class="toast" id="toast"></div>
 
     <!-- ============================================================
-    JAVASCRIPT (ไม่มีการเปลี่ยนแปลง)
+    JAVASCRIPT
     ============================================================ -->
     <script>
         // ============================================================
@@ -3257,7 +3216,7 @@
         }
 
         // ============================================================
-        // DASHBOARD
+        // DASHBOARD (Admin)
         // ============================================================
         async function refreshDashboard() {
             const btn = $('refreshBtn');
@@ -3270,10 +3229,9 @@
                 renderDebug(data);
                 const s = data.summary || {};
                 $('sTotal').textContent = s.total_members ?? '-';
-                $('sActive').textContent = s.active_members ?? '-';
+                // sActive และ sNoPay ถูกลบออกไปแล้ว
                 $('sExpired').textContent = s.expired_members ?? '-';
                 $('sExpiring').textContent = s.expiring_soon ?? '-';
-                $('sNoPay').textContent = s.no_payment ?? '-';
                 $('sCheckins').textContent = s.today_checkins ?? '-';
                 $('sRevenue').textContent = formatNumber(s.this_month_revenue || 0);
                 $('sNewMembers').textContent = s.new_members_this_month ?? '-';
@@ -3325,18 +3283,25 @@
             `).join('');
         }
 
+        // ปรับตารางการชำระเงินเดือนนี้ให้มีชื่อ
         function renderDashPaymentTable(payments) {
             const tbody = $('dashPaymentTableBody');
-            if (!payments || !payments.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-row">ไม่มีข้อมูล</td></tr>'; return; }
-            tbody.innerHTML = payments.slice(0, 15).map((p, i) => `
-                <tr>
+            if (!payments || !payments.length) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-row">ไม่มีข้อมูล</td></tr>';
+                return;
+            }
+            tbody.innerHTML = payments.slice(0, 15).map((p, i) => {
+                const member = allMembers.find(m => m.member_id === p.member_id);
+                const name = member ? member.full_name : '-';
+                return `<tr>
                     <td>${i+1}</td>
                     <td><strong>${p.member_id||'-'}</strong></td>
+                    <td>${name}</td>
                     <td>${formatNumber(p.amount)} ฿</td>
                     <td>${formatDate(p.payment_date)}</td>
                     <td>${formatDate(p.expiry_date)}</td>
-                </tr>
-            `).join('');
+                </tr>`;
+            }).join('');
         }
 
         function filterDashMembers() {
@@ -3683,7 +3648,7 @@
         }
 
         // ============================================================
-        // PROFILE — ฟังก์ชันการทำงานเดิม (ไม่เปลี่ยนแปลง)
+        // PROFILE — ปรับตามที่ขอ
         // ============================================================
         async function loadProfile() {
             try {
@@ -3759,6 +3724,7 @@
             }
         }
 
+        // ปรับ status banner ตัดข้อความเกะกะออก
         function renderMemberStatus(member, isExpired, hasPayment, expiryDateStr) {
             const container = document.getElementById('memberStatusBanner');
             let html = '';
@@ -3796,7 +3762,7 @@
                             <strong><i class="fas fa-check-circle"></i> สมาชิกกำลังใช้งาน</strong>
                             <span style="font-size:13px;display:block;">หมดอายุ ${formatDate(expiryDateStr)}</span>
                         </div>
-                        <span style="margin-right:auto;font-size:13px;"><i class="fas fa-dumbbell"></i> เริ่มออกกำลังกายกันเถอะ!</span>
+                        <!-- ตัดข้อความ "เริ่มออกกำลังกายกันเถอะ!" ออก -->
                     </div>
                 `;
             }
@@ -3816,7 +3782,6 @@
                 return;
             }
             try {
-                // ใช้ขนาด 68x68 ให้พอดีกับบัตรบนมือถือ
                 qrCodeInstance = new QRCode(container, {
                     text: memberId || 'G-XXXX',
                     width: 68,
@@ -4059,18 +4024,20 @@
             });
         }
 
-        // ----- MEMBER DASHBOARD STATS -----
+        // ============================================================
+        // MEMBER DASHBOARD STATS — ปรับตามที่ขอ
+        // ============================================================
         function updateMemberDashboard() {
             if (!profileMember) return;
             const m = profileMember;
             const today = getTodayStr();
             const thisMonth = today.slice(0, 7);
-            const expiryDisplay = profileExpiryStr && profileExpiryStr !== '-' ? formatDate(profileExpiryStr) : 'ยังไม่ชำระ';
-            $('mStatExpiry').textContent = expiryDisplay;
+            // รายได้เดือนนี้
             const monthPayments = profilePayments.filter(p => p.payment_date && normalizeDate(p.payment_date).slice(0, 7) ===
                 thisMonth);
             const totalPaid = monthPayments.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
             $('mStatRevenue').textContent = formatNumber(totalPaid) + ' ฿';
+            // ฉายา
             const monthCheckins = profileCheckins.filter(c => c.checkin_date && normalizeDate(c.checkin_date).slice(0, 7) ===
                 thisMonth);
             const count = monthCheckins.length;
@@ -4081,74 +4048,46 @@
             else if (count >= 10) rankTitle = '<i class="fas fa-thumbs-up"></i> พอใช้';
             else if (count >= 5) rankTitle = '<i class="fas fa-bed"></i> ขี้เกียจ';
             $('mStatRank').innerHTML = rankTitle + ` (${count} ครั้ง)`;
-            $('mStatPeak').innerHTML = '<i class="fas fa-chevron-left"></i> คลิกดู';
 
-            let totalActive = allMembers.filter(mem => mem.status === 'active' || mem.status === 'expiring_soon').length;
-            const activeIds = new Set(allMembers.filter(mem => mem.status === 'active' || mem.status === 'expiring_soon')
-                .map(m => m.member_id));
-            const todayActiveCheckins = allCheckins.filter(c => normalizeDate(c.checkin_date) === today && activeIds.has(c
-                .member_id));
-            const pct = totalActive > 0 ? Math.round((todayActiveCheckins.length / totalActive) * 100) : 0;
-            $('mStatPercent').textContent = pct + '%';
+            // เวลาคนเข้าใช้มากที่สุด (เดือนนี้) — แสดงจำนวนครั้งสูงสุด
+            const monthCheckinsAll = allCheckins.filter(c => c.checkin_date && normalizeDate(c.checkin_date).slice(0, 7) ===
+                thisMonth);
+            const hourCounts = {};
+            monthCheckinsAll.forEach(c => {
+                if (c.checkin_time) {
+                    const h = c.checkin_time.split(':')[0];
+                    hourCounts[h] = (hourCounts[h] || 0) + 1;
+                }
+            });
+            let maxHour = '-',
+                maxCount = 0;
+            for (const [h, cnt] of Object.entries(hourCounts)) {
+                if (cnt > maxCount) {
+                    maxCount = cnt;
+                    maxHour = h;
+                }
+            }
+            $('mStatPeak').textContent = maxHour !== '-' ? `${maxHour}:00 (${maxCount} ครั้ง)` : 'ไม่มีข้อมูล';
 
-            renderTop5();
+            // จำนวนคนที่เช็คอินวันนี้ (ทั้งหมด)
+            const todayCheckinsAll = allCheckins.filter(c => normalizeDate(c.checkin_date) === today).length;
+            $('mStatPercent').textContent = todayCheckinsAll + ' คน';
 
+            // วันหมดอายุ
             let daysLeft = '-';
             if (profileExpiryStr && profileExpiryStr !== '-') {
                 const diff = daysBetween(today, normalizeDate(profileExpiryStr));
                 daysLeft = diff >= 0 ? diff + ' วัน' : 'หมดอายุ';
             }
             $('mStatDaysLeft').textContent = daysLeft;
-            const todayCheckin = profileCheckins.filter(c => normalizeDate(c.checkin_date) === today);
-            $('mStatCheckinToday').textContent = todayCheckin.length ? '✅ ' + todayCheckin.length + ' ครั้ง' : '❌ ยังไม่เข้า';
+
+            // แต้มสะสม
+            $('mStatPoints').textContent = m.points || 0;
         }
 
+        // Top 5 ยังคงไว้ แต่ซ่อนการ์ดไว้ (ไม่ได้ใช้)
         async function renderTop5() {
-            const container = document.getElementById('memberTop5Container');
-            try {
-                if (!allMembers.length) await fetchMembers();
-                if (!allCheckins.length) await fetchCheckins();
-                const thisMonth = getTodayStr().slice(0, 7);
-                const countMap = {};
-                allCheckins.forEach(c => {
-                    if (c.checkin_date && normalizeDate(c.checkin_date).slice(0, 7) === thisMonth) {
-                        countMap[c.member_id] = (countMap[c.member_id] || 0) + 1;
-                    }
-                });
-                const sorted = Object.entries(countMap).sort((a, b) => b[1] - a[1]).slice(0, 5);
-                let html = '<ul class="top5-list">';
-                if (sorted.length === 0) {
-                    html += '<li><i class="fas fa-info-circle"></i> ยังไม่มีข้อมูลเช็คอินในเดือนนี้</li>';
-                } else {
-                    const medals = ['<i class="fas fa-trophy" style="color:#f59e0b;"></i>',
-                        '<i class="fas fa-medal" style="color:#94a3b8;"></i>',
-                        '<i class="fas fa-medal" style="color:#cd7f32;"></i>',
-                        '<i class="fas fa-medal" style="color:#64748b;"></i>',
-                        '<i class="fas fa-medal" style="color:#64748b;"></i>'
-                    ];
-                    sorted.forEach(([id, cnt], idx) => {
-                        const member = allMembers.find(m => m.member_id === id);
-                        const name = member ? member.full_name || id : id;
-                        html += `<li>
-                            <span class="rank">${medals[idx] || '#'+(idx+1)}</span>
-                            <span class="member-name">${name}</span>
-                            <span class="count">${cnt} ครั้ง</span>
-                        </li>`;
-                    });
-                }
-                html += '</ul>';
-                if (profileMember) {
-                    const myId = profileMember.member_id;
-                    const myCount = countMap[myId] || 0;
-                    const rank = Object.entries(countMap).sort((a, b) => b[1] - a[1]).findIndex(([id]) => id === myId) + 1;
-                    const rankText = rank > 0 ? `อันดับที่ ${rank}` : 'ไม่มีข้อมูล';
-                    html += `<p style="margin-top:12px;font-size:14px;"><strong><i class="fas fa-medal"></i> ฉายาของคุณ:</strong> ${rankText} (${myCount} ครั้ง)</p>`;
-                }
-                container.innerHTML = html;
-            } catch (e) {
-                container.innerHTML = '<p class="text-muted text-sm"><i class="fas fa-exclamation-triangle"></i> ไม่สามารถโหลดข้อมูล Top 5</p>';
-                console.error(e);
-            }
+            // ฟังก์ชันนี้ไม่ถูกเรียกใช้แล้ว
         }
 
         // ============================================================
@@ -4275,7 +4214,7 @@
         }
 
         // ============================================================
-        // CARD DETAIL
+        // CARD DETAIL (เพิ่ม case member_points)
         // ============================================================
         function showCardDetail(type) {
             let title = 'รายละเอียด';
@@ -4286,12 +4225,6 @@
                 case 'total':
                     title = '👥 สมาชิกทั้งหมด';
                     content = `จำนวนสมาชิกทั้งหมด: <strong>${allMembers.length}</strong> คน`;
-                    break;
-                case 'active':
-                    const active = allMembers.filter(m => m.status === 'active' || m.status === 'expiring_soon');
-                    title = '✅ สมาชิกกำลังใช้งาน';
-                    content =
-                        `จำนวน: <strong>${active.length}</strong> คน<br><br>รายชื่อ: ${active.map(m => m.full_name).join(', ')}`;
                     break;
                 case 'expired':
                     const expired = allMembers.filter(m => m.status === 'expired');
@@ -4304,12 +4237,6 @@
                     title = '🟡 สมาชิกใกล้หมดอายุ';
                     content =
                         `จำนวน: <strong>${expiring.length}</strong> คน<br><br>รายชื่อ: ${expiring.map(m => m.full_name).join(', ')}`;
-                    break;
-                case 'nopay':
-                    const nopay = allMembers.filter(m => m.status === 'no_payment');
-                    title = '⚠️ สมาชิกยังไม่ชำระ';
-                    content =
-                        `จำนวน: <strong>${nopay.length}</strong> คน<br><br>รายชื่อ: ${nopay.map(m => m.full_name).join(', ')}`;
                     break;
                 case 'checkin':
                     const todayCheckins = allCheckins.filter(c => normalizeDate(c.checkin_date) === today);
@@ -4331,11 +4258,6 @@
                     title = '🆕 สมาชิกใหม่เดือนนี้';
                     content =
                         `จำนวน: <strong>${newMembers.length}</strong> คน<br><br>รายชื่อ: ${newMembers.map(m => m.full_name).join(', ')}`;
-                    break;
-                case 'member_expiry':
-                    title = '📅 วันหมดอายุ';
-                    content =
-                        `วันหมดอายุ: <strong>${formatDate(profileExpiryStr)}</strong>`;
                     break;
                 case 'member_revenue':
                     const mPay = profilePayments.filter(p => p.payment_date && normalizeDate(p.payment_date).slice(0, 7) ===
@@ -4389,37 +4311,10 @@
                     }
                     break;
                 case 'member_percent':
-                    let totalActive2 = allMembers.filter(m => m.status === 'active' || m.status === 'expiring_soon').length;
-                    const activeIds2 = new Set(allMembers.filter(m => m.status === 'active' || m.status === 'expiring_soon')
-                        .map(m => m.member_id));
-                    const todayActive = allCheckins.filter(c => normalizeDate(c.checkin_date) === today && activeIds2.has(c
-                        .member_id));
-                    const pct2 = totalActive2 > 0 ? Math.round((todayActive.length / totalActive2) * 100) : 0;
-                    title = '📊 สมาชิกทั้งหมดเข้าวันนี้';
+                    const todayC = allCheckins.filter(c => normalizeDate(c.checkin_date) === today).length;
+                    title = '📊 เช็คอินวันนี้';
                     content =
-                        `วันนี้: <strong>${pct2}%</strong> (${todayActive.length} คน จาก ${totalActive2} คนที่ยังไม่หมดอายุ)`;
-                    break;
-                case 'member_top5':
-                    title = '🏆 อันดับ Top 5';
-                    const thisMonth2 = today.slice(0, 7);
-                    const countMap2 = {};
-                    allCheckins.forEach(c => {
-                        if (c.checkin_date && normalizeDate(c.checkin_date).slice(0, 7) === thisMonth2) {
-                            countMap2[c.member_id] = (countMap2[c.member_id] || 0) + 1;
-                        }
-                    });
-                    const sorted2 = Object.entries(countMap2).sort((a, b) => b[1] - a[1]).slice(0, 5);
-                    if (sorted2.length) {
-                        content = '<ul style="list-style:none;padding:0;">';
-                        sorted2.forEach(([id, cnt], idx) => {
-                            const mem = allMembers.find(m => m.member_id === id);
-                            const name = mem ? mem.full_name || id : id;
-                            content += `<li style="padding:4px 0;border-bottom:1px solid var(--border-color);">#${idx+1} ${name} (${cnt} ครั้ง)</li>`;
-                        });
-                        content += '</ul>';
-                    } else {
-                        content = 'ยังไม่มีข้อมูล';
-                    }
+                        `วันนี้มีผู้เข้าใช้ทั้งหมด <strong>${todayC}</strong> คน`;
                     break;
                 case 'member_daysleft':
                     let days = '-';
@@ -4431,11 +4326,9 @@
                     content =
                         `เหลือ <strong>${days}</strong>`;
                     break;
-                case 'member_checkin_today':
-                    const todayC = profileCheckins.filter(c => normalizeDate(c.checkin_date) === today);
-                    title = '📋 เช็คอินวันนี้';
-                    content =
-                        `จำนวน: <strong>${todayC.length}</strong> ครั้ง`;
+                case 'member_points':
+                    title = '⭐ แต้มสะสม';
+                    content = `แต้มสะสมทั้งหมด: <strong>${profileMember.points || 0}</strong> แต้ม`;
                     break;
                 default:
                     content = 'ไม่พบข้อมูล';
@@ -4458,9 +4351,12 @@
 
         function exportPaymentsCSV() {
             if (!allPayments.length) { showToast('⚠️ ไม่มีข้อมูลการชำระเงิน', 'warning'); return; }
-            const headers = ['รหัส', 'สมาชิก', 'จำนวน', 'วันที่', 'หมดอายุ'];
-            const rows = allPayments.map(p => [p.payment_id, p.member_id, p.amount, formatDate(p.payment_date), formatDate(p
-                    .expiry_date)]);
+            const headers = ['รหัส', 'สมาชิก', 'ชื่อ', 'จำนวน', 'วันที่', 'หมดอายุ'];
+            const rows = allPayments.map(p => {
+                const member = allMembers.find(m => m.member_id === p.member_id);
+                const name = member ? member.full_name : '-';
+                return [p.payment_id, p.member_id, name, p.amount, formatDate(p.payment_date), formatDate(p.expiry_date)];
+            });
             downloadCSV('payments.csv', headers, rows);
             showToast('✅ ส่งออก CSV สำเร็จ', 'success');
         }
