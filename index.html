@@ -919,34 +919,48 @@
 
         /* ============================================================
            MEMBER CARD — ดีไซน์พรีเมียม ขนาดใกล้บัตรจริง
-           QR ทางขวา ข้อมูลทางซ้าย (RTL)
+           ปรับให้สมจริงบนมือถือ
            ============================================================ */
         .member-card-preview {
             background: linear-gradient(145deg, #0f172a, #1e293b);
             color: #fff;
-            padding: 18px 22px;
-            border-radius: 18px;
-            width: 360px;
-            height: 210px;
+            padding: 20px 24px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 400px;
             margin: 0 auto;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.25), 0 4px 12px rgba(0, 0, 0, 0.1);
             position: relative;
             overflow: hidden;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            border: 1px solid rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            aspect-ratio: 1.6 / 1;
+            min-height: 200px;
         }
 
+        /* พื้นหลังไล่ระดับและลายเส้นพรีเมียม */
         .member-card-preview::before {
             content: '';
             position: absolute;
-            top: -60%;
-            right: -30%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle at 70% 30%, rgba(96, 165, 250, 0.10), transparent 70%);
+            top: -40%;
+            right: -20%;
+            width: 150%;
+            height: 150%;
+            background: radial-gradient(circle at 70% 30%, rgba(96, 165, 250, 0.08), transparent 70%);
             pointer-events: none;
+        }
+
+        .member-card-preview::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #2563eb, #60a5fa, #2563eb);
+            opacity: 0.4;
         }
 
         .member-card-preview .mc-header {
@@ -955,32 +969,37 @@
             align-items: center;
             position: relative;
             z-index: 1;
-            margin-bottom: 2px;
+            margin-bottom: 4px;
         }
 
         .member-card-preview .mc-header .mc-brand {
             display: flex;
             align-items: center;
-            gap: 6px;
-            font-size: 16px;
+            gap: 8px;
+            font-size: 18px;
             font-weight: 700;
             letter-spacing: -0.3px;
         }
 
         .member-card-preview .mc-header .mc-brand i {
-            font-size: 22px;
+            font-size: 26px;
             color: #60a5fa;
+            background: rgba(96, 165, 250, 0.12);
+            padding: 6px;
+            border-radius: 10px;
         }
 
         .member-card-preview .mc-header .mc-badge {
-            background: rgba(255, 255, 255, 0.08);
-            padding: 0 14px;
-            border-radius: 20px;
-            font-size: 10px;
-            font-weight: 600;
-            line-height: 22px;
+            background: rgba(255, 255, 255, 0.06);
             backdrop-filter: blur(4px);
-            border: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 0 16px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 600;
+            line-height: 26px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .member-card-preview .mc-body {
@@ -990,36 +1009,32 @@
             flex: 1;
             position: relative;
             z-index: 1;
-            /* ใน RTL ให้ qr อยู่ขวา, info อยู่ซ้าย */
-            direction: ltr;
-            /* ใช้ ltr เพื่อควบคุม layout โดยตรง */
         }
 
         .member-card-preview .mc-body .mc-info {
             flex: 1;
             min-width: 0;
-            direction: rtl;
-            /* ข้อความกลับมา RTL */
         }
 
         .member-card-preview .mc-body .mc-info .mc-name {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 700;
-            line-height: 1.3;
+            line-height: 1.2;
             letter-spacing: -0.2px;
         }
 
         .member-card-preview .mc-body .mc-info .mc-id {
+            font-size: 12px;
             opacity: 0.5;
-            font-size: 11px;
             font-weight: 500;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
+            margin-top: 1px;
         }
 
         .member-card-preview .mc-body .mc-info .mc-detail {
-            font-size: 10.5px;
+            font-size: 11px;
             opacity: 0.7;
-            margin-top: 1px;
+            margin-top: 2px;
             display: flex;
             align-items: center;
             gap: 4px;
@@ -1033,11 +1048,11 @@
         .member-card-preview .mc-body .mc-qr {
             flex-shrink: 0;
             background: #ffffff;
-            padding: 5px;
-            border-radius: 10px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+            padding: 6px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
             text-align: center;
-            width: 70px;
+            width: 80px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -1045,25 +1060,25 @@
 
         .member-card-preview .mc-body .mc-qr canvas {
             display: block;
-            width: 60px !important;
-            height: 60px !important;
+            width: 68px !important;
+            height: 68px !important;
         }
 
         .member-card-preview .mc-body .mc-qr .mc-qr-label {
-            font-size: 7px;
-            color: #64748b;
-            margin-top: 1px;
-            letter-spacing: 0.3px;
+            font-size: 8px;
+            color: #475569;
+            margin-top: 2px;
             font-weight: 600;
+            letter-spacing: 0.3px;
         }
 
         .member-card-preview .mc-footer {
-            margin-top: 4px;
-            padding-top: 8px;
+            margin-top: 6px;
+            padding-top: 10px;
             border-top: 1px solid rgba(255, 255, 255, 0.06);
             display: flex;
             justify-content: space-between;
-            font-size: 9.5px;
+            font-size: 10px;
             opacity: 0.6;
             position: relative;
             z-index: 1;
@@ -1080,8 +1095,14 @@
             display: flex;
             justify-content: center;
             gap: 10px;
-            margin-top: 14px;
+            margin-top: 16px;
             flex-wrap: wrap;
+        }
+
+        .card-actions-row .btn {
+            font-size: 13px;
+            padding: 8px 18px;
+            border-radius: 30px;
         }
 
         /* ============================================================
@@ -1884,28 +1905,55 @@
                 min-width: 0;
             }
 
+            /* ปรับบัตรบนมือถือ */
             .member-card-preview {
-                width: 100%;
-                max-width: 340px;
-                height: auto;
+                max-width: 100%;
+                padding: 16px 18px;
+                aspect-ratio: auto;
                 min-height: 190px;
-                padding: 14px 16px;
             }
 
             .member-card-preview .mc-body {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 8px;
+                flex-direction: row;
+                align-items: center;
+                gap: 12px;
             }
 
             .member-card-preview .mc-body .mc-qr {
-                align-self: center;
-                width: 64px;
+                width: 70px;
+                padding: 4px;
             }
 
             .member-card-preview .mc-body .mc-qr canvas {
-                width: 54px !important;
-                height: 54px !important;
+                width: 60px !important;
+                height: 60px !important;
+            }
+
+            .member-card-preview .mc-body .mc-info .mc-name {
+                font-size: 17px;
+            }
+
+            .member-card-preview .mc-body .mc-info .mc-detail {
+                font-size: 10px;
+            }
+
+            .member-card-preview .mc-header .mc-brand {
+                font-size: 15px;
+            }
+
+            .member-card-preview .mc-header .mc-brand i {
+                font-size: 20px;
+            }
+
+            .member-card-preview .mc-header .mc-badge {
+                font-size: 9px;
+                padding: 0 12px;
+                line-height: 22px;
+            }
+
+            .card-actions-row .btn {
+                font-size: 12px;
+                padding: 6px 14px;
             }
 
             .kpi-row {
@@ -1956,6 +2004,28 @@
 
             .member-stats-grid .stat-card .stat-number {
                 font-size: 16px;
+            }
+
+            .member-card-preview {
+                padding: 12px 14px;
+                min-height: 160px;
+            }
+
+            .member-card-preview .mc-body .mc-qr {
+                width: 60px;
+            }
+
+            .member-card-preview .mc-body .mc-qr canvas {
+                width: 50px !important;
+                height: 50px !important;
+            }
+
+            .member-card-preview .mc-body .mc-info .mc-name {
+                font-size: 15px;
+            }
+
+            .member-card-preview .mc-body .mc-info .mc-detail {
+                font-size: 9px;
             }
         }
 
@@ -2438,7 +2508,7 @@
         </div>
 
         <!-- ============================================================
-        PAGE: PROFILE — ปรับบัตรให้ QR อยู่ขวา ข้อมูลซ้าย
+        PAGE: PROFILE — ปรับปรุงบัตรให้สมจริงบนมือถือ
         ============================================================ -->
         <div id="page-profile" class="page-section">
 
@@ -2489,7 +2559,7 @@
             <!-- Status Banner -->
             <div id="memberStatusBanner"></div>
 
-            <!-- Profile Card + Member Card Preview (QR ขวา, Info ซ้าย) -->
+            <!-- Profile Card + Member Card Preview (ปรับให้สมจริง) -->
             <div class="card-panel relative" id="profileCard">
                 <div class="expired-overlay" id="profileExpiredOverlay">
                     <i class="fas fa-lock"></i>
@@ -2509,28 +2579,29 @@
                     </div>
                 </div>
 
-                <!-- บัตรสมาชิก : QR ทางขวา, ข้อมูลทางซ้าย (ใช้ flex row-reverse หรือจัดลำดับ) -->
+                <!-- บัตรสมาชิก ดีไซน์พรีเมียม ใช้งานบนมือถือได้ดี -->
                 <div style="display:flex; justify-content:center; margin-top:8px;">
                     <div class="member-card-preview" id="memberCardPreview">
                         <div class="mc-header">
-                            <div class="mc-brand"><i class="fas fa-dumbbell"></i><span>Pro Gym</span></div>
+                            <div class="mc-brand">
+                                <i class="fas fa-dumbbell"></i>
+                                <span>Pro Gym</span>
+                            </div>
                             <span class="mc-badge" id="previewType">-</span>
                         </div>
                         <div class="mc-body">
-                            <!-- QR อยู่ทางขวา (เรียงก่อนใน DOM แต่ใช้ flex row-reverse เพื่อให้ QR ขวาใน LTR) -->
-                            <!-- แต่ใช้ RTL ทั้งหน้า เราจึงจัดลำดับให้ QR อยู่ก่อน แล้ว info ตามหลัง แล้วใช้ flex-direction: row-reverse -->
-                            <div class="mc-qr" id="profileQrBox">
-                                <div style="width:60px;height:60px;display:flex;align-items:center;justify-content:center;background:#fff;border-radius:8px;margin:0 auto;">
-                                    <span style="color:#888;font-size:8px;">QR</span>
-                                </div>
-                                <div class="mc-qr-label">รหัสสมาชิก</div>
-                            </div>
                             <div class="mc-info">
                                 <div class="mc-name" id="previewName">-</div>
                                 <div class="mc-id" id="previewId">-</div>
                                 <div class="mc-detail"><i class="fas fa-phone"></i> <span id="previewPhone">-</span></div>
                                 <div class="mc-detail"><i class="fas fa-calendar"></i> หมดอายุ: <span id="previewExpiry">-</span></div>
                                 <div class="mc-detail"><i class="fas fa-star"></i> แต้ม: <span id="previewPoints">0</span></div>
+                            </div>
+                            <div class="mc-qr" id="profileQrBox">
+                                <div style="width:68px;height:68px;display:flex;align-items:center;justify-content:center;background:#fff;border-radius:8px;margin:0 auto;">
+                                    <span style="color:#888;font-size:8px;">QR</span>
+                                </div>
+                                <div class="mc-qr-label">รหัสสมาชิก</div>
                             </div>
                         </div>
                         <div class="mc-footer">
@@ -2542,9 +2613,9 @@
 
                 <!-- ปุ่มจัดการบัตร -->
                 <div class="card-actions-row">
-                    <button class="btn btn-primary btn-sm" onclick="downloadQR()"><i class="fas fa-qrcode"></i> ดาวน์โหลด QR</button>
-                    <button class="btn btn-primary btn-sm" onclick="printMemberCard()"><i class="fas fa-print"></i> พิมพ์บัตร</button>
-                    <button class="btn btn-success btn-sm" onclick="printMemberCard()"><i class="fas fa-file-pdf"></i> ดาวน์โหลด PDF</button>
+                    <button class="btn btn-primary btn-sm" onclick="downloadQR()"><i class="fas fa-qrcode"></i> QR</button>
+                    <button class="btn btn-primary btn-sm" onclick="printMemberCard()"><i class="fas fa-print"></i> พิมพ์</button>
+                    <button class="btn btn-success btn-sm" onclick="printMemberCard()"><i class="fas fa-file-pdf"></i> PDF</button>
                 </div>
             </div>
 
@@ -2699,7 +2770,7 @@
     <div class="toast" id="toast"></div>
 
     <!-- ============================================================
-    JAVASCRIPT (คงเดิม — ปรับเฉพาะส่วนแสดง QR/Info)
+    JAVASCRIPT (ไม่มีการเปลี่ยนแปลง)
     ============================================================ -->
     <script>
         // ============================================================
@@ -3612,7 +3683,7 @@
         }
 
         // ============================================================
-        // PROFILE — ปรับบัตรให้ QR อยู่ขวา ข้อมูลซ้าย
+        // PROFILE — ฟังก์ชันการทำงานเดิม (ไม่เปลี่ยนแปลง)
         // ============================================================
         async function loadProfile() {
             try {
@@ -3745,11 +3816,11 @@
                 return;
             }
             try {
-                // ใช้ขนาด 60x60 เพื่อให้พอดีกับพื้นที่ในบัตร
+                // ใช้ขนาด 68x68 ให้พอดีกับบัตรบนมือถือ
                 qrCodeInstance = new QRCode(container, {
                     text: memberId || 'G-XXXX',
-                    width: 60,
-                    height: 60,
+                    width: 68,
+                    height: 68,
                     colorDark: '#0f172a',
                     colorLight: '#ffffff',
                     correctLevel: QRCode.CorrectLevel.H
