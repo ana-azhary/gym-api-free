@@ -4006,37 +4006,66 @@
 
             switch (type) {
                 case 'members': {
-                    title = '👥 สมาชิกทั้งหมด';
-                    if (!allMembers.length) {
-                        content = 'ไม่มีข้อมูลสมาชิก';
-                    } else {
-                        let table =
-                            `<table class="rank-table"><thead><tr><th>รหัส</th><th>ชื่อ</th><th>เบอร์</th><th>ประเภท</th><th>สถานะ</th><th>หมดอายุ</th><th>ติดต่อ</th></tr></thead><tbody>`;
-                        allMembers.forEach(m => {
-                            const phone = m.phone || '';
-                            const wa = formatPhoneForWhatsApp(phone);
-                            const waLink = wa ? `https://wa.me/${wa}?text=${encodeURIComponent('👋 สวัสดี ' + m.full_name + ' จาก Pro Gym ครับ')}` : '#';
-                            const statusMap = {
-                                'active': '✅ ใช้งาน',
-                                'expired': '🔴 หมดอายุ',
-                                'expiring_soon': '🟡 ใกล้หมดอายุ',
-                                'no_payment': '⚪ ยังไม่ชำระ'
-                            };
-                            table += `<tr>
-                                    <td><strong>${m.member_id||'-'}</strong></td>
-                                    <td>${m.full_name||'-'}</td>
-                                    <td>${phone||'-'}</td>
-                                    <td>${m.membership_type||'-'}</td>
-                                    <td>${statusMap[m.status] || m.status || '-'}</td>
-                                    <td>${formatDate(m.expiry_date)}</td>
-                                    <td>${wa ? `<a href="${waLink}" target="_blank" class="btn btn-whatsapp btn-sm"><i class="fab fa-whatsapp"></i></a>` : '-'}</td>
-                                </tr>`;
-                        });
-                        table += '</tbody></table>';
-                        content = `จำนวน: <strong>${allMembers.length}</strong> คน<br><br>${table}`;
-                    }
-                    break;
-                }
+    title = '👥 สมาชิกทั้งหมด';
+    if (!allMembers.length) {
+        content = 'ไม่มีข้อมูลสมาชิก';
+    } else {
+        // ฟังก์ชันคำนวณสถานะจากวันหมดอายุโดยตรง
+        const getMemberStatus = (m) => {
+            if (!m.expiry_date) {
+                return { label: '✅ ใช้งาน', class: 'active', icon: 'fa-check-circle' };
+            }
+            const expDate = normalizeDate(m.expiry_date);
+            if (!expDate) {
+                return { label: '✅ ใช้งาน', class: 'active', icon: 'fa-check-circle' };
+            }
+            const diff = daysBetween(getTodayStr(), expDate);
+            if (diff < 0) {
+                return { label: '🔴 หมดอายุ', class: 'expired', icon: 'fa-times-circle' };
+            } else if (diff <= 7) {
+                return { label: '🟡 ใกล้หมดอายุ', class: 'expiring', icon: 'fa-clock' };
+            } else {
+                return { label: '✅ ใช้งาน', class: 'active', icon: 'fa-check-circle' };
+            }
+        };
+
+        let table = `
+            <table class="rank-table">
+                <thead>
+                    <tr>
+                        <th>รหัส</th>
+                        <th>ชื่อ</th>
+                        <th>เบอร์</th>
+                        <th>ประเภท</th>
+                        <th>สถานะ</th>
+                        <th>หมดอายุ</th>
+                        <th>ติดต่อ</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        allMembers.forEach(m => {
+            const phone = m.phone || '';
+            const wa = formatPhoneForWhatsApp(phone);
+            const waLink = wa ? `https://wa.me/${wa}?text=${encodeURIComponent('👋 สวัสดี ' + m.full_name + ' จาก Pro Gym ครับ')}` : '#';
+            const status = getMemberStatus(m);
+            table += `
+                <tr>
+                    <td><strong>${m.member_id || '-'}</strong></td>
+                    <td>${m.full_name || '-'}</td>
+                    <td>${phone || '-'}</td>
+                    <td>${m.membership_type || '-'}</td>
+                    <td><span class="status-badge ${status.class}"><i class="fas ${status.icon}"></i> ${status.label}</span></td>
+                    <td>${formatDate(m.expiry_date)}</td>
+                    <td>${wa ? `<a href="${waLink}" target="_blank" class="btn btn-whatsapp btn-sm"><i class="fab fa-whatsapp"></i></a>` : '-'}</td>
+                </tr>
+            `;
+        });
+        table += '</tbody></table>';
+        content = `จำนวน: <strong>${allMembers.length}</strong> คน<br><br>${table}`;
+    }
+    break;
+}
 
                 case 'renewal': {
                     title = '🔄 อัตราการต่ออายุ';
