@@ -648,7 +648,7 @@
             background: var(--stat-green);
         }
         .stat-card-click:nth-child(3)::before {
-            background: var(--stat-amber);
+            background: var(--stat-green); /* เปลี่ยนจาก amber เป็น green */
         }
         .stat-card-click:nth-child(4)::before {
             background: var(--stat-red);
@@ -2492,12 +2492,13 @@
                     <div class="label">อัตราต่ออายุ</div>
                 </div>
 
+                <!-- การ์ดที่ 3: เปลี่ยนจาก "เข้าวันนี้" เป็น "สมาชิกเข้าใช้" -->
                 <div class="stat-card-click" onclick="showStatDetail('todayCheckins')">
                     <div class="stat-top">
-                        <div class="stat-icon amber"><i class="fas fa-check-circle"></i></div>
+                        <div class="stat-icon green"><i class="fas fa-user-check"></i></div>
                     </div>
                     <div class="num" id="statTodayCheckins">-</div>
-                    <div class="label">เข้าวันนี้</div>
+                    <div class="label">สมาชิกเข้าใช้</div>
                 </div>
 
                 <div class="stat-card-click" onclick="showStatDetail('expiring')">
@@ -3633,51 +3634,68 @@
         // ============================================================
         // LOGIN / LOGOUT
         // ============================================================
-        function checkAuth() {
-            const role = localStorage.getItem('gym_role');
-            const user = localStorage.getItem('gym_user');
-            if (role === 'admin' || role === 'member') {
-                document.getElementById('loginPage').style.display = 'none';
-                document.getElementById('appMain').style.display = 'block';
-                const navItems = document.querySelectorAll('.nav-item');
-                if (role === 'admin') {
-                    navItems.forEach(item => {
-                        const page = item.dataset.page;
-                        if (page === 'profile') item.style.display = 'none';
-                        else item.style.display = 'flex';
-                    });
-                    profileMemberId = null;
-                    document.getElementById('sidebarUserName').textContent = 'Admin';
-                    document.getElementById('sidebarUserRole').textContent = 'ผู้ดูแลระบบ';
-                    document.getElementById('sidebarAvatar').textContent = 'A';
-                    refreshDashboard();
-                    fetchMembers();
-                    fetchCheckins();
-                    fetchPayments();
-                    loadAnalytics();
-                    switchTab('dashboard');
-                } else if (role === 'member' && user) {
-                    navItems.forEach(item => {
-                        const page = item.dataset.page;
-                        if (page === 'profile') item.style.display = 'flex';
-                        else item.style.display = 'none';
-                    });
-                    profileMemberId = user;
-                    document.getElementById('sidebarUserName').textContent = 'สมาชิก';
-                    document.getElementById('sidebarUserRole').textContent = 'ผู้ใช้งาน';
-                    document.getElementById('sidebarAvatar').textContent = 'M';
-                    setTimeout(() => {
-                        loadProfile();
-                        switchTab('profile');
-                    }, 300);
-                }
-                document.getElementById('profileNav').style.display = role === 'member' ? 'flex' : 'none';
-                startAutoRefresh();
-                return true;
-            }
-            return false;
-        }
+// ============================================================
+// แก้ไข checkAuth() — ให้ member โหลดข้อมูล allMembers & allCheckins
+// ============================================================
+function checkAuth() {
+    const role = localStorage.getItem('gym_role');
+    const user = localStorage.getItem('gym_user');
+    if (role === 'admin' || role === 'member') {
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('appMain').style.display = 'block';
 
+        // 🔥 ตั้งค่า sidebar
+        const navItems = document.querySelectorAll('.nav-item');
+        if (role === 'admin') {
+            navItems.forEach(item => {
+                const page = item.dataset.page;
+                if (page === 'profile') item.style.display = 'none';
+                else item.style.display = 'flex';
+            });
+            profileMemberId = null;
+            document.getElementById('sidebarUserName').textContent = 'Admin';
+            document.getElementById('sidebarUserRole').textContent = 'ผู้ดูแลระบบ';
+            document.getElementById('sidebarAvatar').textContent = 'A';
+            refreshDashboard();
+            fetchMembers();
+            fetchCheckins();
+            fetchPayments();
+            loadAnalytics();
+            switchTab('dashboard');
+        } else if (role === 'member' && user) {
+            navItems.forEach(item => {
+                const page = item.dataset.page;
+                if (page === 'profile') item.style.display = 'flex';
+                else item.style.display = 'none';
+            });
+            profileMemberId = user;
+            document.getElementById('sidebarUserName').textContent = 'สมาชิก';
+            document.getElementById('sidebarUserRole').textContent = 'ผู้ใช้งาน';
+            document.getElementById('sidebarAvatar').textContent = 'M';
+
+            // 🔥 โหลดข้อมูล allMembers และ allCheckins ก่อนเข้าหน้าโปรไฟล์
+            Promise.all([
+                apiCall('/members').then(d => { allMembers = d.data || []; }),
+                apiCall('/checkin').then(d => { allCheckins = d.data || []; })
+            ]).then(() => {
+                setTimeout(() => {
+                    loadProfile();
+                    switchTab('profile');
+                }, 300);
+            }).catch(() => {
+                // ถ้าโหลดไม่สำเร็จ ก็ยังเข้าโปรไฟล์ได้ (ใช้ข้อมูลที่มีอยู่)
+                setTimeout(() => {
+                    loadProfile();
+                    switchTab('profile');
+                }, 300);
+            });
+        }
+        document.getElementById('profileNav').style.display = role === 'member' ? 'flex' : 'none';
+        startAutoRefresh();
+        return true;
+    }
+    return false;
+}
         async function handleLogin() {
             const user = $('loginUser').value.trim();
             const pass = $('loginPass').value.trim();
@@ -4074,10 +4092,10 @@
                 }
 
                 case 'todayCheckins': {
-                    title = '✅ เช็คอินวันนี้';
+                    title = '✅ สมาชิกเข้าใช้วันนี้'; // เปลี่ยนชื่อ
                     const todayCheckins = allCheckins.filter(c => normalizeDate(c.checkin_date) === todayStr);
                     if (!todayCheckins.length) {
-                        content = 'วันนี้ยังไม่มีเช็คอิน';
+                        content = 'วันนี้ยังไม่มีสมาชิกเข้าใช้';
                     } else {
                         let table =
                             `<table class="rank-table"><thead><tr><th>#</th><th>รหัส</th><th>ชื่อ</th><th>เวลา</th><th>ติดต่อ</th></tr></thead><tbody>`;
@@ -4986,56 +5004,78 @@
             });
         }
 
-        // ============================================================
-        // MEMBER DASHBOARD STATS
-        // ============================================================
-        function updateMemberDashboard() {
-            if (!profileMember) return;
-            const m = profileMember;
-            const today = getTodayStr();
-            const thisMonth = today.slice(0, 7);
-            const monthPayments = profilePayments.filter(p => p.payment_date && normalizeDate(p.payment_date).slice(0, 7) ===
-                thisMonth);
-            const totalPaid = monthPayments.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
-            $('mStatRevenue').textContent = formatNumber(totalPaid) + ' ฿';
-            const monthCheckins = profileCheckins.filter(c => c.checkin_date && normalizeDate(c.checkin_date).slice(0, 7) ===
-                thisMonth);
-            const count = monthCheckins.length;
-            let rankTitle = '<i class="fas fa-seedling"></i> เริ่มต้น';
-            if (count >= 25) rankTitle = '<i class="fas fa-crown"></i> ราชา';
-            else if (count >= 20) rankTitle = '<i class="fas fa-dumbbell"></i> นักสู้';
-            else if (count >= 15) rankTitle = '<i class="fas fa-running"></i> ขยัน';
-            else if (count >= 10) rankTitle = '<i class="fas fa-thumbs-up"></i> พอใช้';
-            else if (count >= 5) rankTitle = '<i class="fas fa-bed"></i> ขี้เกียจ';
-            $('mStatRank').innerHTML = rankTitle + ` (${count} ครั้ง)`;
-            const monthCheckinsAll = allCheckins.filter(c => c.checkin_date && normalizeDate(c.checkin_date).slice(0, 7) ===
-                thisMonth);
-            const hourCounts = {};
-            monthCheckinsAll.forEach(c => {
-                if (c.checkin_time) {
-                    const h = c.checkin_time.split(':')[0];
-                    hourCounts[h] = (hourCounts[h] || 0) + 1;
-                }
-            });
-            let maxHour = '-',
-                maxCount = 0;
-            for (const [h, cnt] of Object.entries(hourCounts)) {
-                if (cnt > maxCount) {
-                    maxCount = cnt;
-                    maxHour = h;
-                }
-            }
-            $('mStatPeak').textContent = maxHour !== '-' ? `${maxHour}:00 (${maxCount} ครั้ง)` : 'ไม่มีข้อมูล';
-            const todayCheckinsAll = allCheckins.filter(c => normalizeDate(c.checkin_date) === today).length;
-            $('mStatPercent').textContent = todayCheckinsAll + ' คน';
-            let daysLeft = '-';
-            if (profileExpiryStr && profileExpiryStr !== '-') {
-                const diff = daysBetween(today, normalizeDate(profileExpiryStr));
-                daysLeft = diff >= 0 ? diff + ' วัน' : 'หมดอายุ';
-            }
-            $('mStatDaysLeft').textContent = daysLeft;
-            $('mStatPoints').textContent = m.points || 0;
+// ============================================================
+// แก้ไขฟังก์ชัน updateMemberDashboard() — แสดง % การเข้าใช้ของวันนี้
+// ============================================================
+function updateMemberDashboard() {
+    if (!profileMember) return;
+    const m = profileMember;
+    const today = getTodayStr();
+    const thisMonth = today.slice(0, 7);
+
+    // 1. ยอดชำระเดือนนี้
+    const monthPayments = profilePayments.filter(p => p.payment_date && normalizeDate(p.payment_date).slice(0, 7) === thisMonth);
+    const totalPaid = monthPayments.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
+    $('mStatRevenue').textContent = formatNumber(totalPaid) + ' ฿';
+
+    // 2. ฉายาประจำเดือน
+    const monthCheckins = profileCheckins.filter(c => c.checkin_date && normalizeDate(c.checkin_date).slice(0, 7) === thisMonth);
+    const count = monthCheckins.length;
+    let rankTitle = '<i class="fas fa-seedling"></i> เริ่มต้น';
+    if (count >= 25) rankTitle = '<i class="fas fa-crown"></i> ราชา';
+    else if (count >= 20) rankTitle = '<i class="fas fa-dumbbell"></i> นักสู้';
+    else if (count >= 15) rankTitle = '<i class="fas fa-running"></i> ขยัน';
+    else if (count >= 10) rankTitle = '<i class="fas fa-thumbs-up"></i> พอใช้';
+    else if (count >= 5) rankTitle = '<i class="fas fa-bed"></i> ขี้เกียจ';
+    $('mStatRank').innerHTML = rankTitle + ` (${count} ครั้ง)`;
+
+    // 3. เวลาคนเข้าใช้มากสุด (ของสมาชิกคนนี้)
+    const memberHourCounts = {};
+    profileCheckins.forEach(c => {
+        if (c.checkin_time) {
+            const h = c.checkin_time.split(':')[0];
+            memberHourCounts[h] = (memberHourCounts[h] || 0) + 1;
         }
+    });
+    let maxHour = '-',
+        maxCount = 0;
+    for (const [h, cnt] of Object.entries(memberHourCounts)) {
+        if (cnt > maxCount) { maxCount = cnt;
+            maxHour = h; }
+    }
+    $('mStatPeak').textContent = maxHour !== '-' ? `${maxHour}:00 (${maxCount} ครั้ง)` : 'ไม่มีข้อมูล';
+
+    // 4. 🔥 เช็คอินวันนี้ — แสดงเป็น % ของสมาชิกทั้งหมดที่เข้าใช้
+    const totalMembers = allMembers.length || 1;
+    const todayCheckinsAll = allCheckins.filter(c => normalizeDate(c.checkin_date) === today).length;
+    const percentage = Math.round((todayCheckinsAll / totalMembers) * 100);
+    $('mStatPercent').textContent = percentage + '%';
+    // เปลี่ยนสีตามเปอร์เซ็นต์
+    const card = $('mStatPercent').closest('.stat-card-click');
+    if (card) {
+        if (percentage >= 50) {
+            card.style.borderRight = '4px solid var(--success)';
+        } else if (percentage >= 25) {
+            card.style.borderRight = '4px solid var(--warning)';
+        } else {
+            card.style.borderRight = '4px solid var(--danger)';
+        }
+    }
+    // เก็บข้อมูลไว้ใช้ใน modal
+    window._todayCheckinsAll = todayCheckinsAll;
+    window._todayPercentage = percentage;
+
+    // 5. เหลือวันต่ออายุ
+    let daysLeft = '-';
+    if (profileExpiryStr && profileExpiryStr !== '-') {
+        const diff = daysBetween(today, normalizeDate(profileExpiryStr));
+        daysLeft = diff >= 0 ? diff + ' วัน' : 'หมดอายุ';
+    }
+    $('mStatDaysLeft').textContent = daysLeft;
+
+    // 6. แต้มสะสม
+    $('mStatPoints').textContent = m.points || 0;
+}
 
         // ============================================================
         // WHATSAPP, QR, MODAL, CARD DETAIL, CSV, DEBUG
