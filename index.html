@@ -1084,7 +1084,7 @@
         }
 
         /* ============================================================
-           MEMBER STATS GRID — 6 ใบใหม่
+           MEMBER STATS GRID — 6 ใบ
            ============================================================ */
         .member-stats-grid {
             display: grid;
@@ -1095,7 +1095,7 @@
 
         .member-stats-grid .stat-card-click {
             padding: 10px 12px;
-            min-height: 90px;
+            min-height: 80px;
             justify-content: center;
         }
 
@@ -1110,7 +1110,7 @@
         }
 
         .member-stats-grid .stat-card-click .label {
-            font-size: 11px;
+            font-size: 10px;
         }
 
         .member-stats-grid .stat-card-click .stat-top {
@@ -1310,7 +1310,7 @@
         }
 
         /* ============================================================
-           CALENDAR — พร้อมลูกเล่น
+           CALENDAR
            ============================================================ */
         .calendar-grid {
             display: grid;
@@ -2195,11 +2195,52 @@
         }
 
         /* ============================================================
+           BMI ENCOURAGEMENT
+           ============================================================ */
+        .bmi-encouragement {
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            margin-top: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+            border-right: 4px solid;
+            animation: fadeSlide 0.5s ease;
+        }
+
+        .bmi-encouragement.healthy {
+            background: rgba(16, 185, 129, 0.08);
+            color: var(--success);
+            border-right-color: var(--success);
+        }
+
+        .bmi-encouragement.underweight {
+            background: rgba(245, 158, 11, 0.08);
+            color: var(--warning);
+            border-right-color: var(--warning);
+        }
+
+        .bmi-encouragement.overweight {
+            background: rgba(239, 68, 68, 0.08);
+            color: var(--danger);
+            border-right-color: var(--danger);
+        }
+
+        .bmi-encouragement.obese {
+            background: rgba(239, 68, 68, 0.12);
+            color: var(--danger);
+            border-right-color: var(--danger);
+        }
+
+        /* ============================================================
            RESPONSIVE
            ============================================================ */
         @media (max-width: 1200px) {
             .stats-grid {
                 grid-template-columns: repeat(4, 1fr);
+            }
+            .member-stats-grid {
+                grid-template-columns: repeat(3, 1fr);
             }
         }
 
@@ -2449,7 +2490,7 @@
 
             .member-stats-grid .stat-card-click {
                 padding: 6px 8px;
-                min-height: 70px;
+                min-height: 65px;
             }
 
             .member-stats-grid .stat-card-click .num {
@@ -2702,7 +2743,7 @@
 
             .member-stats-grid .stat-card-click {
                 padding: 4px 6px;
-                min-height: 60px;
+                min-height: 55px;
             }
 
             .member-stats-grid .stat-card-click .num {
@@ -2955,7 +2996,19 @@
         }
 
         /* ============================================================
-           PRINT STYLE — พิมพ์บัตร
+           TOP HOUR — เน้นสีแดง
+           ============================================================ */
+        .top-hour-highlight {
+            color: var(--danger) !important;
+            font-weight: 800 !important;
+            background: rgba(239, 68, 68, 0.08) !important;
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(239, 68, 68, 0.15);
+        }
+
+        /* ============================================================
+           PRINT STYLE
            ============================================================ */
         @media print {
             body * {
@@ -3457,10 +3510,10 @@
         ============================================================ -->
         <div id="page-profile" class="page-section">
 
-            <!-- 6 Member Stat Cards (แก้ไขใหม่) -->
+            <!-- 6 Member Stat Cards -->
             <div class="member-stats-grid" id="memberStatsGrid">
 
-                <!-- 1. ยอดชำระเงินเดือนนี้ -->
+                <!-- 1. ยอดชำระเดือนนี้ -->
                 <div class="stat-card-click" onclick="showCardDetail('member_revenue')">
                     <div class="stat-top"><div class="stat-icon blue"><i class="fas fa-coins"></i></div></div>
                     <div class="num" id="mStatRevenue">-</div>
@@ -3474,7 +3527,7 @@
                     <div class="label">⭐ แต้มสะสม (เข้าทั้งหมด)</div>
                 </div>
 
-                <!-- 3. เวลาคนเข้าใช้มากสุด (3 ชั่วโมง) -->
+                <!-- 3. เวลาคนเข้าใช้มากสุด (TOP 1 สีแดง) -->
                 <div class="stat-card-click" onclick="showCardDetail('member_peak')">
                     <div class="stat-top"><div class="stat-icon amber"><i class="fas fa-clock"></i></div></div>
                     <div class="num" id="mStatPeak">-</div>
@@ -3564,7 +3617,7 @@
             </div>
 
             <!-- ============================================================
-            NEW: ฉายาคนเข้าฟิตเนสมากที่สุดประจำปี (Top 7)
+            🏆 ฉายาคนเข้าฟิตเนสมากที่สุดประจำปี (Top 7)
             ============================================================ -->
             <div class="card-panel" id="top7Panel">
                 <div class="card-header">
@@ -3577,7 +3630,7 @@
             </div>
 
             <!-- ============================================================
-            เป้าหมายเข้าใช้รายเดือน (พร้อมกำลังใจ)
+            🎯 เป้าหมายเข้าใช้รายเดือน (พร้อมกำลังใจ)
             ============================================================ -->
             <div class="card-panel" id="goalSection">
                 <div class="flex-center" style="justify-content:space-between; flex-wrap:wrap; gap:6px;">
@@ -3596,14 +3649,13 @@
                         <div class="fill" id="goalProgressFill" style="width:0%;"></div>
                     </div>
                 </div>
-                <!-- กำลังใจ -->
                 <div id="goalEncouragement" class="goal-encouragement started">
                     💪 เริ่มต้นการเดินทางของคุณวันนี้!
                 </div>
             </div>
 
             <!-- ============================================================
-            ปฏิทินเข้าใช้ (พร้อมลูกเล่น)
+            📅 ปฏิทินเข้าใช้ (พร้อมลูกเล่น)
             ============================================================ -->
             <div class="card-panel" id="calendarSection">
                 <div class="card-header">
@@ -3612,17 +3664,16 @@
                 </div>
                 <div class="calendar-grid" id="calendarContainer"></div>
                 <div id="calendarTimeDetail" style="margin-top:10px; font-size:13px; color:var(--primary); text-align:center; font-weight:600;"></div>
-                <!-- กำลังใจปฏิทิน -->
                 <div id="calendarEncouragement" style="margin-top:8px; text-align:center; font-size:12px; color:var(--text-muted);">
                     💪 ทุกวันคือโอกาสใหม่!
                 </div>
             </div>
 
             <!-- ============================================================
-            Weight & BMI
+            📝 บันทึกน้ำหนักและ BMI (พร้อมกำลังใจ)
             ============================================================ -->
             <div class="card-panel" id="weightSection">
-                <h3 style="font-size:16px;font-weight:700;"><i class="fas fa-weight" style="color:var(--primary);"></i> บันทึกน้ำหนักและ BMI</h3>
+                <h3 style="font-size:16px;font-weight:700;"><i class="fas fa-weight" style="color:var(--primary);"></i> 📝 บันทึกน้ำหนักและ BMI</h3>
                 <div class="form-row">
                     <input type="number" id="weightInput" placeholder="น้ำหนัก (กก.)" step="0.1" style="flex:0 0 120px;" />
                     <input type="number" id="heightInput" placeholder="ส่วนสูง (ซม.)" step="0.1" style="flex:0 0 120px;" />
@@ -3631,6 +3682,10 @@
                 <div style="margin-top:10px;display:flex;gap:24px;flex-wrap:wrap;">
                     <span><strong>BMI:</strong> <span id="bmiDisplay" style="color:var(--primary);font-weight:700;">-</span></span>
                     <span><strong>สถานะ:</strong> <span id="bmiStatus" style="font-weight:700;">-</span></span>
+                </div>
+                <!-- BMI กำลังใจ -->
+                <div id="bmiEncouragement" class="bmi-encouragement healthy" style="display:none;">
+                    💪 รักษาสุขภาพให้แข็งแรงต่อไป!
                 </div>
                 <div style="margin-top:12px;max-height:180px;"><canvas id="weightChart"></canvas></div>
             </div>
@@ -3745,7 +3800,7 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- ============================================================
-    JAVASCRIPT
+    JAVASCRIPT — Full Version
     ============================================================ -->
     <script>
         // ============================================================
@@ -3982,7 +4037,7 @@
         }
 
         // ============================================================
-        // WHATSAPP HELPERS (Egypt +20)
+        // WHATSAPP HELPERS
         // ============================================================
         function formatPhoneForWhatsApp(phone) {
             if (!phone) return null;
@@ -4068,7 +4123,6 @@
             showToast(`📱 เปิด WhatsApp ให้ ${name}`, 'info');
         }
 
-        // Bulk WhatsApp functions
         function sendWhatsAppExpiryReminderBulk() {
             const today = getTodayStr();
             const expiring = allMembers.filter(m => m.status === 'expiring_soon' && m.phone);
@@ -5511,7 +5565,7 @@
         }
 
         // ============================================================
-        // UPDATE MEMBER DASHBOARD — 6 การ์ด
+        // UPDATE MEMBER DASHBOARD — 6 การ์ด (ปรับปรุง)
         // ============================================================
         function updateMemberDashboard() {
             if (!profileMember) return;
@@ -5525,11 +5579,11 @@
             const totalPaid = monthPayments.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
             $('mStatRevenue').textContent = formatNumber(totalPaid) + ' ฿';
 
-            // 2. ⭐ แต้มสะสม = จำนวนการเข้าทั้งหมด
+            // 2. ⭐ แต้มสะสม = จำนวนการเข้าทั้งหมดของสมาชิกคนนี้
             const totalCheckins = profileCheckins.length;
             $('mStatPoints').textContent = totalCheckins;
 
-            // 3. ⏰ เวลาเข้าใช้มากสุด (3 อันดับในเดือนนี้)
+            // 3. ⏰ เวลาเข้าใช้มากสุด (TOP 1 — เน้นสีแดง)
             const monthCheckinsAll = allCheckins.filter(c => c.checkin_date && normalizeDate(c.checkin_date).slice(0, 7) ===
                 thisMonth);
             const hourCounts = {};
@@ -5539,10 +5593,12 @@
                     hourCounts[h] = (hourCounts[h] || 0) + 1;
                 }
             });
-            const sortedHours = Object.entries(hourCounts).sort((a, b) => b[1] - a[1]).slice(0, 3);
+            const sortedHours = Object.entries(hourCounts).sort((a, b) => b[1] - a[1]);
             if (sortedHours.length > 0) {
-                const labels = sortedHours.map(([h, cnt]) => `${h}:00 (${cnt} ครั้ง)`);
-                $('mStatPeak').textContent = labels.join(' | ');
+                const top = sortedHours[0];
+                // แสดง TOP 1 พร้อมสีแดง
+                $('mStatPeak').innerHTML =
+                    `<span class="top-hour-highlight">${top[0]}:00</span> (${top[1]} ครั้ง)`;
             } else {
                 $('mStatPeak').textContent = 'ไม่มีข้อมูล';
             }
@@ -5675,7 +5731,7 @@
                     break;
                 }
 
-                // 3. ⏰ เวลาเข้าใช้มากสุด (3 อันดับ)
+                // 3. ⏰ เวลาเข้าใช้มากสุด (TOP 3 — เน้น TOP 1 สีแดง)
                 case 'member_peak': {
                     const monthCheckinsAll = allCheckins.filter(c => c.checkin_date && normalizeDate(c.checkin_date).slice(0,
                         7) === thisMonth);
@@ -5695,10 +5751,12 @@
                         let tableHtml =
                             `<table class="rank-table"><thead><tr><th>อันดับ</th><th>เวลา</th><th>จำนวนครั้ง</th></tr></thead><tbody>`;
                         sorted.forEach(([hour, cnt], idx) => {
-                            const cls = idx === 0 ? 'rank-1' : idx === 1 ? 'rank-2' : 'rank-3';
+                            const cls = idx === 0 ? 'rank-1 top-hour-highlight' : idx === 1 ? 'rank-2' :
+                                'rank-3';
+                            const style = idx === 0 ? 'font-size:18px;font-weight:800;' : '';
                             tableHtml += `<tr>
                                         <td class="rank-badge ${cls}">${medals[idx]}</td>
-                                        <td><strong>${hour}:00</strong></td>
+                                        <td style="${style}"><strong>${hour}:00</strong></td>
                                         <td>${cnt} ครั้ง</td>
                                     </tr>`;
                         });
@@ -5844,10 +5902,15 @@
                 const member = allMembers.find(m => m.member_id === memberId);
                 const name = member ? member.full_name : memberId;
                 const colorClass = colors[idx] ? colors[idx] : '';
+
+                // ตรวจสอบว่าสมาชิกคนนี้คือตัวเราไหม
+                const isMe = memberId === profileMemberId;
+                const meBadge = isMe ? ' 👈 คุณ' : '';
+
                 html += `
                     <div class="top7-item ${colorClass}">
                         <span class="rank-medal">${medals[idx] || '🏅'}</span>
-                        <div class="top7-name">${name}</div>
+                        <div class="top7-name">${name}${meBadge}</div>
                         <div class="top7-points">⭐ ${count} ครั้ง</div>
                         <div class="top7-title">${titles[idx] || 'กำลังมาแรง'}</div>
                     </div>
@@ -5855,9 +5918,28 @@
             });
             html += '</div>';
 
-            // เพิ่มสรุป
+            // กำลังใจเพิ่มเติม
+            const myRank = sorted.findIndex(([id]) => id === profileMemberId);
+            let encouragementMsg = '';
+            if (myRank === 0) {
+                encouragementMsg = '👑 คุณคือที่สุด! เก่งมาก! เป็นแรงบันดาลใจให้คนอื่น! 💪';
+            } else if (myRank === 1) {
+                encouragementMsg = '🥈 เยี่ยมมาก! อีกนิดก็ถึงอันดับ 1 แล้ว! ไปต่อ! 💪';
+            } else if (myRank === 2) {
+                encouragementMsg = '🥉 สุดยอด! ติด 3 อันดับแรก! ภูมิใจในตัวเองได้เลย! 🏆';
+            } else if (myRank >= 0 && myRank < 7) {
+                encouragementMsg = '🌟 คุณอยู่ใน 7 อันดับแรก! เก่งมาก! ตั้งใจต่อไป! 💪';
+            } else {
+                encouragementMsg = '💪 ทุกก้าวมีความหมาย! ตั้งใจต่อไป แล้วคุณจะขึ้นมาได้! 🚀';
+            }
+
             html +=
-                `<div style="text-align:center;margin-top:10px;font-size:12px;color:var(--text-muted);">
+                `<div style="text-align:center;margin-top:10px;padding:8px 12px;background:var(--bg-body);border-radius:var(--radius-sm);border-right:4px solid var(--accent);font-size:13px;color:var(--text-secondary);">
+                    ${encouragementMsg}
+                </div>`;
+
+            html +=
+                `<div style="text-align:center;margin-top:8px;font-size:11px;color:var(--text-muted);">
                     <i class="fas fa-calendar-alt"></i> ข้อมูล 1 ปีล่าสุด (${formatDate(oneYearAgoStr)} - ${formatDate(getTodayStr())})
                 </div>`;
 
@@ -5966,7 +6048,7 @@
         }
 
         // ============================================================
-        // PDF MEMBER CARD — ใช้ html2canvas ถ่ายรูปการ์ด
+        // PDF MEMBER CARD
         // ============================================================
         function downloadMemberCardPDF() {
             const card = document.getElementById('memberCardPreview');
@@ -6030,7 +6112,6 @@
             const fill = $('goalProgressFill');
             fill.style.width = pct + '%';
 
-            // กำลังใจ
             const encouragement = $('goalEncouragement');
             if (count >= goalTarget) {
                 fill.classList.add('complete');
@@ -6066,7 +6147,7 @@
         }
 
         // ============================================================
-        // CALENDAR — ปฏิทินพร้อมลูกเล่น
+        // CALENDAR
         // ============================================================
         function renderCalendar() {
             const container = $('calendarContainer');
@@ -6085,7 +6166,6 @@
                 }
             });
 
-            // คำนวณ streak
             let streak = 0;
             const today = getTodayStr();
             let checkDate = today;
@@ -6114,7 +6194,6 @@
                 const isToday = dateStr === today;
                 const times = hasCheckin ? checkinMap[dateStr].join(', ') : '';
 
-                // คำนวณสตรีค badge
                 let badge = '';
                 if (hasCheckin) {
                     let streakCount = 0;
@@ -6139,7 +6218,6 @@
             container.innerHTML = html;
             document.getElementById('calendarTimeDetail').innerHTML = '';
 
-            // กำลังใจปฏิทิน
             const enc = $('calendarEncouragement');
             if (streak >= 7) {
                 enc.innerHTML = '🔥 7 วันติด! คุณเป็นสุดยอด! 💪👑';
@@ -6174,7 +6252,7 @@
         }
 
         // ============================================================
-        // WEIGHT & BMI
+        // WEIGHT & BMI — พร้อมกำลังใจ
         // ============================================================
         function loadWeightData() {
             const stored = localStorage.getItem('weight_' + profileMemberId);
@@ -6210,16 +6288,43 @@
         function updateBMI() {
             const last = weightRecords[weightRecords.length - 1];
             if (!last) { $('bmiDisplay').textContent = '-';
-                $('bmiStatus').textContent = '-'; return; }
+                $('bmiStatus').textContent = '-';
+                document.getElementById('bmiEncouragement').style.display = 'none';
+                return; }
             const h = last.height || 175;
             const bmi = last.weight / ((h / 100) ** 2);
             $('bmiDisplay').textContent = bmi.toFixed(1);
+
+            const statusEl = $('bmiStatus');
+            const encEl = document.getElementById('bmiEncouragement');
             let status = 'ปกติ';
-            if (bmi < 18.5) status = 'ผอม';
-            else if (bmi < 25) status = 'ปกติ';
-            else if (bmi < 30) status = 'น้ำหนักเกิน';
-            else status = 'อ้วน';
-            $('bmiStatus').textContent = status;
+            let encClass = 'healthy';
+            let encMsg = '';
+
+            if (bmi < 18.5) {
+                status = 'ผอม';
+                encClass = 'underweight';
+                encMsg = '🍎 ทานอาหารที่มีประโยชน์ให้เพียงพอ และออกกำลังกายอย่างเหมาะสมนะ! 💪';
+            } else if (bmi < 25) {
+                status = 'ปกติ';
+                encClass = 'healthy';
+                encMsg = '💪 ดีมาก! รักษาสุขภาพให้แข็งแรงต่อไป! 🏃';
+            } else if (bmi < 30) {
+                status = 'น้ำหนักเกิน';
+                encClass = 'overweight';
+                encMsg = '💪 เริ่มปรับอาหารและเพิ่มการเคลื่อนไหว! คุณทำได้! 🚀';
+            } else {
+                status = 'อ้วน';
+                encClass = 'obese';
+                encMsg = '💪 อย่าท้อ! เริ่มทีละเล็กทีละน้อย เพื่อสุขภาพที่ดีขึ้น! 🏆';
+            }
+
+            statusEl.textContent = status;
+            statusEl.style.color = bmi < 25 ? 'var(--success)' : bmi < 30 ? 'var(--warning)' : 'var(--danger)';
+
+            encEl.className = `bmi-encouragement ${encClass}`;
+            encEl.textContent = encMsg;
+            encEl.style.display = 'block';
         }
 
         function renderWeightChart() {
@@ -6469,7 +6574,7 @@
             console.log('🔑 รหัสลับ Admin: adminreset-2026');
             console.log('👤 Admin: admin / admin123');
             console.log('⌨️ Ctrl+R = รีเฟรช, ESC = ปิด Modal');
-            console.log('✨ ฟีเจอร์ใหม่: Top 7 ประจำปี, กำลังใจเป้าหมาย, ปฏิทินสตรีค!');
+            console.log('✨ ฟีเจอร์ใหม่: TOP 1 เวลาเข้าใช้สีแดง, แต้ม = จำนวนเข้าทั้งหมด, BMI กำลังใจ, Top 7 แสดงชื่อตัวเอง');
         });
 
         document.addEventListener('click', function(e) {
