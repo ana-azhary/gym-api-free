@@ -5640,6 +5640,59 @@ case 'revenue': {
         }
 
         // ============================================================
+// REFRESH REVENUE CHART — ปุ่มรีเฟรชใน Modal
+// ============================================================
+function refreshRevenueChart() {
+    showToast('🔄 กำลังรีเฟรชกราฟ...', 'info');
+    
+    // 🔥 เก็บข้อมูลเก่าไว้ก่อน
+    const oldPayments = [...allPayments];
+    const oldMembers = [...allMembers];
+    const oldCheckins = [...allCheckins];
+    
+    // 🔥 รีเฟรชข้อมูล dashboard
+    refreshDashboard().then(() => {
+        // 🔥 ถ้าข้อมูลใหม่มีน้อยกว่า 3 เดือน ให้ใช้ข้อมูลเก่าผสาน
+        const revByMonth = {};
+        allPayments.forEach(p => {
+            if (p.payment_date) {
+                const m = normalizeDate(p.payment_date).slice(0, 7);
+                revByMonth[m] = (revByMonth[m] || 0) + parseFloat(p.amount || 0);
+            }
+        });
+        const sortedMonths = Object.keys(revByMonth).sort();
+        
+        // 🔥 ถ้ามีน้อยกว่า 3 เดือน ให้ใช้ข้อมูลเก่าผสาน
+        if (sortedMonths.length < 3 && oldPayments.length > 0) {
+            // ผสานข้อมูลเก่าและใหม่
+            const mergedPayments = [...oldPayments];
+            allPayments.forEach(p => {
+                if (!mergedPayments.some(old => old.payment_id === p.payment_id)) {
+                    mergedPayments.push(p);
+                }
+            });
+            allPayments = mergedPayments;
+            showToast('📊 ใช้ข้อมูลรวมจากเก่าและใหม่', 'info');
+        }
+        
+        // 🔥 ปิด Modal เก่า
+        closeTempModal();
+        // 🔥 เปิดใหม่
+        setTimeout(() => {
+            showStatDetail('revenue');
+        }, 300);
+    }).catch(() => {
+        // 🔥 ถ้ารีเฟรชไม่สำเร็จ ให้ใช้ข้อมูลเก่า
+        allPayments = oldPayments;
+        allMembers = oldMembers;
+        allCheckins = oldCheckins;
+        setTimeout(() => {
+            closeTempModal();
+            showStatDetail('revenue');
+        }, 300);
+    });
+}
+        // ============================================================
         // MEMBERS (Admin)
         // ============================================================
         async function fetchMembers() {
