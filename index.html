@@ -1386,7 +1386,7 @@
         }
 
         /* ============================================================
-           PROGRESS — เป้าหมายพร้อมกำลังใจ
+           PROGRESS
            ============================================================ */
         .progress-wrap {
             margin: 10px 0;
@@ -1687,7 +1687,7 @@
         }
 
         /* ============================================================
-           MODAL
+           MODAL — สวยงาม
            ============================================================ */
         .modal-overlay {
             display: none;
@@ -1709,11 +1709,11 @@
         .modal-box {
             background: var(--bg-surface);
             border-radius: var(--radius-lg);
-            max-width: 720px;
+            max-width: 500px;
             width: 100%;
             max-height: 95vh;
             overflow-y: auto;
-            padding: 28px 32px;
+            padding: 32px 36px;
             box-shadow: 0 40px 96px rgba(0, 0, 0, 0.3);
             animation: fadeUp 0.35s ease;
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -1734,20 +1734,22 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 16px;
+            margin-bottom: 20px;
         }
 
         .modal-box .modal-header h3 {
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 800;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             color: var(--text-primary);
         }
 
         .modal-box .modal-header .close {
-            font-size: 28px;
+            font-size: 30px;
             cursor: pointer;
             opacity: 0.4;
             transition: all var(--transition);
@@ -1760,6 +1762,96 @@
         .modal-box .modal-header .close:hover {
             opacity: 1;
             transform: rotate(90deg);
+        }
+
+        .modal-box .form-group {
+            margin-bottom: 14px;
+        }
+
+        .modal-box .form-group label {
+            display: block;
+            font-weight: 700;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .modal-box .form-group input,
+        .modal-box .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            border: 2px solid rgba(0, 0, 0, 0.06);
+            background: var(--bg-body);
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all 0.3s;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .modal-box .form-group input:focus,
+        .modal-box .form-group select:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(15, 59, 94, 0.10);
+        }
+
+        .modal-box .btn-submit {
+            width: 100%;
+            padding: 14px;
+            font-size: 16px;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .modal-box .btn-submit:hover {
+            transform: translateY(-2px);
+        }
+
+        .copy-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .copy-group input {
+            flex: 1;
+            padding: 10px 14px !important;
+            border-radius: var(--radius-sm) !important;
+            border: 2px solid rgba(15, 59, 94, 0.15) !important;
+            background: rgba(15, 59, 94, 0.04) !important;
+            color: var(--primary) !important;
+            font-weight: 700 !important;
+            font-size: 14px !important;
+        }
+
+        .copy-group .btn-copy {
+            flex-shrink: 0;
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: #fff;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 13px;
+        }
+
+        .copy-group .btn-copy:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(15, 59, 94, 0.25);
+        }
+
+        .copy-group .btn-copy.copied {
+            background: var(--success);
         }
 
         /* ============================================================
@@ -2233,6 +2325,70 @@
         }
 
         /* ============================================================
+           TOP HOUR — เน้นสีแดง
+           ============================================================ */
+        .top-hour-highlight {
+            color: var(--danger) !important;
+            font-weight: 800 !important;
+            background: rgba(239, 68, 68, 0.08) !important;
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(239, 68, 68, 0.15);
+        }
+
+        /* ============================================================
+           PRINT STYLE
+           ============================================================ */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .member-card-preview,
+            .member-card-preview * {
+                visibility: visible;
+            }
+            .member-card-preview {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                max-width: 100%;
+                width: 400px;
+                box-shadow: none !important;
+                border: 1px solid #ccc;
+                border-radius: 8px;
+                page-break-inside: avoid;
+                background: linear-gradient(145deg, #0f172a, #1e293b) !important;
+                color: #fff !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .member-card-preview .mc-header .mc-badge,
+            .member-card-preview .mc-header .mc-brand i {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .member-card-preview .mc-body .mc-qr {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .member-card-preview .mc-body .mc-qr canvas {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .member-card-preview::before,
+            .member-card-preview::after {
+                display: none !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .card-actions-row {
+                display: none !important;
+            }
+        }
+
+        /* ============================================================
            RESPONSIVE
            ============================================================ */
         @media (max-width: 1200px) {
@@ -2355,6 +2511,17 @@
             .top7-card {
                 grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             }
+
+            /* Modal responsive */
+            .modal-box {
+                max-width: 95%;
+                padding: 24px 20px;
+            }
+
+            .modal-box [style*="grid-template-columns: 1fr 1fr"] {
+                grid-template-columns: 1fr !important;
+                gap: 8px !important;
+            }
         }
 
         @media (max-width: 768px) {
@@ -2448,6 +2615,38 @@
 
             .top7-card {
                 grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            }
+
+            .modal-box {
+                padding: 20px 16px;
+            }
+
+            .modal-box .modal-header h3 {
+                font-size: 18px;
+            }
+
+            .modal-box .modal-header {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .copy-group {
+                flex-wrap: wrap;
+            }
+
+            .copy-group input {
+                flex: 1 1 100%;
+            }
+
+            .copy-group .btn-copy {
+                flex: 1 1 100%;
+                text-align: center;
+                padding: 8px 16px;
+            }
+
+            .modal-box [style*="grid-template-columns: 1fr 1fr"] {
+                grid-template-columns: 1fr !important;
+                gap: 8px !important;
             }
         }
 
@@ -2991,70 +3190,6 @@
 
         @media (max-width: 768px) {
             .hide-phone {
-                display: none !important;
-            }
-        }
-
-        /* ============================================================
-           TOP HOUR — เน้นสีแดง
-           ============================================================ */
-        .top-hour-highlight {
-            color: var(--danger) !important;
-            font-weight: 800 !important;
-            background: rgba(239, 68, 68, 0.08) !important;
-            padding: 2px 8px;
-            border-radius: 4px;
-            border: 1px solid rgba(239, 68, 68, 0.15);
-        }
-
-        /* ============================================================
-           PRINT STYLE
-           ============================================================ */
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-            .member-card-preview,
-            .member-card-preview * {
-                visibility: visible;
-            }
-            .member-card-preview {
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                max-width: 100%;
-                width: 400px;
-                box-shadow: none !important;
-                border: 1px solid #ccc;
-                border-radius: 8px;
-                page-break-inside: avoid;
-                background: linear-gradient(145deg, #0f172a, #1e293b) !important;
-                color: #fff !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-            .member-card-preview .mc-header .mc-badge,
-            .member-card-preview .mc-header .mc-brand i {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-            .member-card-preview .mc-body .mc-qr {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-            .member-card-preview .mc-body .mc-qr canvas {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-            .member-card-preview::before,
-            .member-card-preview::after {
-                display: none !important;
-            }
-            .no-print {
-                display: none !important;
-            }
-            .card-actions-row {
                 display: none !important;
             }
         }
@@ -3704,92 +3839,133 @@
     </main>
 
     <!-- ============================================================
-    MODALS
+    MODALS — ลงทะเบียนสมาชิก (สวยงาม)
     ============================================================ -->
     <div class="modal-overlay" id="registerMemberModal">
         <div class="modal-box">
             <div class="modal-header">
-                <h3><i class="fas fa-user-plus"></i> ลงทะเบียนสมาชิก</h3>
+                <h3>
+                    <span style="background: linear-gradient(135deg, var(--primary), var(--secondary)); padding: 8px 12px; border-radius: 12px; color: #fff; font-size: 18px;">
+                        <i class="fas fa-dumbbell"></i>
+                    </span>
+                    ลงทะเบียนสมาชิก Pro Gym
+                </h3>
                 <button class="close" onclick="closeRegisterModal('registerMemberModal')">&times;</button>
             </div>
-            <div style="margin-bottom:14px; padding:12px 16px; background:rgba(16,185,129,0.08); border-radius:var(--radius-sm); border-right:4px solid var(--success);">
-                <p style="font-size:12px; color:var(--success); margin:0;">
-                    <i class="fas fa-info-circle"></i> ระบบจะสร้างรหัสสมาชิกใหม่ให้อัตโนมัติ
+
+            <div style="margin-bottom: 18px; padding: 14px 18px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(56, 189, 248, 0.08)); border-radius: var(--radius-sm); border-right: 4px solid var(--success);">
+                <p style="font-size: 13px; color: var(--text-secondary); margin: 0; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-sparkles" style="color: var(--success); font-size: 18px;"></i>
+                    <span>สร้างรหัสสมาชิกใหม่ <strong style="color: var(--primary);">อัตโนมัติ</strong> พร้อมใช้ทันที! 💪</span>
                 </p>
             </div>
+
             <div id="registerMemberForm">
                 <div class="form-group">
-                    <label>รหัสสมาชิก <span style="color:var(--danger);">*</span></label>
+                    <label><i class="fas fa-id-card" style="color: var(--primary); margin-left: 6px;"></i> รหัสสมาชิก <span style="color: var(--danger);">*</span></label>
                     <div class="copy-group">
-                        <input type="text" id="regMemberId" readonly style="background:var(--bg-body);font-weight:700;color:var(--primary);" />
+                        <input type="text" id="regMemberId" readonly />
                         <button class="btn-copy" id="copyMemberIdBtn" onclick="copyMemberId()">
                             <i class="fas fa-copy"></i> คัดลอก
                         </button>
                     </div>
-                    <small id="copyMessage" style="color:var(--success);font-size:10px;display:none;">
+                    <small id="copyMessage" style="color: var(--success); font-size: 11px; display: none; margin-top: 4px;">
                         <i class="fas fa-check-circle"></i> คัดลอกแล้ว!
                     </small>
                 </div>
+
                 <div class="form-group">
-                    <label>ชื่อเต็ม <span style="color:var(--danger);">*</span></label>
+                    <label><i class="fas fa-user" style="color: var(--primary); margin-left: 6px;"></i> ชื่อเต็ม <span style="color: var(--danger);">*</span></label>
                     <input type="text" id="regMemberFullName" placeholder="เช่น สมชาย ใจดี" />
                 </div>
-                <div class="form-group">
-                    <label>เบอร์โทรศัพท์</label>
-                    <input type="text" id="regMemberPhone" placeholder="081-234-5678" />
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+                    <div class="form-group">
+                        <label><i class="fas fa-phone" style="color: var(--primary); margin-left: 6px;"></i> เบอร์โทรศัพท์</label>
+                        <input type="text" id="regMemberPhone" placeholder="081-234-5678" />
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar" style="color: var(--primary); margin-left: 6px;"></i> อายุ</label>
+                        <input type="number" id="regMemberAge" placeholder="25" />
+                    </div>
                 </div>
+
                 <div class="form-group">
-                    <label>อายุ</label>
-                    <input type="number" id="regMemberAge" placeholder="25" />
-                </div>
-                <div class="form-group">
-                    <label>ประเภทสมาชิก</label>
+                    <label><i class="fas fa-tag" style="color: var(--primary); margin-left: 6px;"></i> ประเภทสมาชิก</label>
                     <select id="regMemberType">
-                        <option value="عادي">ปกติ (عادي)</option>
-                        <option value="متوسط">ปานกลาง (متوسط)</option>
-                        <option value="مميز">พรีเมียม (مميز)</option>
+                        <option value="عادي">🏋️ ปกติ (عادي)</option>
+                        <option value="متوسط">⭐ ปานกลาง (متوسط)</option>
+                        <option value="مميز">👑 พรีเมียม (مميز)</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label>รหัสผ่านใหม่ <span style="color:var(--danger);">*</span> (อย่างน้อย 4 ตัว)</label>
-                    <input type="text" id="regMemberPassword" placeholder="ตั้งรหัสผ่านอย่างน้อย 4 ตัว" />
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px;">
+                    <div class="form-group">
+                        <label><i class="fas fa-lock" style="color: var(--primary); margin-left: 6px;"></i> รหัสผ่าน <span style="color: var(--danger);">*</span></label>
+                        <input type="text" id="regMemberPassword" placeholder="อย่างน้อย 4 ตัว" />
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-check-circle" style="color: var(--primary); margin-left: 6px;"></i> ยืนยันรหัสผ่าน</label>
+                        <input type="text" id="regMemberPasswordConfirm" placeholder="ยืนยันรหัสผ่าน" />
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>ยืนยันรหัสผ่าน</label>
-                    <input type="text" id="regMemberPasswordConfirm" placeholder="ยืนยันรหัสผ่าน" />
-                </div>
+
                 <button class="btn btn-success btn-submit" onclick="registerMember()">
-                    <i class="fas fa-check"></i> ลงทะเบียน
+                    <i class="fas fa-user-plus"></i> ลงทะเบียนสมาชิก
                 </button>
-                <div id="regMemberResult" style="margin-top:10px; text-align:center; font-size:13px; font-weight:600;"></div>
+
+                <div id="regMemberResult" style="margin-top: 12px; text-align: center; font-size: 14px; font-weight: 600; padding: 8px; border-radius: var(--radius-sm);"></div>
             </div>
         </div>
     </div>
 
+    <!-- ============================================================
+    MODALS — กู้/ตั้งรหัสผู้ดูแล (สวยงาม)
+    ============================================================ -->
     <div class="modal-overlay" id="registerAdminModal">
         <div class="modal-box">
             <div class="modal-header">
-                <h3><i class="fas fa-user-shield"></i> กู้/ตั้งรหัสผู้ดูแล</h3>
+                <h3>
+                    <span style="background: linear-gradient(135deg, var(--warning), #d97706); padding: 8px 12px; border-radius: 12px; color: #fff; font-size: 18px;">
+                        <i class="fas fa-user-shield"></i>
+                    </span>
+                    กู้/ตั้งรหัสผู้ดูแล
+                </h3>
                 <button class="close" onclick="closeRegisterModal('registerAdminModal')">&times;</button>
             </div>
+
+            <div style="margin-bottom: 18px; padding: 12px 16px; background: rgba(245, 158, 11, 0.08); border-radius: var(--radius-sm); border-right: 4px solid var(--warning);">
+                <p style="font-size: 13px; color: var(--text-secondary); margin: 0; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-exclamation-triangle" style="color: var(--warning); font-size: 16px;"></i>
+                    <span>กรุณากรอกรหัสลับให้ถูกต้องเพื่อตั้งรหัสผ่านใหม่</span>
+                </p>
+            </div>
+
             <div id="registerAdminForm">
                 <div class="form-group">
-                    <label>รหัสลับ <span style="color:var(--danger);">*</span></label>
+                    <label><i class="fas fa-key" style="color: var(--warning); margin-left: 6px;"></i> รหัสลับ <span style="color: var(--danger);">*</span></label>
                     <input type="password" id="regAdminSecret" placeholder="adminreset-2026" />
-                    <small class="text-muted">รหัสลับเริ่มต้น: adminreset-2026</small>
+                    <small class="text-muted" style="display: block; margin-top: 4px; font-size: 11px; color: var(--text-muted);">
+                        <i class="fas fa-info-circle"></i> รหัสลับเริ่มต้น: <strong>adminreset-2026</strong>
+                    </small>
                 </div>
-                <div class="form-group">
-                    <label>รหัสผ่านใหม่ <span style="color:var(--danger);">*</span> (6 ตัวขึ้นไป)</label>
-                    <input type="password" id="regAdminPass" placeholder="รหัสผ่านใหม่" />
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px;">
+                    <div class="form-group">
+                        <label><i class="fas fa-lock" style="color: var(--warning); margin-left: 6px;"></i> รหัสผ่านใหม่ <span style="color: var(--danger);">*</span></label>
+                        <input type="password" id="regAdminPass" placeholder="6 ตัวขึ้นไป" />
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-check-circle" style="color: var(--warning); margin-left: 6px;"></i> ยืนยันรหัสผ่าน</label>
+                        <input type="password" id="regAdminPassConfirm" placeholder="ยืนยันรหัสผ่าน" />
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>ยืนยันรหัสผ่าน</label>
-                    <input type="password" id="regAdminPassConfirm" placeholder="ยืนยันรหัสผ่าน" />
-                </div>
+
                 <button class="btn btn-primary btn-submit" onclick="registerAdmin()">
-                    <i class="fas fa-check"></i> ตั้งรหัสผ่านใหม่
+                    <i class="fas fa-check-circle"></i> ตั้งรหัสผ่านใหม่
                 </button>
-                <div id="regAdminResult" style="margin-top:10px; text-align:center; font-size:13px; font-weight:600;"></div>
+
+                <div id="regAdminResult" style="margin-top: 12px; text-align: center; font-size: 14px; font-weight: 600; padding: 8px; border-radius: var(--radius-sm);"></div>
             </div>
         </div>
     </div>
@@ -4247,35 +4423,74 @@
         }
 
         // ============================================================
-        // REGISTER MODALS
+        // REGISTER MODALS — เปิด/ปิด
         // ============================================================
         async function openRegisterMember() {
-            const modal = $('registerMemberModal');
-            if (!modal) return;
+            const modal = document.getElementById('registerMemberModal');
+            if (!modal) {
+                showToast('⚠️ ไม่พบ Modal', 'error');
+                return;
+            }
             modal.classList.add('show');
-            $('regMemberFullName').value = '';
-            $('regMemberPhone').value = '';
-            $('regMemberAge').value = '';
-            $('regMemberType').value = 'عادي';
-            $('regMemberPassword').value = '';
-            $('regMemberPasswordConfirm').value = '';
-            $('regMemberResult').textContent = '';
-            $('copyMessage').style.display = 'none';
+            modal.style.display = 'flex';
+
+            document.getElementById('regMemberFullName').value = '';
+            document.getElementById('regMemberPhone').value = '';
+            document.getElementById('regMemberAge').value = '';
+            document.getElementById('regMemberType').value = 'عادي';
+            document.getElementById('regMemberPassword').value = '';
+            document.getElementById('regMemberPasswordConfirm').value = '';
+            document.getElementById('regMemberResult').textContent = '';
+            document.getElementById('regMemberResult').innerHTML = '';
+            document.getElementById('copyMessage').style.display = 'none';
+
             try {
                 const data = await apiCall('/members');
                 const members = data.data || [];
-                $('regMemberId').value = generateNewMemberId(members);
+                document.getElementById('regMemberId').value = generateNewMemberId(members);
                 showToast('✅ พร้อมลงทะเบียน', 'success');
             } catch (e) {
-                $('regMemberId').value = 'G-0001';
+                document.getElementById('regMemberId').value = 'G-0001';
                 showToast('⚠️ ใช้รหัสเริ่มต้น G-0001', 'warning');
             }
         }
 
+        async function openRegisterAdmin() {
+            const modal = document.getElementById('registerAdminModal');
+            if (!modal) {
+                showToast('⚠️ ไม่พบ Modal', 'error');
+                return;
+            }
+            modal.classList.add('show');
+            modal.style.display = 'flex';
+
+            document.getElementById('regAdminSecret').value = '';
+            document.getElementById('regAdminPass').value = '';
+            document.getElementById('regAdminPassConfirm').value = '';
+            document.getElementById('regAdminResult').textContent = '';
+            document.getElementById('regAdminResult').innerHTML = '';
+
+            showToast('🔑 กรุณากรอกรหัสลับ', 'info');
+        }
+
+        function closeRegisterModal(id) {
+            const modal = document.getElementById(id);
+            if (modal) {
+                modal.classList.remove('show');
+                modal.style.display = 'none';
+            }
+            // ปิด overlays ทั้งหมด
+            const overlays = document.querySelectorAll('.modal-overlay.show');
+            overlays.forEach(el => {
+                el.classList.remove('show');
+                el.style.display = 'none';
+            });
+        }
+
         function copyMemberId() {
-            const input = $('regMemberId');
-            const btn = $('copyMemberIdBtn');
-            const msg = $('copyMessage');
+            const input = document.getElementById('regMemberId');
+            const btn = document.getElementById('copyMemberIdBtn');
+            const msg = document.getElementById('copyMessage');
             if (!input || !input.value) { showToast('⚠️ ไม่มีรหัส', 'warning'); return; }
             navigator.clipboard.writeText(input.value).then(() => {
                 msg.style.display = 'block';
@@ -4296,23 +4511,38 @@
         }
 
         async function registerMember() {
-            const memberId = $('regMemberId').value.trim();
-            const fullName = $('regMemberFullName').value.trim();
-            const phone = $('regMemberPhone').value.trim();
-            const age = $('regMemberAge').value.trim();
-            const membershipType = $('regMemberType').value;
-            const password = $('regMemberPassword').value.trim();
-            const confirmPass = $('regMemberPasswordConfirm').value.trim();
-            const resultDiv = $('regMemberResult');
+            const memberId = document.getElementById('regMemberId').value.trim();
+            const fullName = document.getElementById('regMemberFullName').value.trim();
+            const phone = document.getElementById('regMemberPhone').value.trim();
+            const age = document.getElementById('regMemberAge').value.trim();
+            const membershipType = document.getElementById('regMemberType').value;
+            const password = document.getElementById('regMemberPassword').value.trim();
+            const confirmPass = document.getElementById('regMemberPasswordConfirm').value.trim();
+            const resultDiv = document.getElementById('regMemberResult');
 
-            if (!memberId) { resultDiv.innerHTML =
-                    '<span style="color:var(--danger);"><i class="fas fa-exclamation-circle"></i> ไม่พบรหัส</span>'; return; }
-            if (!fullName) { resultDiv.innerHTML =
-                    '<span style="color:var(--danger);"><i class="fas fa-exclamation-circle"></i> กรุณากรอกชื่อ</span>'; return; }
-            if (!password || password.length < 4) { resultDiv.innerHTML =
-                    '<span style="color:var(--danger);"><i class="fas fa-exclamation-circle"></i> รหัสผ่าน >=4 ตัว</span>'; return; }
-            if (password !== confirmPass) { resultDiv.innerHTML =
-                    '<span style="color:var(--danger);"><i class="fas fa-exclamation-circle"></i> รหัสไม่ตรงกัน</span>'; return; }
+            if (!memberId) {
+                resultDiv.innerHTML = '<span style="color:var(--danger);"><i class="fas fa-exclamation-circle"></i> ไม่พบรหัส</span>';
+                resultDiv.style.background = 'rgba(239, 68, 68, 0.06)';
+                return;
+            }
+            if (!fullName) {
+                resultDiv.innerHTML =
+                    '<span style="color:var(--danger);"><i class="fas fa-exclamation-circle"></i> กรุณากรอกชื่อ</span>';
+                resultDiv.style.background = 'rgba(239, 68, 68, 0.06)';
+                return;
+            }
+            if (!password || password.length < 4) {
+                resultDiv.innerHTML =
+                    '<span style="color:var(--danger);"><i class="fas fa-exclamation-circle"></i> รหัสผ่าน >=4 ตัว</span>';
+                resultDiv.style.background = 'rgba(239, 68, 68, 0.06)';
+                return;
+            }
+            if (password !== confirmPass) {
+                resultDiv.innerHTML =
+                    '<span style="color:var(--danger);"><i class="fas fa-exclamation-circle"></i> รหัสไม่ตรงกัน</span>';
+                resultDiv.style.background = 'rgba(239, 68, 68, 0.06)';
+                return;
+            }
 
             try {
                 const data = await apiCall('/members');
@@ -4320,6 +4550,7 @@
                 if (members.find(m => m.member_id === memberId)) {
                     resultDiv.innerHTML =
                         `<span style="color:var(--danger);"><i class="fas fa-times-circle"></i> รหัส ${memberId} มีอยู่แล้ว</span>`;
+                    resultDiv.style.background = 'rgba(239, 68, 68, 0.06)';
                     return;
                 }
                 await apiCall('/members', {
@@ -4336,6 +4567,7 @@
                 });
                 resultDiv.innerHTML =
                     `<span style="color:var(--success);"><i class="fas fa-check-circle"></i> ลงทะเบียนสำเร็จ!<br>รหัส: <strong>${memberId}</strong> | รหัสผ่าน: <strong>${password}</strong></span>`;
+                resultDiv.style.background = 'rgba(16, 185, 129, 0.06)';
                 showToast(`✅ ลงทะเบียน ${memberId} สำเร็จ`, 'success');
                 addNotification(`ลงทะเบียนสมาชิกใหม่: ${fullName} (${memberId})`, 'success');
                 if (phone) {
@@ -4351,57 +4583,69 @@
                 }
                 setTimeout(() => {
                     closeRegisterModal('registerMemberModal');
-                    $('loginUser').value = memberId;
-                    $('loginPass').value = password;
+                    document.getElementById('loginUser').value = memberId;
+                    document.getElementById('loginPass').value = password;
                     showToast('🔑 กรุณาคลิก "เข้าสู่ระบบ"', 'info');
                 }, 2500);
             } catch (error) {
                 resultDiv.innerHTML =
                     `<span style="color:var(--danger);"><i class="fas fa-times-circle"></i> ${error.message}</span>`;
+                resultDiv.style.background = 'rgba(239, 68, 68, 0.06)';
                 showToast('❌ ' + error.message, 'error');
             }
         }
 
         async function registerAdmin() {
-            const secret = $('regAdminSecret').value.trim();
-            const newPass = $('regAdminPass').value.trim();
-            const confirmPass = $('regAdminPassConfirm').value.trim();
-            const resultDiv = $('regAdminResult');
+            const secret = document.getElementById('regAdminSecret').value.trim();
+            const newPass = document.getElementById('regAdminPass').value.trim();
+            const confirmPass = document.getElementById('regAdminPassConfirm').value.trim();
+            const resultDiv = document.getElementById('regAdminResult');
+
             if (secret !== ADMIN_RESET_CODE) {
-                resultDiv.innerHTML = '<span style="color:var(--danger);"><i class="fas fa-times-circle"></i> รหัสลับไม่ถูกต้อง</span>';
+                resultDiv.innerHTML =
+                    `<span style="color:var(--danger);"><i class="fas fa-times-circle"></i> รหัสลับไม่ถูกต้อง (adminreset-2026)</span>`;
+                resultDiv.style.background = 'rgba(239, 68, 68, 0.06)';
                 return;
             }
+
             if (newPass.length < 6) {
                 resultDiv.innerHTML =
-                    '<span style="color:var(--danger);"><i class="fas fa-exclamation-circle"></i> รหัสผ่าน >=6 ตัว</span>';
+                    `<span style="color:var(--danger);"><i class="fas fa-exclamation-circle"></i> รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร</span>`;
+                resultDiv.style.background = 'rgba(239, 68, 68, 0.06)';
                 return;
             }
+
             if (newPass !== confirmPass) {
                 resultDiv.innerHTML =
-                    '<span style="color:var(--danger);"><i class="fas fa-exclamation-circle"></i> รหัสไม่ตรงกัน</span>';
+                    `<span style="color:var(--danger);"><i class="fas fa-exclamation-circle"></i> รหัสผ่านไม่ตรงกัน</span>`;
+                resultDiv.style.background = 'rgba(239, 68, 68, 0.06)';
                 return;
             }
+
             try {
                 const hash = await sha256(newPass);
                 localStorage.setItem('adminHash', hash);
+
                 resultDiv.innerHTML =
-                    `<span style="color:var(--success);"><i class="fas fa-check-circle"></i> ตั้งรหัสผู้ดูแลสำเร็จ! (รหัสผ่านใหม่: ${newPass})</span>`;
+                    `<span style="color:var(--success);"><i class="fas fa-check-circle"></i> ตั้งรหัสผู้ดูแลสำเร็จ!<br><small>รหัสผ่านใหม่: <strong>${newPass}</strong></small></span>`;
+                resultDiv.style.background = 'rgba(16, 185, 129, 0.06)';
+
                 showToast('✅ ตั้งรหัสผู้ดูแลสำเร็จ', 'success');
                 addNotification('ตั้งรหัสผู้ดูแลใหม่สำเร็จ', 'success');
+
                 setTimeout(() => {
                     closeRegisterModal('registerAdminModal');
-                    $('loginUser').value = 'admin';
-                    $('loginPass').value = newPass;
+                    document.getElementById('loginUser').value = 'admin';
+                    document.getElementById('loginPass').value = newPass;
                     showToast('🔑 กรุณาคลิก "เข้าสู่ระบบ"', 'info');
-                }, 1500);
-            } catch (e) {
-                resultDiv.innerHTML = `<span style="color:var(--danger);"><i class="fas fa-times-circle"></i> ${e.message}</span>`;
-            }
-        }
+                }, 2000);
 
-        function closeRegisterModal(id) {
-            const modal = $(id);
-            if (modal) modal.classList.remove('show');
+            } catch (e) {
+                resultDiv.innerHTML =
+                    `<span style="color:var(--danger);"><i class="fas fa-times-circle"></i> ${e.message}</span>`;
+                resultDiv.style.background = 'rgba(239, 68, 68, 0.06)';
+                showToast('❌ ' + e.message, 'error');
+            }
         }
 
         // ============================================================
@@ -4467,9 +4711,9 @@
         }
 
         async function handleLogin() {
-            const user = $('loginUser').value.trim();
-            const pass = $('loginPass').value.trim();
-            const errorDiv = $('loginError');
+            const user = document.getElementById('loginUser').value.trim();
+            const pass = document.getElementById('loginPass').value.trim();
+            const errorDiv = document.getElementById('loginError');
             errorDiv.style.display = 'none';
             if (!user || !pass) {
                 errorDiv.textContent = '⚠️ กรุณากรอกชื่อผู้ใช้และรหัสผ่าน';
@@ -4572,6 +4816,8 @@
                 showToast('🔄 รีเฟรชสำเร็จ', 'info');
             }
             if (e.key === 'Escape') {
+                closeRegisterModal('registerMemberModal');
+                closeRegisterModal('registerAdminModal');
                 const modal = document.querySelector('.modal-overlay.show');
                 if (modal) {
                     const closeBtn = modal.querySelector('.close');
@@ -5120,7 +5366,7 @@
         }
 
         // ============================================================
-        // MODAL
+        // MODAL (Temp)
         // ============================================================
         function openModal(title, html) {
             const old = document.getElementById('tempModal');
@@ -5455,11 +5701,10 @@
         }
 
         // ============================================================
-        // PROFILE (Member Dashboard) — ฟังก์ชันหลัก
+        // PROFILE (Member Dashboard)
         // ============================================================
         async function loadProfile() {
             try {
-                // โหลดข้อมูลทั้งหมดถ้ายังไม่มี
                 if (!allMembers || allMembers.length === 0) {
                     try {
                         const memberData = await apiCall('/members');
@@ -5479,7 +5724,6 @@
                     } catch (e) { console.warn('⚠️ โหลด allPayments ไม่สำเร็จ:', e.message); }
                 }
 
-                // โหลดข้อมูลของสมาชิกคนนี้
                 const [memberData, ciData, payData] = await Promise.all([
                     apiCall(`/members/${profileMemberId}`),
                     apiCall(`/checkin/member/${profileMemberId}`),
@@ -5552,10 +5796,7 @@
                     renderWeightChart();
                 }
 
-                // 🔥 อัปเดตการ์ดสมาชิกทั้งหมด
                 updateMemberDashboard();
-
-                // 🔥 โหลด Top 7
                 loadTop7();
 
             } catch (e) {
@@ -5565,7 +5806,7 @@
         }
 
         // ============================================================
-        // UPDATE MEMBER DASHBOARD — 6 การ์ด (ปรับปรุง)
+        // UPDATE MEMBER DASHBOARD
         // ============================================================
         function updateMemberDashboard() {
             if (!profileMember) return;
@@ -5573,17 +5814,17 @@
             const today = getTodayStr();
             const thisMonth = today.slice(0, 7);
 
-            // 1. 💳 ยอดชำระเดือนนี้ (ของสมาชิกคนนี้)
+            // 1. ยอดชำระเดือนนี้
             const monthPayments = profilePayments.filter(p => p.payment_date && normalizeDate(p.payment_date).slice(0, 7) ===
                 thisMonth);
             const totalPaid = monthPayments.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
             $('mStatRevenue').textContent = formatNumber(totalPaid) + ' ฿';
 
-            // 2. ⭐ แต้มสะสม = จำนวนการเข้าทั้งหมดของสมาชิกคนนี้
+            // 2. แต้มสะสม = จำนวนการเข้าทั้งหมด
             const totalCheckins = profileCheckins.length;
             $('mStatPoints').textContent = totalCheckins;
 
-            // 3. ⏰ เวลาเข้าใช้มากสุด (TOP 1 — เน้นสีแดง)
+            // 3. เวลาเข้าใช้มากสุด (TOP 1 สีแดง)
             const monthCheckinsAll = allCheckins.filter(c => c.checkin_date && normalizeDate(c.checkin_date).slice(0, 7) ===
                 thisMonth);
             const hourCounts = {};
@@ -5596,14 +5837,13 @@
             const sortedHours = Object.entries(hourCounts).sort((a, b) => b[1] - a[1]);
             if (sortedHours.length > 0) {
                 const top = sortedHours[0];
-                // แสดง TOP 1 พร้อมสีแดง
                 $('mStatPeak').innerHTML =
                     `<span class="top-hour-highlight">${top[0]}:00</span> (${top[1]} ครั้ง)`;
             } else {
                 $('mStatPeak').textContent = 'ไม่มีข้อมูล';
             }
 
-            // 4. 🏅 ฉายาประจำเดือน (ตามเช็คอินของตัวเอง)
+            // 4. ฉายาประจำเดือน
             const myMonthCheckins = profileCheckins.filter(c => c.checkin_date && normalizeDate(c.checkin_date).slice(0, 7) ===
                 thisMonth);
             const myCount = myMonthCheckins.length;
@@ -5615,7 +5855,7 @@
             else if (myCount >= 5) rankTitle = '😴 ขี้เกียจ';
             $('mStatRank').innerHTML = rankTitle + ` (${myCount} ครั้ง)`;
 
-            // 5. 📊 เช็คอินวันนี้ (%)
+            // 5. เช็คอินวันนี้ (%)
             if (!allMembers || allMembers.length === 0) {
                 $('mStatPercent').textContent = '⏳ กำลังโหลด...';
             } else {
@@ -5633,7 +5873,7 @@
                 window._todayPercentage = percentage;
             }
 
-            // 6. ⏳ เหลือวันต่ออายุ
+            // 6. เหลือวันต่ออายุ
             let daysLeft = '-';
             if (profileExpiryStr && profileExpiryStr !== '-') {
                 const diff = daysBetween(today, normalizeDate(profileExpiryStr));
@@ -5643,7 +5883,7 @@
         }
 
         // ============================================================
-        // SHOW CARD DETAIL (Member) — 6 การ์ด
+        // SHOW CARD DETAIL (Member)
         // ============================================================
         function showCardDetail(type) {
             let title = 'รายละเอียด';
@@ -5652,8 +5892,6 @@
             const thisMonth = today.slice(0, 7);
 
             switch (type) {
-
-                // 1. 💳 ยอดชำระเดือนนี้ + ประวัติทั้งหมด
                 case 'member_revenue': {
                     const allPaymentsHistory = profilePayments;
                     const monthPayments = allPaymentsHistory.filter(p => p.payment_date && normalizeDate(p.payment_date).slice(
@@ -5699,7 +5937,6 @@
                     break;
                 }
 
-                // 2. ⭐ แต้มสะสม = จำนวนการเข้าทั้งหมด
                 case 'member_total_checkins': {
                     const total = profileCheckins.length;
                     title = '⭐ แต้มสะสม (จำนวนการเข้าทั้งหมด)';
@@ -5731,7 +5968,6 @@
                     break;
                 }
 
-                // 3. ⏰ เวลาเข้าใช้มากสุด (TOP 3 — เน้น TOP 1 สีแดง)
                 case 'member_peak': {
                     const monthCheckinsAll = allCheckins.filter(c => c.checkin_date && normalizeDate(c.checkin_date).slice(0,
                         7) === thisMonth);
@@ -5766,7 +6002,6 @@
                     break;
                 }
 
-                // 4. 🏅 ฉายาประจำเดือน
                 case 'member_rank': {
                     const myMonthCheckins = profileCheckins.filter(c => c.checkin_date && normalizeDate(c.checkin_date).slice(
                         0, 7) === thisMonth);
@@ -5787,7 +6022,6 @@
                     break;
                 }
 
-                // 5. 📊 เช็คอินวันนี้ (%)
                 case 'member_percent': {
                     const totalMembers = allMembers.length || 1;
                     const todayCheckinsAll = window._todayCheckinsAll !== undefined ? window._todayCheckinsAll :
@@ -5830,7 +6064,6 @@
                     break;
                 }
 
-                // 6. ⏳ เหลือวันต่ออายุ
                 case 'member_daysleft': {
                     let days = '-';
                     if (profileExpiryStr && profileExpiryStr !== '-') {
@@ -5857,7 +6090,7 @@
         }
 
         // ============================================================
-        // TOP 7 — ฉายาคนเข้าฟิตเนสมากที่สุดประจำปี
+        // TOP 7
         // ============================================================
         function loadTop7() {
             const container = $('top7Container');
@@ -5873,7 +6106,6 @@
             oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
             const oneYearAgoStr = oneYearAgo.toISOString().split('T')[0];
 
-            // นับจำนวนเช็คอินของแต่ละคนใน 1 ปีที่ผ่านมา
             const checkinCounts = {};
             allCheckins.forEach(c => {
                 if (c.checkin_date && normalizeDate(c.checkin_date) >= oneYearAgoStr) {
@@ -5882,7 +6114,6 @@
                 }
             });
 
-            // จัดเรียงและเลือก 7 อันดับ
             const sorted = Object.entries(checkinCounts).sort((a, b) => b[1] - a[1]).slice(0, 7);
 
             if (sorted.length === 0) {
@@ -5903,7 +6134,6 @@
                 const name = member ? member.full_name : memberId;
                 const colorClass = colors[idx] ? colors[idx] : '';
 
-                // ตรวจสอบว่าสมาชิกคนนี้คือตัวเราไหม
                 const isMe = memberId === profileMemberId;
                 const meBadge = isMe ? ' 👈 คุณ' : '';
 
@@ -5918,7 +6148,6 @@
             });
             html += '</div>';
 
-            // กำลังใจเพิ่มเติม
             const myRank = sorted.findIndex(([id]) => id === profileMemberId);
             let encouragementMsg = '';
             if (myRank === 0) {
@@ -6095,7 +6324,7 @@
         }
 
         // ============================================================
-        // GOAL — เป้าหมายพร้อมกำลังใจ
+        // GOAL
         // ============================================================
         function loadGoalProgress() {
             const stored = localStorage.getItem('goal_' + profileMemberId);
@@ -6252,7 +6481,7 @@
         }
 
         // ============================================================
-        // WEIGHT & BMI — พร้อมกำลังใจ
+        // WEIGHT & BMI
         // ============================================================
         function loadWeightData() {
             const stored = localStorage.getItem('weight_' + profileMemberId);
@@ -6397,9 +6626,6 @@
             showToast('✅ ดาวน์โหลด QR สำเร็จ', 'success');
         }
 
-        // ============================================================
-        // CSV EXPORT
-        // ============================================================
         function exportMembersCSV() {
             if (!allMembers.length) { showToast('⚠️ ไม่มีข้อมูลสมาชิก', 'warning'); return; }
             const headers = ['รหัส', 'ชื่อ', 'เบอร์', 'อายุ', 'ประเภท', 'แต้ม', 'หมดอายุ'];
@@ -6574,7 +6800,7 @@
             console.log('🔑 รหัสลับ Admin: adminreset-2026');
             console.log('👤 Admin: admin / admin123');
             console.log('⌨️ Ctrl+R = รีเฟรช, ESC = ปิด Modal');
-            console.log('✨ ฟีเจอร์ใหม่: TOP 1 เวลาเข้าใช้สีแดง, แต้ม = จำนวนเข้าทั้งหมด, BMI กำลังใจ, Top 7 แสดงชื่อตัวเอง');
+            console.log('✨ ฟีเจอร์ใหม่: ฟอร์มลงทะเบียนสวย, Modal ทำงานได้, กู้รหัสผู้ดูแล');
         });
 
         document.addEventListener('click', function(e) {
