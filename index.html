@@ -5260,20 +5260,16 @@ async function refreshDashboard() {
                     }
                     break;
                 }
-// ============================================================
-// แก้ไขฟังก์ชัน showStatDetail() — กรณี 'revenue'
-// ให้แสดง 3 เดือนล่าสุดตามปฏิทินเสมอ (ไม่ตัดเดือนที่ไม่มีข้อมูล)
-// ============================================================
 case 'revenue': {
     title = '💰 รายได้ (3 เดือนล่าสุด)';
     const todayStr = getTodayStr();
     const thisMonth = todayStr.slice(0, 7);
-
-    // คำนวณยอดรวมเดือนนี้
+    
+    // 🔥 ใช้ allPayments ที่มีอยู่ทั้งหมด (ไม่จำกัดเฉพาะเดือนนี้)
     const monthPay = allPayments.filter(p => p.payment_date && normalizeDate(p.payment_date).slice(0, 7) === thisMonth);
     const totalRev = monthPay.reduce((s, p) => s + parseFloat(p.amount || 0), 0);
 
-    // สร้าง object เก็บรายได้แยกตามเดือนจากข้อมูลที่มี
+    // 🔥 จัดกลุ่มรายได้ตามเดือนจากข้อมูลทั้งหมด
     const revByMonth = {};
     allPayments.forEach(p => {
         if (p.payment_date) {
@@ -5282,56 +5278,48 @@ case 'revenue': {
         }
     });
 
-    // 🔥 สร้าง 3 เดือนล่าสุดตามปฏิทิน (จากวันปัจจุบัน)
-    const today = new Date();
-    const currentYear = today.getFullYear();
-    const currentMonth = today.getMonth(); // 0-indexed
-
-    const lastThreeMonths = [];
-    for (let i = 0; i < 3; i++) {
-        const d = new Date(currentYear, currentMonth - i, 1);
-        const monthStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-        lastThreeMonths.push(monthStr);
-    }
-    // เรียงจากเก่าไปใหม่ (i=2,1,0)
-    lastThreeMonths.reverse();
-
-    // กำหนด labels และ values
-    const lastLabels = lastThreeMonths.map(m => {
+    // 🔥 เรียงลำดับเดือนและเลือก 3 เดือนล่าสุด
+    const sortedMonths = Object.keys(revByMonth).sort();
+    const lastMonths = sortedMonths.slice(-3);
+    const lastValues = lastMonths.map(m => revByMonth[m] || 0);
+    const lastLabels = lastMonths.map(m => {
         const d = new Date(m + '-01');
-        return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+        return d.toLocaleDateString('th-TH', { month: 'short', year: 'numeric' });
     });
-    const lastValues = lastThreeMonths.map(m => revByMonth[m] || 0);
 
-    // ตรวจสอบว่ามีข้อมูลอย่างน้อย 1 เดือน (ถ้าไม่มีเลยให้แสดงข้อความ)
-    if (lastValues.every(v => v === 0)) {
+    // 🔥 ถ้ามีข้อมูลน้อยกว่า 3 เดือน ให้ดึงจาก API เพิ่มเติม
+    if (lastMonths.length < 3 && allPayments.length > 0) {
+        // ใช้ข้อมูลที่มีอยู่แล้ว แสดงเท่าที่มี
+    }
+
+    // 🔥 สร้าง chart id แบบไดนามิก
+    const chartId = 'revenueModalChart_' + Date.now();
+
+    if (lastMonths.length === 0) {
         content = `<div style="text-align:center;padding:20px 0;">
             <div style="font-size:48px;color:var(--text-muted);margin-bottom:12px;">📊</div>
             <h4 style="color:var(--text-muted);">ยังไม่มีข้อมูลรายได้</h4>
             <p style="color:var(--text-muted);font-size:13px;margin-top:8px;">เริ่มบันทึกการชำระเงินเพื่อดูกราฟ</p>
         </div>`;
     } else {
-        const chartId = 'revenueModalChart_' + Date.now();
-
-        // สร้างตารางสรุป 3 เดือน
+        // 🔥 สร้างตารางสรุป 3 เดือน
         let tableHtml = `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;">
-            ${lastThreeMonths.map((m, idx) => {
-                const isLatest = idx === lastThreeMonths.length - 1;
-                const icon = isLatest ? '🔴' : idx === lastThreeMonths.length - 2 ? '🟡' : '🟢';
-                const label = isLatest ? 'เดือนนี้' : idx === lastThreeMonths.length - 2 ? 'เดือนที่แล้ว' : 'เดือนเก่าสุด';
-                const color = isLatest ? 'var(--danger)' : idx === lastThreeMonths.length - 2 ? 'var(--warning)' : 'var(--success)';
-                const value = lastValues[idx] || 0;
+            ${lastMonths.map((m, idx) => {
+                const isLatest = idx === lastMonths.length - 1;
+                const icon = isLatest ? '🔴' : idx === lastMonths.length - 2 ? '🟡' : '🟢';
+                const label = isLatest ? 'เดือนนี้' : idx === lastMonths.length - 2 ? 'เดือนที่แล้ว' : 'เดือนเก่าสุด';
+                const color = isLatest ? 'var(--danger)' : idx === lastMonths.length - 2 ? 'var(--warning)' : 'var(--success)';
                 return `
                     <div style="background:var(--bg-body);border-radius:8px;padding:10px;border:1px solid rgba(0,0,0,0.04);text-align:center;border-top:3px solid ${color};">
                         <div style="font-size:11px;color:var(--text-muted);">${icon} ${label}</div>
-                        <div style="font-size:20px;font-weight:700;color:${color};">${toBath(value)}</div>
+                        <div style="font-size:20px;font-weight:700;color:${color};">${toBath(lastValues[idx] || 0)}</div>
                         <div style="font-size:10px;color:var(--text-muted);">${lastLabels[idx]}</div>
                     </div>
                 `;
             }).join('')}
         </div>`;
 
-        // กราฟ
+        // 🔥 สร้างกราฟ
         let chartHtml = `
             <div style="background:var(--bg-body);border-radius:var(--radius-sm);padding:12px;border:1px solid rgba(0,0,0,0.04);">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
@@ -5350,21 +5338,25 @@ case 'revenue': {
             </div>
         `;
 
-        // เปรียบเทียบ % การเปลี่ยนแปลง
+        // 🔥 เปรียบเทียบ %
         let compareHtml = '';
         if (lastValues.length >= 2) {
             const latest = lastValues[lastValues.length - 1] || 0;
             const previous = lastValues[lastValues.length - 2] || 0;
             const oldest = lastValues[lastValues.length - 3] || 0;
-
-            let change = 0, changeText = '', changeColor = '';
+            
+            let change = 0;
+            let changeText = '';
+            let changeColor = '';
             if (previous > 0) {
                 change = ((latest - previous) / previous) * 100;
                 changeText = change > 0 ? `↑ ${change.toFixed(1)}%` : `↓ ${Math.abs(change).toFixed(1)}%`;
                 changeColor = change > 0 ? 'var(--success)' : 'var(--danger)';
             }
 
-            let compareOld = 0, compareOldText = '', compareOldColor = '';
+            let compareOld = 0;
+            let compareOldText = '';
+            let compareOldColor = '';
             if (oldest > 0 && previous > 0) {
                 compareOld = ((previous - oldest) / oldest) * 100;
                 compareOldText = compareOld > 0 ? `↑ ${compareOld.toFixed(1)}%` : `↓ ${Math.abs(compareOld).toFixed(1)}%`;
@@ -5387,7 +5379,6 @@ case 'revenue': {
             `;
         }
 
-        // รวมเนื้อหา
         content = `
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;flex:1;min-width:200px;">
@@ -5409,11 +5400,11 @@ case 'revenue': {
             ${compareHtml}
         `;
 
-        // สร้างกราฟหลังจาก DOM อัปเดต
+        // 🔥 สร้างกราฟหลังจาก DOM อัปเดต
         setTimeout(() => {
             const canvas = document.getElementById(chartId);
             if (canvas && lastLabels.length) {
-                // ลบกราฟเก่า
+                // ลบกราฟเก่าถ้ามี
                 if (window._revenueChartInstance) {
                     try { window._revenueChartInstance.destroy(); } catch (e) {}
                     window._revenueChartInstance = null;
@@ -5450,9 +5441,12 @@ case 'revenue': {
                         responsive: true,
                         maintainAspectRatio: true,
                         plugins: {
-                            legend: {
+                            legend: { 
                                 display: true,
-                                labels: { color: textColor, font: { size: 11, weight: 'bold' } }
+                                labels: { 
+                                    color: textColor, 
+                                    font: { size: 11, weight: 'bold' }
+                                }
                             },
                             tooltip: {
                                 callbacks: {
@@ -5492,7 +5486,7 @@ case 'revenue': {
                             const data = chart.data.datasets[0].data;
                             const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
                             const textColor = isDark ? '#b0b0cc' : '#4a4a6a';
-
+                            
                             meta.data.forEach(function(bar, index) {
                                 const value = data[index];
                                 if (value > 0) {
@@ -5507,11 +5501,10 @@ case 'revenue': {
                     }]
                 });
             }
-        }, 300);
+        }, 200);
     }
     break;
-}
-                case 'newMembers': {
+}                case 'newMembers': {
                     title = '➕ สมาชิกใหม่เดือนนี้';
                     const thisMonth = todayStr.slice(0, 7);
                     const newMembers = allMembers.filter(m => m.start_date && normalizeDate(m.start_date).slice(0, 7) ===
@@ -6569,23 +6562,18 @@ function refreshRevenueChart() {
                 return;
             }
 
-const today = new Date();
-const currentYear = today.getFullYear();
-const currentMonth = today.getMonth(); // 0-indexed
+            const today = new Date();
+            const oneYearAgo = new Date(today);
+            oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+            const oneYearAgoStr = oneYearAgo.toISOString().split('T')[0];
 
-const lastThreeMonths = [];
-for (let i = 0; i < 3; i++) {
-    const d = new Date(currentYear, currentMonth - i, 1);
-    const monthStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-    lastThreeMonths.push(monthStr);
-}
-// reverse เพื่อให้เรียงจากเก่าไปใหม่
-lastThreeMonths.reverse();
-const lastLabels = lastThreeMonths.map(m => {
-    const d = new Date(m + '-01');
-    return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-});
-const lastValues = lastThreeMonths.map(m => revByMonth[m] || 0);
+            const checkinCounts = {};
+            allCheckins.forEach(c => {
+                if (c.checkin_date && normalizeDate(c.checkin_date) >= oneYearAgoStr) {
+                    const id = c.member_id;
+                    if (id) checkinCounts[id] = (checkinCounts[id] || 0) + 1;
+                }
+            });
 
             const sorted = Object.entries(checkinCounts).sort((a, b) => b[1] - a[1]).slice(0, 8);
 
