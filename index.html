@@ -78,6 +78,9 @@
             --gold: #f59e0b;
             --silver: #94a3b8;
             --bronze: #cd7f32;
+
+            --z-notification: 99999;
+            --z-dropdown: 99998;
         }
 
         [data-theme="dark"] {
@@ -414,29 +417,6 @@
             align-items: center;
             gap: 8px;
             flex-wrap: wrap;
-        }
-
-        .topbar .topbar-right .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: var(--success);
-            display: inline-block;
-            flex-shrink: 0;
-            margin-left: 4px;
-            animation: pulse-dot 2s infinite;
-        }
-
-        @keyframes pulse-dot {
-            0%,
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-            50% {
-                opacity: 0.5;
-                transform: scale(0.8);
-            }
         }
 
         .topbar .topbar-right .btn-icon {
@@ -1487,7 +1467,7 @@
         }
 
         /* ============================================================
-           RANK TABLE (Modal + Top 7)
+           RANK TABLE (Modal + Top 8)
            ============================================================ */
         .rank-table {
             width: 100%;
@@ -1530,7 +1510,7 @@
 
         .top8-card {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 10px;
             margin-top: 12px;
         }
@@ -1559,16 +1539,16 @@
 
         .top8-item .top8-name {
             font-weight: 700;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .top8-item .top8-points {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
         }
 
         .top8-item .top8-title {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 600;
             color: var(--primary);
             margin-top: 2px;
@@ -2217,12 +2197,12 @@
         }
 
         /* ============================================================
-           NOTIFICATION BELL — ซ่อนสำหรับสมาชิก
+           NOTIFICATION BELL — Z-index สูง
            ============================================================ */
         .notification-bell {
             position: relative;
             cursor: pointer;
-            z-index: 9999;
+            z-index: var(--z-notification) !important;
         }
         .notification-bell .badge-notif {
             position: absolute;
@@ -2254,7 +2234,7 @@
             max-height: 300px;
             overflow-y: auto;
             padding: 6px 0;
-            z-index: 1001;
+            z-index: var(--z-dropdown);
             margin-top: 6px;
             backdrop-filter: var(--glass-blur);
         }
@@ -2510,7 +2490,7 @@
             }
 
             .top8-card {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             }
 
             .modal-box {
@@ -2614,7 +2594,7 @@
             }
 
             .top8-card {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
             }
 
             .modal-box {
@@ -3193,82 +3173,6 @@
                 display: none !important;
             }
         }
-
-        /* ============================================================
-           NEW TABS — แนะนำเพิ่ม
-           ============================================================ */
-        .suggested-tabs-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .suggested-tab-card {
-            background: var(--bg-card);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: var(--radius-md);
-            padding: 14px 16px;
-            text-align: center;
-            cursor: pointer;
-            transition: all var(--transition);
-            box-shadow: var(--shadow);
-            backdrop-filter: var(--glass-blur);
-        }
-
-        .suggested-tab-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-hover);
-            background: var(--bg-card-hover);
-        }
-
-        .suggested-tab-card .tab-icon {
-            font-size: 28px;
-            color: var(--primary);
-            display: block;
-            margin-bottom: 4px;
-        }
-
-        .suggested-tab-card .tab-label {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .suggested-tab-card .tab-desc {
-            font-size: 10px;
-            color: var(--text-muted);
-            margin-top: 2px;
-        }
-
-        @media (max-width: 768px) {
-            .suggested-tabs-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .suggested-tabs-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 8px;
-            }
-
-            .suggested-tab-card {
-                padding: 10px 12px;
-            }
-
-            .suggested-tab-card .tab-icon {
-                font-size: 22px;
-            }
-
-            .suggested-tab-card .tab-label {
-                font-size: 11px;
-            }
-
-            .suggested-tab-card .tab-desc {
-                font-size: 9px;
-            }
-        }
     </style>
 </head>
 <body>
@@ -3353,6 +3257,14 @@
                 <i class="fas fa-chart-line"></i>
                 <span>วิเคราะห์</span>
             </button>
+            <button class="nav-item" data-page="reports" onclick="switchTab('reports')">
+                <i class="fas fa-file-alt"></i>
+                <span>รายงาน</span>
+            </button>
+            <button class="nav-item" data-page="settings" onclick="switchTab('settings')">
+                <i class="fas fa-cog"></i>
+                <span>ตั้งค่าระบบ</span>
+            </button>
             <div class="nav-label" style="margin-top:12px;">ส่วนตัว</div>
             <button class="nav-item" data-page="profile" onclick="switchTab('profile')" id="profileNav">
                 <i class="fas fa-id-card"></i>
@@ -3391,17 +3303,19 @@
                 </div>
             </div>
             <div class="topbar-right">
-                <span class="status-dot" id="statusDot"></span>
+                <!-- 🔥 ตัวแสดงเชื่อมต่อถูกลบออกแล้ว -->
                 <span class="text-muted text-sm" id="updateTime">-</span>
                 <span class="shortcut-hint" title="กด Ctrl+R เพื่อรีเฟรช"><i class="fas fa-keyboard"></i> Ctrl+R</span>
-                <!-- Notification Bell — ซ่อนสำหรับสมาชิก (จะแสดงเฉพาะ admin) -->
-                <button class="btn-icon notification-bell" id="notificationBell" onclick="toggleNotifications()" title="การแจ้งเตือน">
+
+                <!-- 🔥 ปุ่มแจ้งเตือน — เฉพาะ Admin เท่านั้นที่เห็น (จัดการผ่าน JS) -->
+                <button class="btn-icon notification-bell" onclick="toggleNotifications()" title="การแจ้งเตือน" id="notificationBell" style="display:none;">
                     <i class="fas fa-bell"></i>
                     <span class="badge-notif" id="notifBadge">0</span>
                     <div class="notification-dropdown" id="notifDropdown">
                         <div class="notif-empty">ไม่มีแจ้งเตือน</div>
                     </div>
                 </button>
+
                 <button class="btn-icon" onclick="toggleTheme()" title="สลับธีม">
                     <i id="themeIcon" class="fas fa-moon"></i>
                 </button>
@@ -3497,10 +3411,10 @@
                 <div class="chart-box"><h4><i class="fas fa-clock"></i> ชั่วโมงเร่งด่วน</h4><canvas id="peakChart"></canvas></div>
             </div>
 
-            <!-- Dashboard Members Table — สมาชิกล่าสุดในเดือนนี้ -->
+            <!-- Dashboard Members Table — แสดงสมาชิกล่าสุดในเดือนนี้ -->
             <div class="card-panel">
                 <div class="card-header">
-                    <h3><i class="fas fa-list"></i> สมาชิกล่าสุด (เดือนนี้) <span class="badge" id="dashMemberBadge">0</span></h3>
+                    <h3><i class="fas fa-list"></i> สมาชิกล่าสุด <span class="badge" id="dashMemberBadge">0</span></h3>
                     <div class="card-actions">
                         <input type="text" id="dashMemberSearch" placeholder="ค้นหา..." oninput="filterDashMembers()" />
                         <button class="btn btn-success btn-sm" onclick="exportMembersCSV()"><i class="fas fa-file-csv"></i> CSV</button>
@@ -3571,7 +3485,7 @@
         </div>
 
         <!-- ============================================================
-        PAGE: CHECKIN (Admin)
+        PAGE: CHECKIN (Admin) — เรียงล่าสุดบนสุด
         ============================================================ -->
         <div id="page-checkin" class="page-section">
             <div class="flex-center" style="justify-content:space-between; flex-wrap:wrap; gap:6px; margin-bottom:12px;">
@@ -3603,7 +3517,7 @@
         </div>
 
         <!-- ============================================================
-        PAGE: PAYMENTS (Admin)
+        PAGE: PAYMENTS (Admin) — เรียงล่าสุดบนสุด
         ============================================================ -->
         <div id="page-payments" class="page-section">
             <div class="flex-center" style="justify-content:space-between; flex-wrap:wrap; gap:6px; margin-bottom:12px;">
@@ -3718,6 +3632,45 @@
         </div>
 
         <!-- ============================================================
+        PAGE: REPORTS (ใหม่)
+        ============================================================ -->
+        <div id="page-reports" class="page-section">
+            <div class="flex-center" style="justify-content:space-between; flex-wrap:wrap; gap:6px; margin-bottom:12px;">
+                <h3 style="font-size:18px;font-weight:700;"><i class="fas fa-file-alt" style="color:var(--primary);"></i> รายงาน</h3>
+                <button class="btn btn-success btn-sm" onclick="exportFullReport()"><i class="fas fa-file-pdf"></i> PDF</button>
+            </div>
+            <div class="card-panel">
+                <h4 style="margin-bottom:12px;">📊 สรุปภาพรวม</h4>
+                <div id="reportSummary"><p class="text-muted"><i class="fas fa-spinner fa-spin"></i> กำลังโหลด...</p></div>
+            </div>
+            <div class="card-panel">
+                <h4 style="margin-bottom:12px;">📈 สถิติรายเดือน</h4>
+                <canvas id="reportChart" style="max-height:250px;"></canvas>
+            </div>
+        </div>
+
+        <!-- ============================================================
+        PAGE: SETTINGS (ใหม่)
+        ============================================================ -->
+        <div id="page-settings" class="page-section">
+            <div class="flex-center" style="justify-content:space-between; flex-wrap:wrap; gap:6px; margin-bottom:12px;">
+                <h3 style="font-size:18px;font-weight:700;"><i class="fas fa-cog" style="color:var(--primary);"></i> ตั้งค่าระบบ</h3>
+            </div>
+            <div class="card-panel">
+                <h4 style="margin-bottom:12px;">🎨 ธีม</h4>
+                <button class="btn btn-primary" onclick="toggleTheme()"><i class="fas fa-moon"></i> สลับธีม</button>
+            </div>
+            <div class="card-panel">
+                <h4 style="margin-bottom:12px;">🔑 รหัสผ่านผู้ดูแล</h4>
+                <button class="btn btn-warning" onclick="openRegisterAdmin()"><i class="fas fa-key"></i> เปลี่ยนรหัสผ่าน</button>
+            </div>
+            <div class="card-panel">
+                <h4 style="margin-bottom:12px;">🗑️ ข้อมูล</h4>
+                <button class="btn btn-danger" onclick="if(confirm('ยืนยันลบข้อมูลทั้งหมด?')){localStorage.clear();showToast('🗑️ ล้างข้อมูลเรียบร้อย','warning');}"><i class="fas fa-trash"></i> ล้างข้อมูลแคช</button>
+            </div>
+        </div>
+
+        <!-- ============================================================
         PAGE: PROFILE (Member Dashboard)
         ============================================================ -->
         <div id="page-profile" class="page-section">
@@ -3732,11 +3685,11 @@
                     <div class="label">💳 ยอดชำระเดือนนี้</div>
                 </div>
 
-                <!-- 2. แต้มสะสม = จำนวนการจ่าย (จ่าย 1 ครั้ง = 1 แต้ม) -->
-                <div class="stat-card-click" onclick="showCardDetail('member_points')">
+                <!-- 2. แต้ม = จำนวนครั้งที่จ่ายเงิน -->
+                <div class="stat-card-click" onclick="showCardDetail('member_total_checkins')">
                     <div class="stat-top"><div class="stat-icon green"><i class="fas fa-star"></i></div></div>
                     <div class="num" id="mStatPoints">-</div>
-                    <div class="label">⭐ แต้มสะสม (จ่าย)</div>
+                    <div class="label">⭐ แต้ม (จ่ายเงิน)</div>
                 </div>
 
                 <!-- 3. เวลาคนเข้าใช้มากสุด (TOP 1 สีแดง) -->
@@ -3746,7 +3699,7 @@
                     <div class="label">⏰ เวลาเข้าใช้มากสุด</div>
                 </div>
 
-                <!-- 4. ฉายาประจำเดือน (แสดงอิโมจิ+ชื่อ) -->
+                <!-- 4. ฉายาประจำเดือน (พร้อมอิโมจิ) -->
                 <div class="stat-card-click" onclick="showCardDetail('member_rank')">
                     <div class="stat-top"><div class="stat-icon purple"><i class="fas fa-medal"></i></div></div>
                     <div class="num" id="mStatRank">-</div>
@@ -3829,7 +3782,7 @@
             </div>
 
             <!-- ============================================================
-            🏆 ฉายาคนเข้าฟิตเนสมากที่สุดประจำปี (TOP 8)
+            🏆 ฉายาคนเข้าฟิตเนสมากที่สุดประจำปี (Top 8)
             ============================================================ -->
             <div class="card-panel" id="top8Panel">
                 <div class="card-header">
@@ -3903,68 +3856,6 @@
             </div>
         </div>
 
-        <!-- ============================================================
-        PAGE: SUGGESTED TABS — 3 แท็บแนะนำ
-        ============================================================ -->
-        <div id="page-suggested" class="page-section">
-            <div class="flex-center" style="justify-content:space-between; flex-wrap:wrap; gap:6px; margin-bottom:12px;">
-                <h3 style="font-size:18px;font-weight:700;"><i class="fas fa-lightbulb" style="color:var(--primary);"></i> 🔥 แท็บแนะนำ</h3>
-                <span class="text-xs text-muted">ฟีเจอร์เสริมเพื่อการจัดการที่ครบวงจร</span>
-            </div>
-
-            <div class="suggested-tabs-grid">
-                <!-- แท็บ 1: จัดการคลาส -->
-                <div class="suggested-tab-card" onclick="showToast('📋 กำลังเปิดหน้าจัดการคลาส...', 'info')">
-                    <span class="tab-icon"><i class="fas fa-calendar-check"></i></span>
-                    <div class="tab-label">จัดการคลาส</div>
-                    <div class="tab-desc">จัดตารางออกกำลังกาย</div>
-                </div>
-
-                <!-- แท็บ 2: รายงานและส่งออก -->
-                <div class="suggested-tab-card" onclick="showToast('📊 กำลังเปิดหน้ารายงาน...', 'info')">
-                    <span class="tab-icon"><i class="fas fa-file-alt"></i></span>
-                    <div class="tab-label">รายงานและส่งออก</div>
-                    <div class="tab-desc">สรุปข้อมูลทั้งหมด</div>
-                </div>
-
-                <!-- แท็บ 3: ตั้งค่าระบบ -->
-                <div class="suggested-tab-card" onclick="showToast('⚙️ กำลังเปิดหน้าตั้งค่า...', 'info')">
-                    <span class="tab-icon"><i class="fas fa-cog"></i></span>
-                    <div class="tab-label">ตั้งค่าระบบ</div>
-                    <div class="tab-desc">ปรับแต่งการทำงาน</div>
-                </div>
-            </div>
-
-            <!-- คำอธิบายเพิ่มเติม -->
-            <div class="card-panel">
-                <p style="font-size:13px;color:var(--text-secondary);">
-                    <i class="fas fa-info-circle" style="color:var(--primary);"></i>
-                    <strong>ฟีเจอร์แนะนำ:</strong> จัดการคลาส ระบบจองคิว, รายงานสรุปยอดรายเดือน/ปี, ตั้งค่าราคาและโปรโมชั่น
-                    <br><span class="text-xs text-muted">(คลิกที่การ์ดเพื่อดูตัวอย่าง)</span>
-                </p>
-            </div>
-
-            <!-- ตัวอย่างข้อมูลการจัดการคลาส -->
-            <div class="card-panel">
-                <div class="card-header">
-                    <h3><i class="fas fa-dumbbell" style="color:var(--primary);"></i> คลาสยอดนิยมประจำสัปดาห์</h3>
-                    <span class="text-xs text-muted">ตัวอย่างข้อมูล</span>
-                </div>
-                <div class="table-wrap">
-                    <table>
-                        <thead><tr><th>คลาส</th><th>วัน</th><th>เวลา</th><th>ผู้สอน</th><th>ผู้เข้าร่วม</th></tr></thead>
-                        <tbody>
-                            <tr><td>โยคะ</td><td>จันทร์</td><td>18:00</td><td>ครูสมศรี</td><td>12/20</td></tr>
-                            <tr><td>เวทเทรนนิ่ง</td><td>อังคาร</td><td>19:00</td><td>โค้ชสมชาย</td><td>8/15</td></tr>
-                            <tr><td>คาร์ดิโอ</td><td>พุธ</td><td>17:30</td><td>โค้ชวิไล</td><td>10/18</td></tr>
-                            <tr><td>พิลาทิส</td><td>พฤหัส</td><td>18:30</td><td>ครูสมศรี</td><td>6/12</td></tr>
-                            <tr><td>Zumba</td><td>ศุกร์</td><td>20:00</td><td>โค้ชวิไล</td><td>15/25</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
         <!-- DEBUG PANEL -->
         <div class="debug-panel" id="debugPanel">
             <div class="header">
@@ -4032,9 +3923,9 @@
                 <div class="form-group">
                     <label><i class="fas fa-tag" style="color: var(--primary); margin-left: 6px;"></i> ประเภทสมาชิก</label>
                     <select id="regMemberType">
-                        <option value="عادي">ปกติ (عادي)</option>
-                        <option value="متوسط">ปานกลาง (متوسط)</option>
-                        <option value="مميز">พรีเมียม (مميز)</option>
+                        <option value="عادي">🏋️ ปกติ (عادي)</option>
+                        <option value="متوسط">⭐ ปานกลาง (متوسط)</option>
+                        <option value="مميز">👑 พรีเมียม (مميز)</option>
                     </select>
                 </div>
 
@@ -4151,7 +4042,6 @@
         let notifications = [];
         let autoRefreshTimer = null;
         let refreshInProgress = false;
-        let currentUserRole = 'admin'; // 'admin' or 'member'
 
         // ============================================================
         // HELPERS
@@ -4798,40 +4688,21 @@
                 document.getElementById('appMain').style.display = 'block';
 
                 const navItems = document.querySelectorAll('.nav-item');
-                currentUserRole = role;
+                const notifBell = document.getElementById('notificationBell');
 
                 if (role === 'admin') {
-                    // แสดงทุกแท็บ ยกเว้น profile (สำหรับแอดมินไม่ต้องใช้)
                     navItems.forEach(item => {
                         const page = item.dataset.page;
                         if (page === 'profile') item.style.display = 'none';
                         else item.style.display = 'flex';
                     });
+                    // 🔥 แสดงปุ่มแจ้งเตือนเฉพาะ Admin
+                    if (notifBell) notifBell.style.display = 'flex';
+
                     profileMemberId = null;
                     document.getElementById('sidebarUserName').textContent = 'Admin';
                     document.getElementById('sidebarUserRole').textContent = 'ผู้ดูแลระบบ';
                     document.getElementById('sidebarAvatar').textContent = 'A';
-
-                    // 🔥 แสดง notification bell สำหรับ admin
-                    document.getElementById('notificationBell').style.display = 'flex';
-
-                    // 🔥 เพิ่มแท็บแนะนำใน sidebar
-                    const navSection = document.querySelector('.nav-section');
-                    const existingSuggested = document.querySelector('.nav-item[data-page="suggested"]');
-                    if (!existingSuggested) {
-                        const suggestedBtn = document.createElement('button');
-                        suggestedBtn.className = 'nav-item';
-                        suggestedBtn.dataset.page = 'suggested';
-                        suggestedBtn.innerHTML = `
-                            <i class="fas fa-lightbulb"></i>
-                            <span>แนะนำ</span>
-                        `;
-                        suggestedBtn.onclick = function() { switchTab('suggested'); };
-                        // เพิ่มก่อน sidebar-footer
-                        const footer = document.querySelector('.sidebar-footer');
-                        navSection.insertBefore(suggestedBtn, footer);
-                    }
-
                     refreshDashboard();
                     fetchMembers();
                     fetchCheckins();
@@ -4839,17 +4710,13 @@
                     loadAnalytics();
                     switchTab('dashboard');
                 } else if (role === 'member' && user) {
-                    // 🔥 ซ่อน notification bell สำหรับสมาชิก
-                    document.getElementById('notificationBell').style.display = 'none';
-
                     navItems.forEach(item => {
                         const page = item.dataset.page;
                         if (page === 'profile') item.style.display = 'flex';
                         else item.style.display = 'none';
                     });
-                    // ซ่อนแท็บแนะนำด้วย
-                    const suggestedBtn = document.querySelector('.nav-item[data-page="suggested"]');
-                    if (suggestedBtn) suggestedBtn.style.display = 'none';
+                    // 🔥 ซ่อนปุ่มแจ้งเตือนสำหรับ Member
+                    if (notifBell) notifBell.style.display = 'none';
 
                     profileMemberId = user;
                     document.getElementById('sidebarUserName').textContent = 'สมาชิก';
@@ -4947,9 +4814,6 @@
                 document.getElementById('appMain').style.display = 'none';
                 showToast('👋 ออกจากระบบแล้ว', 'info');
                 document.querySelectorAll('.nav-item').forEach(item => { item.style.display = 'flex'; });
-                // ลบแท็บแนะนำถ้ามี
-                const suggestedBtn = document.querySelector('.nav-item[data-page="suggested"]');
-                if (suggestedBtn) suggestedBtn.remove();
                 if (isSidebarOpen) toggleSidebar();
             }
         }
@@ -4985,7 +4849,7 @@
                 else if (currentPage === 'payments') fetchPayments();
                 else if (currentPage === 'analytics') loadAnalytics();
                 else if (currentPage === 'profile') loadProfile();
-                else if (currentPage === 'suggested') showToast('🔄 รีเฟรชหน้าแนะนำ', 'info');
+                else if (currentPage === 'reports') loadReports();
                 showToast('🔄 รีเฟรชสำเร็จ', 'info');
             }
             if (e.key === 'Escape') {
@@ -5017,7 +4881,8 @@
                 payments: { title: 'การชำระเงิน', sub: 'จัดการประวัติการชำระเงิน' },
                 analytics: { title: 'วิเคราะห์', sub: 'ข้อมูลเชิงลึกและแนวโน้ม' },
                 profile: { title: 'โปรไฟล์', sub: 'ข้อมูลส่วนตัวและสถิติ' },
-                suggested: { title: 'แท็บแนะนำ', sub: 'ฟีเจอร์เสริมเพื่อการจัดการที่ครบวงจร' }
+                reports: { title: 'รายงาน', sub: 'สรุปข้อมูลภาพรวม' },
+                settings: { title: 'ตั้งค่าระบบ', sub: 'จัดการการตั้งค่า' }
             };
             const info = titles[page] || { title: 'หน้า', sub: '' };
             document.getElementById('pageTitle').textContent = info.title;
@@ -5031,10 +4896,8 @@
             else if (page === 'payments') fetchPayments();
             else if (page === 'analytics') loadAnalytics();
             else if (page === 'profile') loadProfile();
-            else if (page === 'suggested') {
-                // หน้าแนะนำ ไม่ต้องโหลดข้อมูล
-                showToast('🌟 แท็บแนะนำ กำลังจะเพิ่มฟีเจอร์ใหม่!', 'info');
-            }
+            else if (page === 'reports') loadReports();
+            else if (page === 'settings') { /* ไม่ต้องทำอะไร */ }
         }
 
         function toggleForm(id) {
@@ -5045,81 +4908,111 @@
         // ============================================================
         // DASHBOARD (Admin)
         // ============================================================
-        async function refreshDashboard() {
-            if (refreshInProgress) return;
-            refreshInProgress = true;
-            const btn = $('refreshBtn');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>โหลด...</span>';
-            try {
-                const data = await apiCall('/dashboard');
-                lastData = data;
-                lastError = null;
-                renderDebug(data);
+async function refreshDashboard() {
+    if (refreshInProgress) return;
+    refreshInProgress = true;
+    const btn = $('refreshBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>โหลด...</span>';
 
-                const s = data.summary || {};
-                $('statTotalMembers').textContent = s.total_members ?? '-';
-                $('statRenewalRate').textContent = (s.renewal_rate ?? 0) + '%';
-                $('statTodayCheckins').textContent = s.today_checkins ?? '-';
-                $('statExpiring').textContent = s.expiring_soon ?? '-';
-                $('statRevenue').textContent = toBath(s.this_month_revenue || 0);
-                $('statNewMembers').textContent = s.new_members_this_month ?? '-';
-                $('statExpired').textContent = s.expired_members ?? '-';
-                $('statTodayPayments').textContent = s.today_payments ?? '-';
+    // 🔥 เก็บข้อมูลเก่าไว้ก่อน
+    const oldMembers = [...allMembers];
+    const oldPayments = [...allPayments];
+    const oldCheckins = [...allCheckins];
 
-                $('updateTime').textContent = '🕐 ' + new Date().toLocaleString('th-TH');
-                $('statusDot').style.background = '#34a853';
-                $('navMemberCount').textContent = s.total_members || 0;
-                $('navMemberCount2').textContent = s.total_members || 0;
+    try {
+        const data = await apiCall('/dashboard');
+        lastData = data;
+        lastError = null;
+        renderDebug(data);
 
-                const members = data.members || [];
-                allMembers = members;
+        const s = data.summary || {};
+        $('statTotalMembers').textContent = s.total_members ?? '-';
+        $('statRenewalRate').textContent = (s.renewal_rate ?? 0) + '%';
+        $('statTodayCheckins').textContent = s.today_checkins ?? '-';
+        $('statExpiring').textContent = s.expiring_soon ?? '-';
+        $('statRevenue').textContent = toBath(s.this_month_revenue || 0);
+        $('statNewMembers').textContent = s.new_members_this_month ?? '-';
+        $('statExpired').textContent = s.expired_members ?? '-';
+        $('statTodayPayments').textContent = s.today_payments ?? '-';
 
-                // 🔥 แสดงเฉพาะสมาชิกล่าสุดในเดือนนี้ (เรียงตามวันที่สมัคร)
-                const thisMonth = getTodayStr().slice(0, 7);
-                const latestMembers = members
-                    .filter(m => m.start_date && normalizeDate(m.start_date).slice(0, 7) === thisMonth)
-                    .sort((a, b) => {
-                        const da = normalizeDate(a.start_date) || '';
-                        const db = normalizeDate(b.start_date) || '';
-                        return db.localeCompare(da);
-                    })
-                    .slice(0, 20);
+        $('updateTime').textContent = '🕐 ' + new Date().toLocaleString('th-TH');
+        $('navMemberCount').textContent = s.total_members || 0;
+        $('navMemberCount2').textContent = s.total_members || 0;
 
-                renderDashMemberTable(latestMembers.length > 0 ? latestMembers : members.slice(0, 20));
-                $('dashMemberBadge').textContent = (latestMembers.length > 0 ? latestMembers.length : members.length) + ' คน';
+        const members = data.members || [];
+        allMembers = members;
 
-                const payments = data.payments || [];
-                allPayments = payments;
-                renderDashPaymentTable(payments);
-                $('dashPaymentBadge').textContent = payments.length + ' รายการ';
-                const total = payments.reduce((s, p) => s + parseFloat(p.amount || 0), 0);
-                $('dashPaymentTotal').textContent = 'รวม: ' + formatNumber(total) + ' ฿';
-
-                renderDashboardCharts(data);
-                showToast('✅ โหลดข้อมูลสำเร็จ', 'success');
-
-                const expiringMembers = members.filter(m => m.status === 'expiring_soon');
-                if (expiringMembers.length > 0) {
-                    addNotification(`⚠️ มีสมาชิกใกล้หมดอายุ ${expiringMembers.length} คน`, 'warning');
-                }
-                const expiredMembers = members.filter(m => m.status === 'expired');
-                if (expiredMembers.length > 0) {
-                    addNotification(`🔴 มีสมาชิกหมดอายุ ${expiredMembers.length} คน`, 'error');
-                }
-            } catch (e) {
-                lastError = e.message;
-                renderDebug(null, e.message);
-                $('statusDot').style.background = '#ea4335';
-                showToast('❌ ' + e.message, 'error');
-                addNotification('❌ โหลดข้อมูลล้มเหลว: ' + e.message, 'error');
-            } finally {
-                refreshInProgress = false;
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-sync"></i> <span>โหลด</span>';
+        // 🔥 ผสานข้อมูลการชำระเงิน (เก็บทุกเดือน)
+        const newPayments = data.payments || [];
+        // เก็บเฉพาะ payment_id ที่ไม่ซ้ำ
+        const existingIds = new Set(allPayments.map(p => p.payment_id));
+        newPayments.forEach(p => {
+            if (!existingIds.has(p.payment_id)) {
+                allPayments.push(p);
             }
+        });
+        // ถ้าไม่มีข้อมูลเก่า ให้ใช้ข้อมูลใหม่
+        if (oldPayments.length === 0) {
+            allPayments = newPayments;
         }
 
+        // 🔥 ผสานข้อมูลเช็คอิน
+        const newCheckins = data.checkins || [];
+        const existingCheckinIds = new Set(allCheckins.map(c => c.log_id));
+        newCheckins.forEach(c => {
+            if (!existingCheckinIds.has(c.log_id)) {
+                allCheckins.push(c);
+            }
+        });
+        if (oldCheckins.length === 0) {
+            allCheckins = newCheckins;
+        }
+
+        // 🔥 แสดงสมาชิกล่าสุดในเดือนนี้
+        const thisMonth = getTodayStr().slice(0, 7);
+        const recentMembers = members
+            .filter(m => m.start_date && normalizeDate(m.start_date).slice(0, 7) === thisMonth)
+            .sort((a, b) => {
+                const da = normalizeDate(a.start_date);
+                const db = normalizeDate(b.start_date);
+                if (!da && !db) return 0;
+                if (!da) return 1;
+                if (!db) return -1;
+                return db.localeCompare(da);
+            });
+        renderDashMemberTable(recentMembers.length > 0 ? recentMembers : members.slice(0, 20));
+        $('dashMemberBadge').textContent = members.length + ' คน';
+
+        renderDashPaymentTable(allPayments.slice(0, 15));
+        $('dashPaymentBadge').textContent = allPayments.length + ' รายการ';
+        const total = allPayments.reduce((s, p) => s + parseFloat(p.amount || 0), 0);
+        $('dashPaymentTotal').textContent = 'รวม: ' + formatNumber(total) + ' ฿';
+
+        renderDashboardCharts(data);
+        showToast('✅ โหลดข้อมูลสำเร็จ', 'success');
+
+        // 🔥 แจ้งเตือนถ้ามีข้อมูลใหม่
+        const newCount = newPayments.length;
+        if (newCount > 0) {
+            addNotification(`💳 มีการชำระเงินใหม่ ${newCount} รายการ`, 'info');
+        }
+
+    } catch (e) {
+        // 🔥 ถ้าโหลดไม่สำเร็จ ให้ใช้ข้อมูลเก่า
+        allMembers = oldMembers;
+        allPayments = oldPayments;
+        allCheckins = oldCheckins;
+        lastError = e.message;
+        renderDebug(null, e.message);
+        showToast('❌ ' + e.message, 'error');
+        addNotification('❌ โหลดข้อมูลล้มเหลว: ' + e.message, 'error');
+    } finally {
+        refreshInProgress = false;
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-sync"></i> <span>โหลด</span>';
+    }
+}
         function renderDashMemberTable(members) {
             const tbody = $('dashMemberTableBody');
             if (!members || !members.length) { tbody.innerHTML =
@@ -5155,13 +5048,7 @@
                 tbody.innerHTML = '<tr><td colspan="6" class="empty-row">ไม่มีข้อมูล</td></tr>';
                 return;
             }
-            // 🔥 เรียงตามวันที่ล่าสุด
-            const sorted = [...payments].sort((a, b) => {
-                const da = normalizeDate(a.payment_date) || '';
-                const db = normalizeDate(b.payment_date) || '';
-                return db.localeCompare(da);
-            });
-            tbody.innerHTML = sorted.slice(0, 15).map((p, i) => {
+            tbody.innerHTML = payments.slice(0, 15).map((p, i) => {
                 const member = allMembers.find(m => m.member_id === p.member_id);
                 const name = member ? member.full_name : '-';
                 return `<tr>
@@ -5188,38 +5075,14 @@
             const isDarkMode = isDark;
             const textColor = isDarkMode ? '#b0b0cc' : '#4a4a6a';
             const gridColor = isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
-
-            // 🔥 แสดง 3 เดือนล่าสุด + เดือนปัจจุบัน
             const revData = data.revenue_by_month || [];
-            const sortedRev = [...revData].sort((a, b) => {
-                return (a.month || '').localeCompare(b.month || '');
-            });
-            // เลือก 3-4 เดือนล่าสุด
-            const lastMonths = sortedRev.slice(-4);
-            const revLabels = lastMonths.map(d => getThaiMonth(d.month));
-            const revValues = lastMonths.map(d => parseFloat(d.total) || 0);
-
-            // ถ้าไม่มีข้อมูลให้ใช้ dummy
-            if (revLabels.length === 0) {
-                const d = new Date();
-                revLabels.push(d.toLocaleDateString('th-TH', { month: 'short' }));
-                revValues.push(0);
-                // ย้อนหลัง 2 เดือน
-                for (let i = 1; i <= 2; i++) {
-                    const dt = new Date();
-                    dt.setMonth(dt.getMonth() - i);
-                    revLabels.unshift(dt.toLocaleDateString('th-TH', { month: 'short' }));
-                    revValues.unshift(0);
-                }
-            }
-
+            const revLabels = revData.map(d => getThaiMonth(d.month));
+            const revValues = revData.map(d => parseFloat(d.total) || 0);
             renderChart('revenueChart', 'bar', revLabels, revValues, 'รายได้ (บาท)', '#0ea5e9', textColor, gridColor);
-
             const trendData = data.checkin_trend || [];
             const trendLabels = trendData.map(d => formatDateShort(d.date));
             const trendValues = trendData.map(d => parseInt(d.count) || 0);
             renderChart('trendChart', 'line', trendLabels, trendValues, 'จำนวนครั้ง', '#10b981', textColor, gridColor);
-
             const peakData = data.peak_hours || [];
             const peakLabels = peakData.map(d => d.hour + ':00');
             const peakValues = peakData.map(d => parseInt(d.count) || 0);
@@ -5254,10 +5117,11 @@
         function refreshAllCharts() {
             if (currentPage === 'dashboard') refreshDashboard();
             else if (currentPage === 'analytics') loadAnalytics();
+            else if (currentPage === 'reports') loadReports();
         }
 
         // ============================================================
-        // SHOW STAT DETAIL (Admin Modal) — revenue แก้ไขแล้ว
+        // SHOW STAT DETAIL (Admin Modal) — revenue 3 เดือนล่าสุด
         // ============================================================
         function showStatDetail(type) {
             const todayStr = getTodayStr();
@@ -5396,115 +5260,251 @@
                     }
                     break;
                 }
-                // 🔥 REVENUE — แสดง 3-4 เดือนล่าสุด
-                case 'revenue': {
-                    title = '💰 รายได้ 3-4 เดือนล่าสุด';
-                    const thisMonth = todayStr.slice(0, 7);
-                    const monthPay = allPayments.filter(p => p.payment_date && normalizeDate(p.payment_date).slice(0, 7) ===
-                        thisMonth);
-                    const totalRev = monthPay.reduce((s, p) => s + parseFloat(p.amount || 0), 0);
+case 'revenue': {
+    title = '💰 รายได้ (3 เดือนล่าสุด)';
+    const todayStr = getTodayStr();
+    const thisMonth = todayStr.slice(0, 7);
+    
+    // 🔥 ใช้ allPayments ที่มีอยู่ทั้งหมด (ไม่จำกัดเฉพาะเดือนนี้)
+    const monthPay = allPayments.filter(p => p.payment_date && normalizeDate(p.payment_date).slice(0, 7) === thisMonth);
+    const totalRev = monthPay.reduce((s, p) => s + parseFloat(p.amount || 0), 0);
 
-                    const revByMonth = {};
-                    allPayments.forEach(p => {
-                        if (p.payment_date) {
-                            const m = normalizeDate(p.payment_date).slice(0, 7);
-                            revByMonth[m] = (revByMonth[m] || 0) + parseFloat(p.amount || 0);
-                        }
-                    });
+    // 🔥 จัดกลุ่มรายได้ตามเดือนจากข้อมูลทั้งหมด
+    const revByMonth = {};
+    allPayments.forEach(p => {
+        if (p.payment_date) {
+            const m = normalizeDate(p.payment_date).slice(0, 7);
+            revByMonth[m] = (revByMonth[m] || 0) + parseFloat(p.amount || 0);
+        }
+    });
 
-                    const sortedMonths = Object.keys(revByMonth).sort();
-                    const lastMonths = sortedMonths.slice(-4); // 4 เดือนล่าสุด
-                    const lastValues = lastMonths.map(m => revByMonth[m] || 0);
-                    const lastLabels = lastMonths.map(m => {
-                        const d = new Date(m + '-01');
-                        return d.toLocaleDateString('th-TH', { month: 'short', year: 'numeric' });
-                    });
+    // 🔥 เรียงลำดับเดือนและเลือก 3 เดือนล่าสุด
+    const sortedMonths = Object.keys(revByMonth).sort();
+    const lastMonths = sortedMonths.slice(-3);
+    const lastValues = lastMonths.map(m => revByMonth[m] || 0);
+    const lastLabels = lastMonths.map(m => {
+        const d = new Date(m + '-01');
+        return d.toLocaleDateString('th-TH', { month: 'short', year: 'numeric' });
+    });
 
-                    if (lastMonths.length === 0) {
-                        content =
-                            `<div style="text-align:center;padding:20px 0;"><div style="font-size:48px;color:var(--text-muted);margin-bottom:12px;">📊</div><h4 style="color:var(--text-muted);">ยังไม่มีข้อมูลรายได้</h4><p style="color:var(--text-muted);font-size:13px;margin-top:8px;">เริ่มบันทึกการชำระเงินเพื่อดูกราฟ</p></div>`;
-                    } else {
-                        let chartHtml =
-                            `<div style="height:200px;margin-top:12px;"><canvas id="revenueModalChart"></canvas></div>`;
-                        let tableHtml =
-                            `<div style="display:grid;grid-template-columns:repeat(${Math.min(lastLabels.length, 4)},1fr);gap:10px;margin-bottom:12px;">`;
-                        lastLabels.forEach((label, idx) => {
-                            tableHtml += `
-                                    <div style="background:var(--bg-body);border-radius:8px;padding:10px;border:1px solid rgba(0,0,0,0.04);text-align:center;">
-                                        <div style="font-size:11px;color:var(--text-muted);">${label}</div>
-                                        <div style="font-size:20px;font-weight:700;color:var(--primary);">${toBath(lastValues[idx] || 0)}</div>
-                                    </div>
-                                `;
-                        });
-                        tableHtml += '</div>';
+    // 🔥 ถ้ามีข้อมูลน้อยกว่า 3 เดือน ให้ดึงจาก API เพิ่มเติม
+    if (lastMonths.length < 3 && allPayments.length > 0) {
+        // ใช้ข้อมูลที่มีอยู่แล้ว แสดงเท่าที่มี
+    }
 
-                        content =
-                            `
-                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
-                                    <div style="background:var(--bg-body);border-radius:8px;padding:12px;border:1px solid rgba(0,0,0,0.04);text-align:center;">
-                                        <div style="font-size:11px;color:var(--text-muted);">${lastLabels[lastLabels.length-1] || 'เดือนนี้'}</div>
-                                        <div style="font-size:26px;font-weight:700;color:var(--primary);">${toBath(totalRev)}</div>
-                                    </div>
-                                    <div style="background:var(--bg-body);border-radius:8px;padding:12px;border:1px solid rgba(0,0,0,0.04);text-align:center;">
-                                        <div style="font-size:11px;color:var(--text-muted);">รายการชำระ</div>
-                                        <div style="font-size:26px;font-weight:700;color:var(--text-primary);">${monthPay.length}</div>
-                                    </div>
-                                </div>
-                                ${tableHtml}
-                                ${chartHtml}
-                            `;
-                        setTimeout(() => {
-                            const canvas = document.getElementById('revenueModalChart');
-                            if (canvas && lastLabels.length) {
-                                const ctx = canvas.getContext('2d');
-                                // สร้างสี gradient
-                                const colors = lastValues.map((v, i) => {
-                                    const alpha = 0.3 + (i / lastValues.length) * 0.4;
-                                    return `rgba(15,59,94,${alpha})`;
-                                });
-                                new Chart(ctx, {
-                                    type: 'bar',
-                                    data: {
-                                        labels: lastLabels,
-                                        datasets: [{
-                                            label: 'รายได้ (บาท)',
-                                            data: lastValues,
-                                            backgroundColor: colors,
-                                            borderColor: '#0f3b5e',
-                                            borderWidth: 2
-                                        }]
-                                    },
-                                    options: {
-                                        responsive: true,
-                                        maintainAspectRatio: true,
-                                        plugins: {
-                                            legend: { display: false },
-                                            tooltip: {
-                                                callbacks: {
-                                                    label: function(context) {
-                                                        return context.parsed.y + ' ฿';
-                                                    }
-                                                }
-                                            }
-                                        },
-                                        scales: {
-                                            y: {
-                                                beginAtZero: true,
-                                                ticks: {
-                                                    callback: function(value) {
-                                                        return value.toLocaleString() + ' ฿';
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                });
-                            }
-                        }, 300);
-                    }
-                    break;
+    // 🔥 สร้าง chart id แบบไดนามิก
+    const chartId = 'revenueModalChart_' + Date.now();
+
+    if (lastMonths.length === 0) {
+        content = `<div style="text-align:center;padding:20px 0;">
+            <div style="font-size:48px;color:var(--text-muted);margin-bottom:12px;">📊</div>
+            <h4 style="color:var(--text-muted);">ยังไม่มีข้อมูลรายได้</h4>
+            <p style="color:var(--text-muted);font-size:13px;margin-top:8px;">เริ่มบันทึกการชำระเงินเพื่อดูกราฟ</p>
+        </div>`;
+    } else {
+        // 🔥 สร้างตารางสรุป 3 เดือน
+        let tableHtml = `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;">
+            ${lastMonths.map((m, idx) => {
+                const isLatest = idx === lastMonths.length - 1;
+                const icon = isLatest ? '🔴' : idx === lastMonths.length - 2 ? '🟡' : '🟢';
+                const label = isLatest ? 'เดือนนี้' : idx === lastMonths.length - 2 ? 'เดือนที่แล้ว' : 'เดือนเก่าสุด';
+                const color = isLatest ? 'var(--danger)' : idx === lastMonths.length - 2 ? 'var(--warning)' : 'var(--success)';
+                return `
+                    <div style="background:var(--bg-body);border-radius:8px;padding:10px;border:1px solid rgba(0,0,0,0.04);text-align:center;border-top:3px solid ${color};">
+                        <div style="font-size:11px;color:var(--text-muted);">${icon} ${label}</div>
+                        <div style="font-size:20px;font-weight:700;color:${color};">${toBath(lastValues[idx] || 0)}</div>
+                        <div style="font-size:10px;color:var(--text-muted);">${lastLabels[idx]}</div>
+                    </div>
+                `;
+            }).join('')}
+        </div>`;
+
+        // 🔥 สร้างกราฟ
+        let chartHtml = `
+            <div style="background:var(--bg-body);border-radius:var(--radius-sm);padding:12px;border:1px solid rgba(0,0,0,0.04);">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                    <span style="font-size:12px;font-weight:600;color:var(--text-secondary);">
+                        <i class="fas fa-chart-bar"></i> เปรียบเทียบรายได้ 3 เดือนล่าสุด
+                    </span>
+                    <span style="font-size:10px;color:var(--text-muted);">
+                        <span style="color:#dc2626;">●</span> เดือนนี้ 
+                        <span style="color:#d97706;">●</span> เดือนที่แล้ว 
+                        <span style="color:#059669;">●</span> เดือนเก่าสุด
+                    </span>
+                </div>
+                <div style="height:200px;margin-top:4px;">
+                    <canvas id="${chartId}"></canvas>
+                </div>
+            </div>
+        `;
+
+        // 🔥 เปรียบเทียบ %
+        let compareHtml = '';
+        if (lastValues.length >= 2) {
+            const latest = lastValues[lastValues.length - 1] || 0;
+            const previous = lastValues[lastValues.length - 2] || 0;
+            const oldest = lastValues[lastValues.length - 3] || 0;
+            
+            let change = 0;
+            let changeText = '';
+            let changeColor = '';
+            if (previous > 0) {
+                change = ((latest - previous) / previous) * 100;
+                changeText = change > 0 ? `↑ ${change.toFixed(1)}%` : `↓ ${Math.abs(change).toFixed(1)}%`;
+                changeColor = change > 0 ? 'var(--success)' : 'var(--danger)';
+            }
+
+            let compareOld = 0;
+            let compareOldText = '';
+            let compareOldColor = '';
+            if (oldest > 0 && previous > 0) {
+                compareOld = ((previous - oldest) / oldest) * 100;
+                compareOldText = compareOld > 0 ? `↑ ${compareOld.toFixed(1)}%` : `↓ ${Math.abs(compareOld).toFixed(1)}%`;
+                compareOldColor = compareOld > 0 ? 'var(--success)' : 'var(--danger)';
+            }
+
+            compareHtml = `
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;">
+                    <div style="background:var(--bg-body);border-radius:8px;padding:10px;border:1px solid rgba(0,0,0,0.04);text-align:center;">
+                        <div style="font-size:10px;color:var(--text-muted);">📈 เปลี่ยนแปลง (เดือนนี้ vs เดือนที่แล้ว)</div>
+                        <div style="font-size:18px;font-weight:700;color:${changeColor};">${changeText}</div>
+                        <div style="font-size:11px;color:var(--text-muted);">${toBath(previous)} → ${toBath(latest)}</div>
+                    </div>
+                    <div style="background:var(--bg-body);border-radius:8px;padding:10px;border:1px solid rgba(0,0,0,0.04);text-align:center;">
+                        <div style="font-size:10px;color:var(--text-muted);">📊 การเติบโต (เดือนที่แล้ว vs เดือนเก่าสุด)</div>
+                        <div style="font-size:18px;font-weight:700;color:${compareOldColor};">${compareOldText}</div>
+                        <div style="font-size:11px;color:var(--text-muted);">${toBath(oldest)} → ${toBath(previous)}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        content = `
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;flex:1;min-width:200px;">
+                    <div style="background:var(--bg-body);border-radius:8px;padding:12px;border:1px solid rgba(0,0,0,0.04);text-align:center;border-right:4px solid var(--danger);">
+                        <div style="font-size:10px;color:var(--text-muted);">💰 รวม ${lastLabels[lastLabels.length-1] || 'เดือนนี้'}</div>
+                        <div style="font-size:24px;font-weight:700;color:var(--danger);">${toBath(totalRev)}</div>
+                    </div>
+                    <div style="background:var(--bg-body);border-radius:8px;padding:12px;border:1px solid rgba(0,0,0,0.04);text-align:center;border-right:4px solid var(--info);">
+                        <div style="font-size:10px;color:var(--text-muted);">📋 รายการชำระ</div>
+                        <div style="font-size:24px;font-weight:700;color:var(--info);">${monthPay.length}</div>
+                    </div>
+                </div>
+                <button class="btn btn-primary btn-sm" onclick="refreshRevenueChart()" style="margin-right:4px;">
+                    <i class="fas fa-sync"></i> รีเฟรช
+                </button>
+            </div>
+            ${tableHtml}
+            ${chartHtml}
+            ${compareHtml}
+        `;
+
+        // 🔥 สร้างกราฟหลังจาก DOM อัปเดต
+        setTimeout(() => {
+            const canvas = document.getElementById(chartId);
+            if (canvas && lastLabels.length) {
+                // ลบกราฟเก่าถ้ามี
+                if (window._revenueChartInstance) {
+                    try { window._revenueChartInstance.destroy(); } catch (e) {}
+                    window._revenueChartInstance = null;
                 }
-                case 'newMembers': {
+
+                const ctx = canvas.getContext('2d');
+                const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+                const textColor = isDarkMode ? '#b0b0cc' : '#4a4a6a';
+                const gridColor = isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+
+                window._revenueChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: lastLabels,
+                        datasets: [{
+                            label: 'รายได้ (บาท)',
+                            data: lastValues,
+                            backgroundColor: lastValues.map((v, i) => {
+                                if (i === lastValues.length - 1) return 'rgba(220,38,38,0.7)';
+                                if (i === lastValues.length - 2) return 'rgba(217,119,6,0.7)';
+                                return 'rgba(5,150,105,0.7)';
+                            }),
+                            borderColor: lastValues.map((v, i) => {
+                                if (i === lastValues.length - 1) return '#dc2626';
+                                if (i === lastValues.length - 2) return '#d97706';
+                                return '#059669';
+                            }),
+                            borderWidth: 3,
+                            borderRadius: 6,
+                            barPercentage: 0.6,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: { 
+                                display: true,
+                                labels: { 
+                                    color: textColor, 
+                                    font: { size: 11, weight: 'bold' }
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const monthLabel = lastLabels[context.dataIndex] || '';
+                                        return `💵 ${monthLabel}: ${context.parsed.y.toLocaleString()} ฿`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value.toLocaleString() + ' ฿';
+                                    },
+                                    color: textColor,
+                                    font: { size: 10 }
+                                },
+                                grid: { color: gridColor }
+                            },
+                            x: {
+                                ticks: {
+                                    color: textColor,
+                                    font: { size: 11, weight: 'bold' }
+                                },
+                                grid: { color: gridColor }
+                            }
+                        }
+                    },
+                    plugins: [{
+                        id: 'valueLabels',
+                        afterDraw: function(chart) {
+                            const ctx = chart.ctx;
+                            const meta = chart.getDatasetMeta(0);
+                            const data = chart.data.datasets[0].data;
+                            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                            const textColor = isDark ? '#b0b0cc' : '#4a4a6a';
+                            
+                            meta.data.forEach(function(bar, index) {
+                                const value = data[index];
+                                if (value > 0) {
+                                    ctx.fillStyle = textColor;
+                                    ctx.font = 'bold 11px sans-serif';
+                                    ctx.textAlign = 'center';
+                                    ctx.textBaseline = 'bottom';
+                                    ctx.fillText(value.toLocaleString() + ' ฿', bar.x, bar.y - 6);
+                                }
+                            });
+                        }
+                    }]
+                });
+            }
+        }, 200);
+    }
+    break;
+}                case 'newMembers': {
                     title = '➕ สมาชิกใหม่เดือนนี้';
                     const thisMonth = todayStr.slice(0, 7);
                     const newMembers = allMembers.filter(m => m.start_date && normalizeDate(m.start_date).slice(0, 7) ===
@@ -5640,6 +5640,59 @@
         }
 
         // ============================================================
+// REFRESH REVENUE CHART — ปุ่มรีเฟรชใน Modal
+// ============================================================
+function refreshRevenueChart() {
+    showToast('🔄 กำลังรีเฟรชกราฟ...', 'info');
+    
+    // 🔥 เก็บข้อมูลเก่าไว้ก่อน
+    const oldPayments = [...allPayments];
+    const oldMembers = [...allMembers];
+    const oldCheckins = [...allCheckins];
+    
+    // 🔥 รีเฟรชข้อมูล dashboard
+    refreshDashboard().then(() => {
+        // 🔥 ถ้าข้อมูลใหม่มีน้อยกว่า 3 เดือน ให้ใช้ข้อมูลเก่าผสาน
+        const revByMonth = {};
+        allPayments.forEach(p => {
+            if (p.payment_date) {
+                const m = normalizeDate(p.payment_date).slice(0, 7);
+                revByMonth[m] = (revByMonth[m] || 0) + parseFloat(p.amount || 0);
+            }
+        });
+        const sortedMonths = Object.keys(revByMonth).sort();
+        
+        // 🔥 ถ้ามีน้อยกว่า 3 เดือน ให้ใช้ข้อมูลเก่าผสาน
+        if (sortedMonths.length < 3 && oldPayments.length > 0) {
+            // ผสานข้อมูลเก่าและใหม่
+            const mergedPayments = [...oldPayments];
+            allPayments.forEach(p => {
+                if (!mergedPayments.some(old => old.payment_id === p.payment_id)) {
+                    mergedPayments.push(p);
+                }
+            });
+            allPayments = mergedPayments;
+            showToast('📊 ใช้ข้อมูลรวมจากเก่าและใหม่', 'info');
+        }
+        
+        // 🔥 ปิด Modal เก่า
+        closeTempModal();
+        // 🔥 เปิดใหม่
+        setTimeout(() => {
+            showStatDetail('revenue');
+        }, 300);
+    }).catch(() => {
+        // 🔥 ถ้ารีเฟรชไม่สำเร็จ ให้ใช้ข้อมูลเก่า
+        allPayments = oldPayments;
+        allMembers = oldMembers;
+        allCheckins = oldCheckins;
+        setTimeout(() => {
+            closeTempModal();
+            showStatDetail('revenue');
+        }, 300);
+    });
+}
+        // ============================================================
         // MEMBERS (Admin)
         // ============================================================
         async function fetchMembers() {
@@ -5764,7 +5817,7 @@
         }
 
         // ============================================================
-        // CHECKIN (Admin) — แสดงล่าสุดด้านบน
+        // CHECKIN (Admin) — เรียงล่าสุดบนสุด
         // ============================================================
         async function fetchCheckins() {
             try {
@@ -5774,10 +5827,13 @@
                 const tbody = $('checkinTableBody');
                 if (!allCheckins.length) { tbody.innerHTML =
                         '<tr><td colspan="5" class="empty-row">ไม่มีข้อมูล</td></tr>'; return; }
-                // 🔥 เรียงตามวันที่ล่าสุด
+                // 🔥 เรียงล่าสุดบนสุด
                 const sorted = [...allCheckins].sort((a, b) => {
-                    const da = normalizeDate(a.checkin_date) + ' ' + (a.checkin_time || '00:00');
-                    const db = normalizeDate(b.checkin_date) + ' ' + (b.checkin_time || '00:00');
+                    const da = normalizeDate(a.checkin_date);
+                    const db = normalizeDate(b.checkin_date);
+                    if (!da && !db) return 0;
+                    if (!da) return 1;
+                    if (!db) return -1;
                     return db.localeCompare(da);
                 });
                 tbody.innerHTML = sorted.slice(0, 100).map((c, i) => {
@@ -5809,7 +5865,7 @@
         }
 
         // ============================================================
-        // PAYMENTS (Admin) — แสดงล่าสุดด้านบน
+        // PAYMENTS (Admin) — เรียงล่าสุดบนสุด
         // ============================================================
         async function fetchPayments() {
             try {
@@ -5819,10 +5875,13 @@
                 const tbody = $('paymentsTableBody');
                 if (!allPayments.length) { tbody.innerHTML =
                         '<tr><td colspan="6" class="empty-row">ไม่มีข้อมูล</td></tr>'; return; }
-                // 🔥 เรียงตามวันที่ล่าสุด
+                // 🔥 เรียงล่าสุดบนสุด
                 const sorted = [...allPayments].sort((a, b) => {
-                    const da = normalizeDate(a.payment_date) || '00:00';
-                    const db = normalizeDate(b.payment_date) || '00:00';
+                    const da = normalizeDate(a.payment_date);
+                    const db = normalizeDate(b.payment_date);
+                    if (!da && !db) return 0;
+                    if (!da) return 1;
+                    if (!db) return -1;
                     return db.localeCompare(da);
                 });
                 tbody.innerHTML = sorted.slice(0, 100).map((p, i) => {
@@ -5959,6 +6018,117 @@
         }
 
         // ============================================================
+        // REPORTS
+        // ============================================================
+        async function loadReports() {
+            try {
+                const data = await apiCall('/dashboard');
+                const summary = data.summary || {};
+                const members = data.members || [];
+                const payments = data.payments || [];
+
+                const totalMembers = summary.total_members || 0;
+                const totalRevenue = payments.reduce((s, p) => s + parseFloat(p.amount || 0), 0);
+                const thisMonthPay = payments.filter(p => p.payment_date && normalizeDate(p.payment_date).slice(0, 7) ===
+                    getTodayStr().slice(0, 7));
+                const thisMonthRevenue = thisMonthPay.reduce((s, p) => s + parseFloat(p.amount || 0), 0);
+
+                document.getElementById('reportSummary').innerHTML = `
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;">
+                            <div style="background:var(--bg-body);border-radius:8px;padding:10px;text-align:center;border:1px solid rgba(0,0,0,0.04);">
+                                <div style="font-size:11px;color:var(--text-muted);">👥 สมาชิกทั้งหมด</div>
+                                <div style="font-size:20px;font-weight:700;color:var(--primary);">${totalMembers}</div>
+                            </div>
+                            <div style="background:var(--bg-body);border-radius:8px;padding:10px;text-align:center;border:1px solid rgba(0,0,0,0.04);">
+                                <div style="font-size:11px;color:var(--text-muted);">💰 รายได้เดือนนี้</div>
+                                <div style="font-size:20px;font-weight:700;color:var(--success);">${toBath(thisMonthRevenue)}</div>
+                            </div>
+                            <div style="background:var(--bg-body);border-radius:8px;padding:10px;text-align:center;border:1px solid rgba(0,0,0,0.04);">
+                                <div style="font-size:11px;color:var(--text-muted);">💳 รายได้ทั้งหมด</div>
+                                <div style="font-size:20px;font-weight:700;color:var(--primary);">${toBath(totalRevenue)}</div>
+                            </div>
+                            <div style="background:var(--bg-body);border-radius:8px;padding:10px;text-align:center;border:1px solid rgba(0,0,0,0.04);">
+                                <div style="font-size:11px;color:var(--text-muted);">📅 สมาชิกใหม่เดือนนี้</div>
+                                <div style="font-size:20px;font-weight:700;color:var(--info);">${summary.new_members_this_month || 0}</div>
+                            </div>
+                        </div>
+                    `;
+
+                // กราฟรายเดือน
+                const revByMonth = {};
+                payments.forEach(p => {
+                    if (p.payment_date) {
+                        const m = normalizeDate(p.payment_date).slice(0, 7);
+                        revByMonth[m] = (revByMonth[m] || 0) + parseFloat(p.amount || 0);
+                    }
+                });
+                const sortedMonths = Object.keys(revByMonth).sort().slice(-6);
+                const labels = sortedMonths.map(m => {
+                    const d = new Date(m + '-01');
+                    return d.toLocaleDateString('th-TH', { month: 'short', year: '2-digit' });
+                });
+                const values = sortedMonths.map(m => revByMonth[m] || 0);
+
+                const canvas = document.getElementById('reportChart');
+                if (canvas) {
+                    if (chartInstances['reportChart']) {
+                        chartInstances['reportChart'].destroy();
+                        delete chartInstances['reportChart'];
+                    }
+                    const ctx = canvas.getContext('2d');
+                    const isDarkMode = isDark;
+                    const textColor = isDarkMode ? '#b0b0cc' : '#4a4a6a';
+                    const gridColor = isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+                    chartInstances['reportChart'] = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'รายได้ (บาท)',
+                                data: values,
+                                backgroundColor: 'rgba(15,59,94,0.6)',
+                                borderColor: '#0f3b5e',
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: { display: true, labels: { color: textColor, font: { size: 11 } } },
+                                tooltip: { callbacks: { label: function(context) { return context.parsed.y +
+                                            ' ฿'; } } }
+                            },
+                            scales: {
+                                x: { ticks: { color: textColor, font: { size: 10 } }, grid: { color: gridColor } },
+                                y: { ticks: { color: textColor, font: { size: 10 } }, grid: { color: gridColor },
+                                    beginAtZero: true }
+                            }
+                        }
+                    });
+                }
+            } catch (e) {
+                document.getElementById('reportSummary').innerHTML =
+                    `<p class="text-muted">❌ โหลดข้อมูลไม่สำเร็จ: ${e.message}</p>`;
+            }
+        }
+
+        function exportFullReport() {
+            showToast('📄 กำลังสร้างรายงาน PDF...', 'info');
+            setTimeout(() => {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('p', 'mm', 'a4');
+                doc.setFontSize(20);
+                doc.text('📊 Pro Gym - รายงานระบบ', 20, 30);
+                doc.setFontSize(12);
+                doc.text(`วันที่: ${new Date().toLocaleString('th-TH')}`, 20, 45);
+                doc.text(`สมาชิกทั้งหมด: ${document.querySelector('#reportSummary .kpi-val')?.textContent || '-'}`, 20, 60);
+                doc.save('report_progym.pdf');
+                showToast('✅ ดาวน์โหลดรายงานสำเร็จ', 'success');
+            }, 500);
+        }
+
+        // ============================================================
         // PROFILE (Member Dashboard)
         // ============================================================
         async function loadProfile() {
@@ -6019,9 +6189,9 @@
                 $('profileId').textContent = 'รหัส: ' + (m.member_id || '-');
                 $('profilePhone').innerHTML = '<i class="fas fa-phone"></i> ' + (m.phone || '-');
                 $('profileType').innerHTML = '<i class="fas fa-tag"></i> ' + (m.membership_type || '-');
-                // 🔥 แต้ม = จำนวนการจ่าย
-                const pointCount = profilePayments.length;
-                $('profilePoints').innerHTML = '<i class="fas fa-star"></i> แต้ม: ' + pointCount;
+                // 🔥 แต้ม = จำนวนครั้งที่จ่ายเงิน
+                const points = profilePayments.length;
+                $('profilePoints').innerHTML = '<i class="fas fa-star"></i> แต้ม: ' + points;
                 $('profileRank').innerHTML = '<i class="fas fa-medal"></i> ระดับ: ' + (m.rank || '-');
                 const expiryDisplay = profileExpiryStr && profileExpiryStr !== '-' ? formatDate(profileExpiryStr) : 'ยังไม่ชำระ';
                 $('profileExpiryStatus').innerHTML = isExpired ?
@@ -6035,7 +6205,7 @@
                 $('previewPhone').textContent = m.phone || '-';
                 $('previewType').textContent = m.membership_type || '-';
                 $('previewExpiry').textContent = expiryDisplay;
-                $('previewPoints').textContent = pointCount;
+                $('previewPoints').textContent = points;
                 $('previewStartDate').textContent = formatDate(m.start_date);
                 $('previewExpiryFooter').textContent = expiryDisplay;
                 $('previewExpiryFooter').className = isExpired ? 'expiry' : '';
@@ -6080,9 +6250,9 @@
             const totalPaid = monthPayments.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
             $('mStatRevenue').textContent = formatNumber(totalPaid) + ' ฿';
 
-            // 2. แต้มสะสม = จำนวนการจ่ายทั้งหมด
-            const totalPayments = profilePayments.length;
-            $('mStatPoints').textContent = totalPayments;
+            // 2. แต้ม = จำนวนครั้งที่จ่ายเงิน
+            const points = profilePayments.length;
+            $('mStatPoints').textContent = points;
 
             // 3. เวลาเข้าใช้มากสุด (TOP 1 สีแดง)
             const monthCheckinsAll = allCheckins.filter(c => c.checkin_date && normalizeDate(c.checkin_date).slice(0, 7) ===
@@ -6103,7 +6273,7 @@
                 $('mStatPeak').textContent = 'ไม่มีข้อมูล';
             }
 
-            // 4. ฉายาประจำเดือน (อิโมจิ+ชื่อ)
+            // 4. ฉายาประจำเดือน (พร้อมอิโมจิ)
             const myMonthCheckins = profileCheckins.filter(c => c.checkin_date && normalizeDate(c.checkin_date).slice(0, 7) ===
                 thisMonth);
             const myCount = myMonthCheckins.length;
@@ -6154,7 +6324,6 @@
             const thisMonth = today.slice(0, 7);
 
             switch (type) {
-                // 1. ยอดชำระเดือนนี้
                 case 'member_revenue': {
                     const allPaymentsHistory = profilePayments;
                     const monthPayments = allPaymentsHistory.filter(p => p.payment_date && normalizeDate(p.payment_date).slice(
@@ -6200,39 +6369,26 @@
                     break;
                 }
 
-                // 2. แต้มสะสม = จำนวนการจ่ายทั้งหมด
-                case 'member_points': {
-                    const total = profilePayments.length;
-                    title = '⭐ แต้มสะสม (จำนวนการจ่ายทั้งหมด)';
-                    let monthly = {};
-                    profilePayments.forEach(p => {
-                        if (p.payment_date) {
-                            const m = normalizeDate(p.payment_date).slice(0, 7);
-                            monthly[m] = (monthly[m] || 0) + 1;
-                        }
-                    });
-                    const sortedMonths = Object.keys(monthly).sort().reverse();
-                    let detailHtml =
-                        `<div style="text-align:center;padding:10px 0;">
-                            <div style="font-size:48px;font-weight:800;color:var(--primary);">${total}</div>
-                            <div style="font-size:13px;color:var(--text-muted);">แต้ม (1 จ่าย = 1 แต้ม)</div>
+                case 'member_total_checkins': {
+                    // 🔥 แต้ม = จำนวนครั้งที่จ่ายเงิน
+                    const points = profilePayments.length;
+                    title = '⭐ แต้มสะสม (จากจำนวนครั้งที่จ่ายเงิน)';
+                    content =
+                        `
+                        <div style="text-align:center;padding:16px 0;">
+                            <div style="font-size:64px;font-weight:800;color:var(--primary);">${points}</div>
+                            <div style="font-size:16px;color:var(--text-muted);">แต้ม</div>
+                            <div style="font-size:13px;color:var(--text-secondary);margin-top:8px;">
+                                <i class="fas fa-coins"></i> จ่ายเงิน ${profilePayments.length} ครั้ง
+                            </div>
+                            <div style="margin-top:12px;font-size:12px;color:var(--text-muted);">
+                                💰 ทุกครั้งที่ชำระเงิน = 1 แต้ม
+                            </div>
                         </div>
-                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(80px,1fr));gap:6px;margin-top:10px;">`;
-                    sortedMonths.slice(0, 6).forEach(m => {
-                        const d = new Date(m + '-01');
-                        const label = d.toLocaleDateString('th-TH', { month: 'short', year: '2-digit' });
-                        detailHtml +=
-                            `<div style="background:var(--bg-body);border-radius:6px;padding:6px;text-align:center;border:1px solid rgba(0,0,0,0.04);">
-                                <div style="font-size:11px;color:var(--text-muted);">${label}</div>
-                                <div style="font-size:16px;font-weight:700;color:var(--primary);">${monthly[m]}</div>
-                            </div>`;
-                    });
-                    detailHtml += '</div>';
-                    content = detailHtml;
+                    `;
                     break;
                 }
 
-                // 3. เวลาเข้าใช้มากสุด (TOP 3)
                 case 'member_peak': {
                     const monthCheckinsAll = allCheckins.filter(c => c.checkin_date && normalizeDate(c.checkin_date).slice(0,
                         7) === thisMonth);
@@ -6267,47 +6423,45 @@
                     break;
                 }
 
-                // 4. 🔥 ฉายาประจำเดือน — แสดง 5 อันดับสมาชิกที่มาใช้มากที่สุดในเดือนนี้
                 case 'member_rank': {
+                    // ฉายาของตัวเอง
                     const myMonthCheckins = profileCheckins.filter(c => c.checkin_date && normalizeDate(c.checkin_date).slice(
                         0, 7) === thisMonth);
                     const myCount = myMonthCheckins.length;
-                    let rankEmoji = '🌱';
-                    let rankTitle = 'เริ่มต้น';
-                    if (myCount >= 25) { rankEmoji = '👑';
-                        rankTitle = 'ราชา'; } else if (myCount >= 20) { rankEmoji = '💪';
-                        rankTitle = 'นักสู้'; } else if (myCount >= 15) { rankEmoji = '🏃';
-                        rankTitle = 'ขยัน'; } else if (myCount >= 10) { rankEmoji = '👍';
-                        rankTitle = 'พอใช้'; } else if (myCount >= 5) { rankEmoji = '😴';
-                        rankTitle = 'ขี้เกียจ'; }
+                    let myRankEmoji = '🌱';
+                    let myRankTitle = 'เริ่มต้น';
+                    if (myCount >= 25) { myRankEmoji = '👑';
+                        myRankTitle = 'ราชา'; } else if (myCount >= 20) { myRankEmoji = '💪';
+                        myRankTitle = 'นักสู้'; } else if (myCount >= 15) { myRankEmoji = '🏃';
+                        myRankTitle = 'ขยัน'; } else if (myCount >= 10) { myRankEmoji = '👍';
+                        myRankTitle = 'พอใช้'; } else if (myCount >= 5) { myRankEmoji = '😴';
+                        myRankTitle = 'ขี้เกียจ'; }
 
-                    // คำนวณ 5 อันดับสมาชิกที่เข้าใช้มากที่สุดในเดือนนี้
+                    // Top 5 เดือนนี้
+                    const thisMonthStr = today.slice(0, 7);
                     const monthCheckinCounts = {};
                     allCheckins.forEach(c => {
-                        if (c.checkin_date && normalizeDate(c.checkin_date).slice(0, 7) === thisMonth) {
+                        if (c.checkin_date && normalizeDate(c.checkin_date).slice(0, 7) === thisMonthStr) {
                             const id = c.member_id;
                             if (id) monthCheckinCounts[id] = (monthCheckinCounts[id] || 0) + 1;
                         }
                     });
-                    const sortedTop = Object.entries(monthCheckinCounts)
-                        .sort((a, b) => b[1] - a[1])
-                        .slice(0, 5);
-
-                    const rankEmojis = ['👑', '🥈', '🥉', '4️⃣', '5️⃣'];
-                    const rankNames = ['ราชา', 'รองราชา', 'ที่ 3', 'ที่ 4', 'ที่ 5'];
+                    const sorted = Object.entries(monthCheckinCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+                    const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
+                    const titles = ['ราชาแห่งเดือน', 'รองราชา', 'นักสู้ตัวยง', 'ขยันมาก', 'เก่ง'];
 
                     let topHtml =
-                        `<div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:6px;">`;
-                    sortedTop.forEach(([id, cnt], idx) => {
+                        `<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:6px;margin-top:10px;">`;
+                    sorted.forEach(([id, count], idx) => {
                         const member = allMembers.find(m => m.member_id === id);
                         const name = member ? member.full_name : id;
                         const isMe = id === profileMemberId;
                         topHtml += `
-                            <div style="background:var(--bg-body);border-radius:var(--radius-sm);padding:8px 4px;text-align:center;border:1px solid rgba(0,0,0,0.04);${isMe?'border-color:var(--accent);background:rgba(245,158,11,0.05);':''}">
-                                <div style="font-size:18px;">${rankEmojis[idx] || '🏅'}</div>
-                                <div style="font-size:13px;font-weight:700;${isMe?'color:var(--accent);':''}">${name}${isMe?' ⭐':''}</div>
-                                <div style="font-size:10px;color:var(--text-muted);">${cnt} ครั้ง</div>
-                                <div style="font-size:9px;color:var(--primary);font-weight:600;">${rankNames[idx] || ''}</div>
+                            <div style="background:var(--bg-body);border-radius:8px;padding:8px 4px;text-align:center;border:1px solid rgba(0,0,0,0.04);${isMe?'border-color:var(--accent);':''}">
+                                <div style="font-size:20px;">${medals[idx]}</div>
+                                <div style="font-size:12px;font-weight:700;">${name}${isMe?' 👈':''}</div>
+                                <div style="font-size:10px;color:var(--text-muted);">${count} ครั้ง</div>
+                                <div style="font-size:9px;color:var(--primary);font-weight:600;">${titles[idx]}</div>
                             </div>
                         `;
                     });
@@ -6315,19 +6469,20 @@
 
                     title = '🏅 ฉายาประจำเดือน';
                     content =
-                        `<div style="text-align:center;padding:10px 0;">
-                            <div style="font-size:48px;">${rankEmoji}</div>
-                            <div style="font-size:22px;font-weight:800;color:var(--primary);margin-top:4px;">${rankTitle}</div>
-                            <div style="font-size:13px;color:var(--text-muted);margin-top:2px;">${myCount} ครั้งในเดือนนี้</div>
-                            <div style="margin-top:12px;border-top:1px solid var(--border-glass);padding-top:12px;">
-                                <div style="font-size:12px;font-weight:600;color:var(--text-secondary);">🏆 5 อันดับสมาชิกขยันเดือนนี้</div>
+                        `
+                        <div style="text-align:center;padding:10px 0;">
+                            <div style="font-size:56px;">${myRankEmoji}</div>
+                            <div style="font-size:24px;font-weight:800;color:var(--primary);margin-top:6px;">${myRankTitle}</div>
+                            <div style="font-size:14px;color:var(--text-muted);">${myCount} ครั้งในเดือนนี้</div>
+                            <div style="margin-top:16px;border-top:1px solid rgba(0,0,0,0.04);padding-top:12px;">
+                                <div style="font-size:13px;font-weight:600;color:var(--text-secondary);">🏆 Top 5 เดือนนี้</div>
                                 ${topHtml}
                             </div>
-                        </div>`;
+                        </div>
+                    `;
                     break;
                 }
 
-                // 5. เช็คอินวันนี้ (%)
                 case 'member_percent': {
                     const totalMembers = allMembers.length || 1;
                     const todayCheckinsAll = window._todayCheckinsAll !== undefined ? window._todayCheckinsAll :
@@ -6370,7 +6525,6 @@
                     break;
                 }
 
-                // 6. เหลือวันต่ออายุ
                 case 'member_daysleft': {
                     let days = '-';
                     if (profileExpiryStr && profileExpiryStr !== '-') {
@@ -6397,10 +6551,10 @@
         }
 
         // ============================================================
-        // TOP 8 — ฉายาคนเข้าฟิตเนสมากที่สุดประจำปี (8 อันดับ)
+        // TOP 8 — ฉายาคนเข้าฟิตเนสมากที่สุดประจำปี
         // ============================================================
         function loadTop8() {
-            const container = $('top8Container');
+            const container = document.getElementById('top8Container');
             if (!container) return;
 
             if (!allCheckins || allCheckins.length === 0) {
@@ -6421,7 +6575,6 @@
                 }
             });
 
-            // 🔥 8 อันดับ
             const sorted = Object.entries(checkinCounts).sort((a, b) => b[1] - a[1]).slice(0, 8);
 
             if (sorted.length === 0) {
@@ -6432,7 +6585,7 @@
             const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣'];
             const titles = [
                 '🏆 ราชาแห่งฟิตเนส', '👑 รองราชา', '💪 นักสู้ตัวยง',
-                '🏃 ขยันมาก', '👍 ดีมาก', '🌟 เก่ง', '✨ เริ่มต้นดี', '💫 กำลังมาแรง'
+                '🏃 ขยันมาก', '👍 ดีมาก', '🌟 เก่ง', '✨ เริ่มต้นดี', '🌱 กำลังมา'
             ];
             const colors = ['gold', 'silver', 'bronze', '', '', '', '', ''];
 
@@ -6441,7 +6594,6 @@
                 const member = allMembers.find(m => m.member_id === memberId);
                 const name = member ? member.full_name : memberId;
                 const colorClass = colors[idx] ? colors[idx] : '';
-
                 const isMe = memberId === profileMemberId;
                 const meBadge = isMe ? ' 👈 คุณ' : '';
 
@@ -6503,28 +6655,8 @@
                         </div>
                     `;
             } else if (!hasPayment) {
-                html = `
-                        <div class="status-banner welcome">
-                            <i class="fas fa-hand-peace"></i>
-                            <div>
-                                <strong><i class="fas fa-smile-wink"></i> ยินดีต้อนรับ!</strong>
-                                <span style="font-size:13px;display:block;">คุณ ${member.full_name || ''} ยังไม่มีประวัติการชำระ</span>
-                            </div>
-                            <button class="btn-pay" style="background:var(--warning);color:#0f172a;" onclick="showToast('📞 ติดต่อเจ้าหน้าที่เพื่อชำระเงิน', 'info')">
-                                <i class="fas fa-coins"></i> ชำระเงิน
-                            </button>
-                        </div>
-                    `;
+                
             } else {
-                html = `
-                        <div class="status-banner active">
-                            <i class="fas fa-check-circle"></i>
-                            <div>
-                                <strong><i class="fas fa-check-circle"></i> สมาชิกกำลังใช้งาน</strong>
-                                <span style="font-size:13px;display:block;">หมดอายุ ${formatDate(expiryDateStr)}</span>
-                            </div>
-                        </div>
-                    `;
             }
             container.innerHTML = html;
         }
@@ -7108,7 +7240,7 @@
             console.log('🔑 รหัสลับ Admin: adminreset-2026');
             console.log('👤 Admin: admin / admin123');
             console.log('⌨️ Ctrl+R = รีเฟรช, ESC = ปิด Modal');
-            console.log('✨ ฟีเจอร์ใหม่: แต้ม=จำนวนจ่าย, ฉายา5อันดับ, Top8, กราฟ3เดือน, เรียงล่าสุด, แท็บแนะนำ!');
+            console.log('✨ ฟีเจอร์ใหม่: Top 8, แต้มจากจ่ายเงิน, ฉายา Top 5, รายงาน, ตั้งค่า');
         });
 
         document.addEventListener('click', function(e) {
