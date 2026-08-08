@@ -6437,71 +6437,64 @@ case 'expired': {
         `;
 
         // ✅ สร้างตาราง
-let table = `
-    ${summaryHtml}
-    <div class="table-wrap" style="border-radius:var(--radius-sm);border:1px solid var(--border-color);max-height:450px;overflow-y:auto;overflow-x:auto;">
-        <table class="rank-table" style="min-width:400px;width:100%;font-size:12px;table-layout:auto;">
-            <thead style="position:sticky;top:0;z-index:5;background:var(--bg-body);">
-                <tr>
-                    <th style="width:30px;padding:4px 4px;text-align:center;">#</th>
-                    <th style="min-width:80px;padding:4px 6px;text-align:right;">الاسم</th>
-                    <th style="min-width:90px;padding:4px 6px;text-align:center;">تاريخ الانتهاء</th>
-                    <th style="min-width:80px;padding:4px 6px;text-align:center;">الحالة</th>
-                    <th style="width:36px;padding:4px 4px;text-align:center;">اتصال</th>
-                </tr>
-            </thead>
-            <tbody>
-`;
+        let table = `
+            ${summaryHtml}
+            <div class="table-wrap" style="border-radius:var(--radius-sm);border:1px solid var(--border-color);">
+                <table class="rank-table" style="min-width:550px;">
+                    <thead>
+                        <tr>
+                            <th style="width:30px;">#</th>
+                            <th style="min-width:100px;">الاسم</th>
+                            <th style="min-width:80px;">الهاتف</th>
+                            <th style="min-width:90px;">تاريخ الانتهاء</th>
+                            <th style="min-width:110px;">الحالة</th>
+                            <th style="width:40px;">اتصال</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
 
-// ... ใน loop สำหรับแต่ละ member ...
-expiredMembers.slice(0, 100).forEach((m, idx) => {
-    const expiry = getLatestExpiry(m.member_id) || normalizeDate(m.expiry_date);
-    const daysOver = expiry ? daysBetween(todayStr, expiry) : 0;
-    const absDays = Math.abs(daysOver);
-    const phone = m.phone || '';
-    const wa = formatPhoneForWhatsApp(phone);
-    const status = getExpiryStatus(absDays);
-    const waLink = wa ? `https://wa.me/${wa}?text=${encodeURIComponent('👋 مرحباً ' + m.full_name + '، لاحظنا انتهاء عضويتك منذ ' + absDays + ' يوم، ندعوك لتجديدها والعودة لممارسة الرياضة! 💪')}` : '#';
+        expiredMembers.slice(0, 100).forEach((m, idx) => {
+            const phone = m.phone || '';
+            const wa = formatPhoneForWhatsApp(phone);
+            const daysOver = daysBetween(normalizeDate(m.expiry_date), todayStr);
+            const status = getExpiryStatus(daysOver);
+            const waLink = wa 
+                ? `https://wa.me/${wa}?text=${encodeURIComponent('👋 مرحباً ' + m.full_name + '، لاحظنا انتهاء عضويتك منذ ' + daysOver + ' يوم، ندعوك لتجديدها والعودة لممارسة الرياضة! 💪')}` 
+                : '#';
 
-    // กำหนดสี badge
-    let badgeColor = '';
-    let emoji = '🟡';
-    if (daysOver === 0) {
-        badgeColor = 'background:rgba(220,38,38,0.12);color:#dc2626;border-color:rgba(220,38,38,0.2);';
-        emoji = '🔴';
-    } else if (daysOver >= -7 && daysOver < 0) {
-        badgeColor = 'background:rgba(245,158,11,0.12);color:#f59e0b;border-color:rgba(245,158,11,0.2);';
-        emoji = '🟠';
-    } else {
-        badgeColor = 'background:rgba(107,114,128,0.12);color:#6b7280;border-color:rgba(107,114,128,0.2);';
-        emoji = '⚪';
-    }
+            // ✅ กำหนดสีพื้นหลังตามระยะเวลา
+            let bgColor = '';
+            if (daysOver > 30) bgColor = 'background:rgba(107,114,128,0.04);';
+            else if (daysOver > 7) bgColor = 'background:rgba(234,179,8,0.04);';
+            else if (daysOver > 0) bgColor = 'background:rgba(239,68,68,0.04);';
+            else bgColor = 'background:rgba(220,38,38,0.08);';
 
-    let bgRow = '';
-    if (daysOver === 0) bgRow = 'background:rgba(220,38,38,0.03);';
-    else if (daysOver >= -7 && daysOver < 0) bgRow = 'background:rgba(245,158,11,0.03);';
-
-    table += `
-        <tr style="${bgRow}">
-            <td style="color:var(--text-muted);font-size:12px;text-align:center;">${idx + 1}</td>
-            <td style="font-weight:600;font-size:12px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px;">${m.full_name || '-'}</td>
-            <td style="font-size:11px;text-align:center;">${expiry ? formatDate(expiry) : '-'}</td>
-            <td style="text-align:center;">
-                <span class="expiry-badge ${status.class}" style="${badgeColor}">
-                    ${emoji} ${status.text}
+            // ✅ Badge สถานะ
+            const statusBadge = `
+                <span class="expiry-badge ${status.class}">
+                    <i class="fas ${status.icon}"></i>
+                    ${status.text}
                 </span>
-            </td>
-            <td style="text-align:center;">${wa ? `<a href="${waLink}" target="_blank" class="btn btn-whatsapp btn-sm" style="padding:1px 6px;font-size:10px;"><i class="fab fa-whatsapp"></i></a>` : '-'}</td>
-        </tr>
-    `;
-});
+            `;
 
-table += `
-            </tbody>
-        </table>
-    </div>
-`;
+            table += `
+                <tr style="${bgColor}">
+                    <td style="color:var(--text-muted);font-size:12px;">${idx + 1}</td>
+                    <td><strong>${m.full_name || '-'}</strong></td>
+                    <td style="font-size:12px;">${phone || '-'}</td>
+                    <td style="font-size:12px;">${formatDate(m.expiry_date)}</td>
+                    <td>${statusBadge}</td>
+                    <td>${wa ? `<a href="${waLink}" target="_blank" class="btn btn-whatsapp btn-sm" style="padding:2px 8px;font-size:10px;"><i class="fab fa-whatsapp"></i></a>` : '-'}</td>
+                </tr>
+            `;
+        });
 
+        table += `
+                    </tbody>
+                </table>
+            </div>
+        `;
 
         content = `
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
