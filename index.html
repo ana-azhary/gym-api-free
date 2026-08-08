@@ -6433,6 +6433,7 @@ case 'newMembers': {
 case 'expired': {
     title = '🚫 الأعضاء منتهي الصلاحية';
     const todayStr = getTodayStr();
+    const thisMonth = todayStr.slice(0, 7);
 
     // ✅ แสดง Loading
     content = `
@@ -6452,8 +6453,11 @@ case 'expired': {
         const members = membersRes.data || [];
         const payments = paymentsRes.data || [];
 
-        // ✅ ฟังก์ชันหา expiry_date ล่าสุดจาก payment (ใช้เป็นข้อมูลเสริม)
-        function getLatestPaymentExpiry(memberId) {
+        console.log('📊 จำนวนสมาชิกทั้งหมด:', members.length);
+        console.log('📊 จำนวนการชำระเงินทั้งหมด:', payments.length);
+
+        // ✅ ฟังก์ชันหา expiry_date ล่าสุดจาก payment
+        function getLatestExpiry(memberId) {
             const memberPayments = payments.filter(p => p.member_id === memberId);
             if (memberPayments.length === 0) return null;
             let latest = null;
@@ -6466,58 +6470,39 @@ case 'expired': {
             return latest;
         }
 
-        // ✅ กรองสมาชิกที่หมดอายุแล้ว (ใช้ expiry_date จาก member โดยตรง)
+        // ✅ ฟังก์ชันตรวจสอบว่าจ่ายเงินในเดือนนี้หรือไม่
+        function hasPaymentThisMonth(memberId) {
+            return payments.some(p => {
+                if (p.member_id !== memberId) return false;
+                if (!p.payment_date) return false;
+                const paymentMonth = normalizeDate(p.payment_date);
+                if (!paymentMonth) return false;
+                return paymentMonth.slice(0, 7) === thisMonth;
+            });
+        }
+
+        // ✅ กรองสมาชิกที่หมดอายุ และยังไม่จ่ายในเดือนนี้
         const expiredMembers = [];
         members.forEach(m => {
-            // ✅ 1. ใช้ expiry_date จาก member โดยตรง (เชื่อถือได้สุด)
-            let expiry = m.expiry_date ? normalizeDate(m.expiry_date) : null;
+            // หา expiry ล่าสุด
+            let expiry = getLatestExpiry(m.member_id);
+            if (!expiry) expiry = m.expiry_date ? normalizeDate(m.expiry_date) : null;
+            if (!expiry) return;
 
-            // ✅ 2. ถ้า member ไม่มี expiry_date ให้ลองจาก payment
-            if (!expiry) {
-                expiry = getLatestPaymentExpiry(m.member_id);
-            }
-
-            // ✅ 3. ถ้ายังไม่มี expiry_date → ถือว่าสมาชิกยังไม่จ่าย (no_payment)
-            //    แต่ไม่จัดว่า "หมดอายุ" เพราะไม่มีข้อมูล
-            if (!expiry) {
-                return; // ไม่แสดงในรายการนี้ (ไปแสดงใน no_payment แทน)
-            }
-
-            // ✅ 4. คำนวณวัน
             const diff = daysBetween(todayStr, expiry);
-            if (diff <= 0) {
+
+            // ✅ เงื่อนไข: หมดอายุแล้ว (diff <= 0) และยังไม่จ่ายเดือนนี้
+            if (diff <= 0 && !hasPaymentThisMonth(m.member_id)) {
                 const daysOver = Math.abs(diff);
                 expiredMembers.push({
                     ...m,
                     daysOver: daysOver,
-                    expiry: expiry,
-                    hasPayment: payments.some(p => p.member_id === m.member_id)
+                    expiry: expiry
                 });
             }
         });
 
-        // ✅ ถ้า expiredMembers ว่าง → ให้แสดงสมาชิกที่ยังไม่จ่าย (no_payment) ด้วย
-        //    (เพื่อให้เห็นว่ามีสมาชิกที่ยังไม่จ่าย)
-        if (expiredMembers.length === 0) {
-            // หาสมาชิกที่ยังไม่จ่าย (no payment)
-            const noPaymentMembers = members.filter(m => {
-                const hasPayment = payments.some(p => p.member_id === m.member_id);
-                return !hasPayment;
-            });
-            // ถ้ามีสมาชิกที่ยังไม่จ่าย ให้แสดงในตาราง
-            if (noPaymentMembers.length > 0) {
-                // แสดงสมาชิกที่ยังไม่จ่ายโดยให้ daysOver = 999 (แสดงเป็น "غير مدفوع")
-                noPaymentMembers.forEach(m => {
-                    expiredMembers.push({
-                        ...m,
-                        daysOver: 999,
-                        expiry: null,
-                        hasPayment: false,
-                        noPayment: true
-                    });
-                });
-            }
-        }
+        console.log('📊 จำนวนสมาชิกที่หมดอายุและยังไม่จ่ายเดือนนี้:', expiredMembers.length);
 
         // ✅ เรียงลำดับจาก daysOver น้อยไปมาก (0,1,2,...)
         expiredMembers.sort((a, b) => a.daysOver - b.daysOver);
@@ -6530,20 +6515,20 @@ case 'expired': {
         }
         $('statExpired').textContent = expiredMembers.length;
 
+        // ✅ ถ้าไม่มีข้อมูล
         if (!expiredMembers.length) {
             content = `
                 <div style="text-align:center;padding:30px 0;color:var(--text-muted);">
                     <div style="font-size:48px;margin-bottom:12px;">🎉</div>
                     <p style="font-size:16px;font-weight:500;">لا يوجد أعضاء منتهي الصلاحية</p>
-                    <p style="font-size:13px;margin-top:4px;">جميع الأعضاء لديهم عضوية سارية</p>
+                    <p style="font-size:13px;margin-top:4px;">جميع الأعضاء لديهم عضوية سارية أو دفعوا هذا الشهر</p>
                 </div>
             `;
         } else {
-            // ✅ สรุปสถิติ
+            // ✅ สรุปสถิติ 4 การ์ด
             const day0 = expiredMembers.filter(m => m.daysOver === 0).length;
             const day1_7 = expiredMembers.filter(m => m.daysOver >= 1 && m.daysOver <= 7).length;
-            const day8plus = expiredMembers.filter(m => m.daysOver > 7 && m.daysOver < 999).length;
-            const noPayment = expiredMembers.filter(m => m.noPayment === true || m.daysOver === 999).length;
+            const day8plus = expiredMembers.filter(m => m.daysOver > 7).length;
 
             const summaryHtml = `
                 <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;">
@@ -6559,14 +6544,14 @@ case 'expired': {
                         <div style="font-size:18px;font-weight:700;color:#6b7280;">${day8plus}</div>
                         <div style="font-size:9px;color:var(--text-muted);"><i class="fas fa-calendar-minus" style="color:#6b7280;"></i> 8+ أيام</div>
                     </div>
-                    <div style="background:rgba(148,163,184,0.08);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(148,163,184,0.1);">
-                        <div style="font-size:18px;font-weight:700;color:#6b7280;">${noPayment}</div>
-                        <div style="font-size:9px;color:var(--text-muted);"><i class="fas fa-triangle-exclamation" style="color:#6b7280;"></i> غير مدفوع</div>
+                    <div style="background:rgba(15,59,94,0.08);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(15,59,94,0.1);">
+                        <div style="font-size:18px;font-weight:700;color:var(--primary);">${expiredMembers.length}</div>
+                        <div style="font-size:9px;color:var(--text-muted);"><i class="fas fa-users" style="color:var(--primary);"></i> الإجمالي</div>
                     </div>
                 </div>
             `;
 
-            // ✅ สร้างตาราง
+            // ✅ สร้างตาราง (ไม่มีคอลัมน์ الهاتف)
             let table = `
                 ${summaryHtml}
                 <div class="table-wrap" style="border-radius:var(--radius-sm);border:1px solid var(--border-color);max-height:450px;overflow-y:auto;overflow-x:auto;">
@@ -6585,40 +6570,28 @@ case 'expired': {
 
             expiredMembers.slice(0, 100).forEach((m, idx) => {
                 const daysOver = m.daysOver;
-                const isNoPayment = m.noPayment === true || daysOver === 999;
                 const expiry = m.expiry;
                 const phone = m.phone || '';
                 const wa = formatPhoneForWhatsApp(phone);
+                const status = getExpiryStatus(daysOver);
+                const waLink = wa ? `https://wa.me/${wa}?text=${encodeURIComponent('👋 مرحباً ' + m.full_name + '، لاحظنا انتهاء عضويتك منذ ' + daysOver + ' يوم، ندعوك لتجديدها والعودة لممارسة الرياضة! 💪')}` : '#';
 
-                let status, badgeColor, emoji;
-
-                if (isNoPayment) {
-                    // ✅ กรณีไม่จ่าย
-                    status = { text: 'غير مدفوع', emoji: '⚪' };
-                    badgeColor = 'background:rgba(148,163,184,0.12);color:#6b7280;border-color:rgba(148,163,184,0.2);';
-                    emoji = '⚪';
+                let badgeColor = '';
+                let emoji = '🟡';
+                if (daysOver === 0) {
+                    badgeColor = 'background:rgba(220,38,38,0.12);color:#dc2626;border-color:rgba(220,38,38,0.2);';
+                    emoji = '🔴';
+                } else if (daysOver <= 7) {
+                    badgeColor = 'background:rgba(245,158,11,0.12);color:#f59e0b;border-color:rgba(245,158,11,0.2);';
+                    emoji = '🟠';
                 } else {
-                    status = getExpiryStatus(daysOver);
-                    if (daysOver === 0) {
-                        badgeColor = 'background:rgba(220,38,38,0.12);color:#dc2626;border-color:rgba(220,38,38,0.2);';
-                        emoji = '🔴';
-                    } else if (daysOver <= 7) {
-                        badgeColor = 'background:rgba(245,158,11,0.12);color:#f59e0b;border-color:rgba(245,158,11,0.2);';
-                        emoji = '🟠';
-                    } else {
-                        badgeColor = 'background:rgba(107,114,128,0.12);color:#6b7280;border-color:rgba(107,114,128,0.2);';
-                        emoji = '⚪';
-                    }
+                    badgeColor = 'background:rgba(107,114,128,0.12);color:#6b7280;border-color:rgba(107,114,128,0.2);';
+                    emoji = '⚪';
                 }
 
-                const waLink = wa ? `https://wa.me/${wa}?text=${encodeURIComponent('👋 مرحباً ' + m.full_name + '، لاحظنا انتهاء عضويتك، ندعوك لتجديدها والعودة لممارسة الرياضة! 💪')}` : '#';
-
                 let bgRow = '';
-                if (!isNoPayment && daysOver === 0) bgRow = 'background:rgba(220,38,38,0.03);';
-                else if (!isNoPayment && daysOver <= 7) bgRow = 'background:rgba(245,158,11,0.03);';
-
-                // ✅ ข้อความสถานะ
-                let statusText = isNoPayment ? 'غير مدفوع' : status.text;
+                if (daysOver === 0) bgRow = 'background:rgba(220,38,38,0.03);';
+                else if (daysOver <= 7) bgRow = 'background:rgba(245,158,11,0.03);';
 
                 table += `
                     <tr style="${bgRow}">
@@ -6626,8 +6599,8 @@ case 'expired': {
                         <td style="font-weight:600;font-size:12px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px;">${m.full_name || '-'}</td>
                         <td style="font-size:11px;text-align:center;">${expiry ? formatDate(expiry) : '-'}</td>
                         <td style="text-align:center;">
-                            <span class="expiry-badge ${isNoPayment ? 'expired-long' : status.class}" style="${badgeColor}">
-                                ${emoji} ${statusText}
+                            <span class="expiry-badge ${status.class}" style="${badgeColor}">
+                                ${emoji} ${status.text}
                             </span>
                         </td>
                         <td style="text-align:center;">${wa ? `<a href="${waLink}" target="_blank" class="btn btn-whatsapp btn-sm" style="padding:1px 6px;font-size:10px;"><i class="fab fa-whatsapp"></i></a>` : '-'}</td>
@@ -6646,7 +6619,12 @@ case 'expired': {
                     <span style="font-size:14px;font-weight:700;">
                         <i class="fas fa-user-slash" style="color:var(--danger);"></i>
                         العدد: <strong style="color:var(--danger);">${expiredMembers.length}</strong> عضو
-                        <span style="font-size:12px;color:var(--text-muted);font-weight:400;">(عرض ${Math.min(100, expiredMembers.length)})</span>
+                        <span style="font-size:12px;color:var(--text-muted);font-weight:400;">
+                            (عرض ${Math.min(100, expiredMembers.length)}) - 
+                            <span style="color:var(--text-muted);font-weight:400;">
+                                <i class="fas fa-info-circle"></i> تم التصفية: منتهي الصلاحية + غير مدفوع هذا الشهر
+                            </span>
+                        </span>
                     </span>
                     <span style="font-size:11px;color:var(--text-muted);">
                         <i class="fas fa-calendar-alt"></i> ${formatDate(todayStr)}
@@ -6677,6 +6655,7 @@ case 'expired': {
     }
     break;
 }
+                        
         
         
                 
