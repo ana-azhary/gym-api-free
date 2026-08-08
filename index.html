@@ -6351,150 +6351,72 @@ case 'newMembers': {
     }
     break;
 }
-case 'expired': {
-    title = '🚫 الأعضاء منتهي الصلاحية';
-    const todayStr = getTodayStr();
-    const allMembersFresh = await fetchMembersWithExpiry();
-    const expiredMembers = allMembersFresh.filter(m => {
-        if (!m.expiry_date) return false;
-        const expDate = new Date(normalizeDate(m.expiry_date));
-        if (isNaN(expDate.getTime())) return false;
-        const diff = (expDate - new Date()) / (1000 * 60 * 60 * 24);
-        return diff < 0 || diff === 0;
-    });
+// ... ภายใน case 'expired' ...
 
-    // ✅ เรียงลำดับ: หมดอายุ 0 วันอยู่บนสุด
-    expiredMembers.sort((a, b) => {
-        const da = normalizeDate(a.expiry_date);
-        const db = normalizeDate(b.expiry_date);
-        if (!da && !db) return 0;
-        if (!da) return 1;
-        if (!db) return -1;
-        return da < db ? 1 : -1;
-    });
-
-    if (lastData) {
-        if (!lastData.summary) lastData.summary = {};
-        lastData.summary.expired_members = expiredMembers.length;
-        lastData.members = allMembersFresh;
-        updateDashboardCards(lastData.summary);
-    }
-    $('statExpired').textContent = expiredMembers.length;
-
-    if (!expiredMembers.length) {
-        content = `
-            <div style="text-align:center;padding:30px 0;color:var(--text-muted);">
-                <div style="font-size:48px;margin-bottom:12px;">🎉</div>
-                <p style="font-size:16px;font-weight:500;">لا يوجد أعضاء منتهي الصلاحية</p>
-                <p style="font-size:13px;margin-top:4px;">جميع الأعضاء لديهم عضوية سارية</p>
-            </div>
-        `;
-    } else {
-        // ✅ ฟังก์ชันสถานะ
-        function getExpiryStatus(daysOver) {
-            if (daysOver === 0) {
-                return { text: 'اليوم', icon: 'fa-circle-exclamation', class: 'expired-today', color: '#dc2626' };
-            } else if (daysOver <= 7) {
-                return { text: `منذ ${daysOver} أيام`, icon: 'fa-clock', class: 'expired-week', color: '#eab308' };
-            } else {
-                return { text: `منذ ${daysOver} يوماً`, icon: 'fa-calendar-minus', class: 'expired-long', color: '#6b7280' };
-            }
-        }
-
-        // ✅ สรุปสถิติตามระยะเวลา
-        const today0 = expiredMembers.filter(m => {
-            const diff = daysBetween(normalizeDate(m.expiry_date), todayStr);
-            return diff === 0;
-        }).length;
-        const today1to7 = expiredMembers.filter(m => {
-            const diff = daysBetween(normalizeDate(m.expiry_date), todayStr);
-            return diff >= 1 && diff <= 7;
-        }).length;
-        const today8plus = expiredMembers.filter(m => {
-            const diff = daysBetween(normalizeDate(m.expiry_date), todayStr);
-            return diff > 7;
-        }).length;
-
-        let summaryHtml = `
-            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;">
-                <div style="background:rgba(239,68,68,0.08);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(239,68,68,0.1);">
-                    <div style="font-size:18px;font-weight:700;color:var(--danger);">${today0}</div>
-                    <div style="font-size:9px;color:var(--text-muted);"><i class="fas fa-circle-exclamation" style="color:var(--danger);"></i> اليوم</div>
-                </div>
-                <div style="background:rgba(234,179,8,0.08);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(234,179,8,0.1);">
-                    <div style="font-size:18px;font-weight:700;color:#eab308;">${today1to7}</div>
-                    <div style="font-size:9px;color:var(--text-muted);"><i class="fas fa-clock" style="color:#eab308;"></i> 1-7 أيام</div>
-                </div>
-                <div style="background:rgba(107,114,128,0.08);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(107,114,128,0.1);">
-                    <div style="font-size:18px;font-weight:700;color:#6b7280;">${today8plus}</div>
-                    <div style="font-size:9px;color:var(--text-muted);"><i class="fas fa-calendar-minus" style="color:#6b7280;"></i> 8+ أيام</div>
-                </div>
-                <div style="background:rgba(15,59,94,0.08);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(15,59,94,0.1);">
-                    <div style="font-size:18px;font-weight:700;color:var(--primary);">${expiredMembers.length}</div>
-                    <div style="font-size:9px;color:var(--text-muted);"><i class="fas fa-users" style="color:var(--primary);"></i> الإجمالي</div>
-                </div>
-            </div>
-        `;
-
-        // ✅ สร้างตาราง
-        let table = `
-            ${summaryHtml}
-            <div class="table-wrap" style="border-radius:var(--radius-sm);border:1px solid var(--border-color);">
-                <table class="rank-table" style="min-width:550px;">
-                    <thead>
-                        <tr>
-                            <th style="width:30px;">#</th>
-                            <th style="min-width:100px;">الاسم</th>
-                            <th style="min-width:80px;">الهاتف</th>
-                            <th style="min-width:90px;">تاريخ الانتهاء</th>
-                            <th style="min-width:110px;">الحالة</th>
-                            <th style="width:40px;">اتصال</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-        `;
-
-        expiredMembers.slice(0, 100).forEach((m, idx) => {
-            const phone = m.phone || '';
-            const wa = formatPhoneForWhatsApp(phone);
-            const daysOver = daysBetween(normalizeDate(m.expiry_date), todayStr);
-            const status = getExpiryStatus(daysOver);
-            const waLink = wa 
-                ? `https://wa.me/${wa}?text=${encodeURIComponent('👋 مرحباً ' + m.full_name + '، لاحظنا انتهاء عضويتك منذ ' + daysOver + ' يوم، ندعوك لتجديدها والعودة لممارسة الرياضة! 💪')}` 
-                : '#';
-
-            // ✅ กำหนดสีพื้นหลังตามระยะเวลา
-            let bgColor = '';
-            if (daysOver > 30) bgColor = 'background:rgba(107,114,128,0.04);';
-            else if (daysOver > 7) bgColor = 'background:rgba(234,179,8,0.04);';
-            else if (daysOver > 0) bgColor = 'background:rgba(239,68,68,0.04);';
-            else bgColor = 'background:rgba(220,38,38,0.08);';
-
-            // ✅ Badge สถานะ
-            const statusBadge = `
-                <span class="expiry-badge ${status.class}">
-                    <i class="fas ${status.icon}"></i>
-                    ${status.text}
-                </span>
-            `;
-
-            table += `
-                <tr style="${bgColor}">
-                    <td style="color:var(--text-muted);font-size:12px;">${idx + 1}</td>
-                    <td><strong>${m.full_name || '-'}</strong></td>
-                    <td style="font-size:12px;">${phone || '-'}</td>
-                    <td style="font-size:12px;">${formatDate(m.expiry_date)}</td>
-                    <td>${statusBadge}</td>
-                    <td>${wa ? `<a href="${waLink}" target="_blank" class="btn btn-whatsapp btn-sm" style="padding:2px 8px;font-size:10px;"><i class="fab fa-whatsapp"></i></a>` : '-'}</td>
+let table = `
+    ${summaryHtml}
+    <div class="table-wrap" style="border-radius:var(--radius-sm);border:1px solid var(--border-color);max-height:450px;overflow-y:auto;overflow-x:auto;">
+        <table class="rank-table" style="min-width:400px;width:100%;font-size:12px;table-layout:auto;">
+            <thead style="position:sticky;top:0;z-index:5;background:var(--bg-body);">
+                <tr>
+                    <th style="width:30px;padding:4px 4px;text-align:center;">#</th>
+                    <th style="min-width:80px;padding:4px 6px;text-align:right;">الاسم</th>
+                    <th style="min-width:90px;padding:4px 6px;text-align:center;">تاريخ الانتهاء</th>
+                    <th style="min-width:80px;padding:4px 6px;text-align:center;">الحالة</th>
+                    <th style="width:36px;padding:4px 4px;text-align:center;">اتصال</th>
                 </tr>
-            `;
-        });
+            </thead>
+            <tbody>
+`;
 
-        table += `
-                    </tbody>
-                </table>
-            </div>
-        `;
+// ... ใน loop สำหรับแต่ละ member ...
+expiredMembers.slice(0, 100).forEach((m, idx) => {
+    const expiry = getLatestExpiry(m.member_id) || normalizeDate(m.expiry_date);
+    const daysOver = expiry ? daysBetween(todayStr, expiry) : 0;
+    const absDays = Math.abs(daysOver);
+    const phone = m.phone || '';
+    const wa = formatPhoneForWhatsApp(phone);
+    const status = getExpiryStatus(absDays);
+    const waLink = wa ? `https://wa.me/${wa}?text=${encodeURIComponent('👋 مرحباً ' + m.full_name + '، لاحظنا انتهاء عضويتك منذ ' + absDays + ' يوم، ندعوك لتجديدها والعودة لممارسة الرياضة! 💪')}` : '#';
+
+    // กำหนดสี badge
+    let badgeColor = '';
+    let emoji = '🟡';
+    if (daysOver === 0) {
+        badgeColor = 'background:rgba(220,38,38,0.12);color:#dc2626;border-color:rgba(220,38,38,0.2);';
+        emoji = '🔴';
+    } else if (daysOver >= -7 && daysOver < 0) {
+        badgeColor = 'background:rgba(245,158,11,0.12);color:#f59e0b;border-color:rgba(245,158,11,0.2);';
+        emoji = '🟠';
+    } else {
+        badgeColor = 'background:rgba(107,114,128,0.12);color:#6b7280;border-color:rgba(107,114,128,0.2);';
+        emoji = '⚪';
+    }
+
+    let bgRow = '';
+    if (daysOver === 0) bgRow = 'background:rgba(220,38,38,0.03);';
+    else if (daysOver >= -7 && daysOver < 0) bgRow = 'background:rgba(245,158,11,0.03);';
+
+    table += `
+        <tr style="${bgRow}">
+            <td style="color:var(--text-muted);font-size:12px;text-align:center;">${idx + 1}</td>
+            <td style="font-weight:600;font-size:12px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px;">${m.full_name || '-'}</td>
+            <td style="font-size:11px;text-align:center;">${expiry ? formatDate(expiry) : '-'}</td>
+            <td style="text-align:center;">
+                <span class="expiry-badge ${status.class}" style="${badgeColor}">
+                    ${emoji} ${status.text}
+                </span>
+            </td>
+            <td style="text-align:center;">${wa ? `<a href="${waLink}" target="_blank" class="btn btn-whatsapp btn-sm" style="padding:1px 6px;font-size:10px;"><i class="fab fa-whatsapp"></i></a>` : '-'}</td>
+        </tr>
+    `;
+});
+
+table += `
+            </tbody>
+        </table>
+    </div>
+`;
 
         content = `
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
