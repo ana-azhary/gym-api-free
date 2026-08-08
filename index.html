@@ -4278,6 +4278,7 @@
     }
 }
         
+        
 /* ============================================================
    TABLES — แคบและเลื่อนได้
    ============================================================ */
@@ -6456,24 +6457,26 @@ case 'expired': {
         return latest;
     }
 
-    // ✅ กรองสมาชิกที่หมดอายุแล้ว
-    const expiredMembers = allMembers.filter(m => {
+    // ✅ กรองสมาชิกที่หมดอายุแล้ว และคำนวณ daysOver (0 = วันนี้)
+    const expiredMembers = [];
+    allMembers.forEach(m => {
         let expiry = getLatestExpiry(m.member_id);
         if (!expiry) expiry = m.expiry_date ? normalizeDate(m.expiry_date) : null;
-        if (!expiry) return false;
+        if (!expiry) return;
+
         const diff = daysBetween(todayStr, expiry);
-        return diff <= 0;
+        if (diff <= 0) {
+            const daysOver = Math.abs(diff);
+            expiredMembers.push({
+                ...m,
+                daysOver: daysOver,
+                expiry: expiry
+            });
+        }
     });
 
-    // ✅ เรียงจากหมดอายุวันนี้ -> นานที่สุด
-    expiredMembers.sort((a, b) => {
-        const expA = getLatestExpiry(a.member_id) || normalizeDate(a.expiry_date);
-        const expB = getLatestExpiry(b.member_id) || normalizeDate(b.expiry_date);
-        if (!expA && !expB) return 0;
-        if (!expA) return 1;
-        if (!expB) return -1;
-        return daysBetween(todayStr, expA) - daysBetween(todayStr, expB);
-    });
+    // ✅ เรียงลำดับจาก daysOver น้อยไปมาก (0,1,2,...)
+    expiredMembers.sort((a, b) => a.daysOver - b.daysOver);
 
     // ✅ อัปเดต Dashboard
     if (lastData) {
@@ -6483,7 +6486,6 @@ case 'expired': {
     }
     $('statExpired').textContent = expiredMembers.length;
 
-    // ✅ ถ้าไม่มีข้อมูล
     if (!expiredMembers.length) {
         content = `
             <div style="text-align:center;padding:30px 0;color:var(--text-muted);">
@@ -6494,18 +6496,9 @@ case 'expired': {
         `;
     } else {
         // ✅ สรุปสถิติ 4 การ์ด
-        const day0 = expiredMembers.filter(m => {
-            const exp = getLatestExpiry(m.member_id) || normalizeDate(m.expiry_date);
-            return exp && daysBetween(todayStr, exp) === 0;
-        }).length;
-        const day1_7 = expiredMembers.filter(m => {
-            const exp = getLatestExpiry(m.member_id) || normalizeDate(m.expiry_date);
-            return exp && daysBetween(todayStr, exp) >= -7 && daysBetween(todayStr, exp) < 0;
-        }).length;
-        const day8plus = expiredMembers.filter(m => {
-            const exp = getLatestExpiry(m.member_id) || normalizeDate(m.expiry_date);
-            return exp && daysBetween(todayStr, exp) < -7;
-        }).length;
+        const day0 = expiredMembers.filter(m => m.daysOver === 0).length;
+        const day1_7 = expiredMembers.filter(m => m.daysOver >= 1 && m.daysOver <= 7).length;
+        const day8plus = expiredMembers.filter(m => m.daysOver > 7).length;
 
         const summaryHtml = `
             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;">
@@ -6546,20 +6539,19 @@ case 'expired': {
         `;
 
         expiredMembers.slice(0, 100).forEach((m, idx) => {
-            const expiry = getLatestExpiry(m.member_id) || normalizeDate(m.expiry_date);
-            const daysOver = expiry ? daysBetween(todayStr, expiry) : 0;
-            const absDays = Math.abs(daysOver);
+            const daysOver = m.daysOver;
+            const expiry = m.expiry;
             const phone = m.phone || '';
             const wa = formatPhoneForWhatsApp(phone);
-            const status = getExpiryStatus(absDays);
-            const waLink = wa ? `https://wa.me/${wa}?text=${encodeURIComponent('👋 مرحباً ' + m.full_name + '، لاحظنا انتهاء عضويتك منذ ' + absDays + ' يوم، ندعوك لتجديدها والعودة لممارسة الرياضة! 💪')}` : '#';
+            const status = getExpiryStatus(daysOver);
+            const waLink = wa ? `https://wa.me/${wa}?text=${encodeURIComponent('👋 مرحباً ' + m.full_name + '، لاحظنا انتهاء عضويتك منذ ' + daysOver + ' يوم، ندعوك لتجديدها والعودة لممارسة الرياضة! 💪')}` : '#';
 
             let badgeColor = '';
             let emoji = '🟡';
             if (daysOver === 0) {
                 badgeColor = 'background:rgba(220,38,38,0.12);color:#dc2626;border-color:rgba(220,38,38,0.2);';
                 emoji = '🔴';
-            } else if (daysOver >= -7 && daysOver < 0) {
+            } else if (daysOver <= 7) {
                 badgeColor = 'background:rgba(245,158,11,0.12);color:#f59e0b;border-color:rgba(245,158,11,0.2);';
                 emoji = '🟠';
             } else {
@@ -6569,7 +6561,7 @@ case 'expired': {
 
             let bgRow = '';
             if (daysOver === 0) bgRow = 'background:rgba(220,38,38,0.03);';
-            else if (daysOver >= -7 && daysOver < 0) bgRow = 'background:rgba(245,158,11,0.03);';
+            else if (daysOver <= 7) bgRow = 'background:rgba(245,158,11,0.03);';
 
             table += `
                 <tr style="${bgRow}">
@@ -6608,6 +6600,7 @@ case 'expired': {
     }
     break;
 }
+                
                         
 
 
@@ -9640,7 +9633,9 @@ function loadTop8() {
 }
 
 // ============================================================
-// EXPIRY STATUS HELPER — แก้ให้ถูกหลักภาษา
+// EXPIRY STATUS HELPER
+// 0 = اليوم, 1 = منذ يوم, 2 = منذ يومين
+// 3-9 = منذ X أيام, 10+ = منذ X يوماً
 // ============================================================
 function getExpiryStatus(daysOver) {
     if (daysOver === 0) {
@@ -9661,11 +9656,11 @@ function getExpiryStatus(daysOver) {
             emoji: '🟡',
             class: 'expired-week'
         };
-    } else if (daysOver <= 7) {
+    } else if (daysOver <= 9) {
         return {
             text: `منذ ${daysOver} أيام`,
-            emoji: '🟡',
-            class: 'expired-week'
+            emoji: daysOver <= 7 ? '🟡' : '⚪',
+            class: daysOver <= 7 ? 'expired-week' : 'expired-long'
         };
     } else {
         return {
@@ -9675,6 +9670,7 @@ function getExpiryStatus(daysOver) {
         };
     }
 }
+                
         
 
 // ============================================================
