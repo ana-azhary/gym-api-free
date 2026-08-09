@@ -5409,11 +5409,125 @@ function updateMemberXp(memberId, checkins) {
             return Math.floor((b - a) / (1000 * 60 * 60 * 24));
         }
 
+        // ============================================================
+        // WHATSAPP HELPERS
+        // ============================================================
+        function formatPhoneForWhatsApp(phone) {
+            if (!phone) return null;
+            let clean = phone.replace(/[^0-9]/g, '');
+            if (clean.startsWith('0')) clean = clean.substring(1);
+            if (!clean.startsWith('20')) clean = '20' + clean;
+            return clean;
+        }
 
-        
-        
+        function sendWhatsAppExpiryReminder(phone, name, daysLeft, expiryDate) {
+            if (!phone) { showToast('⚠️ هذا العضو ليس لديه رقم هاتف', 'warning'); return; }
+            const cleanPhone = formatPhoneForWhatsApp(phone);
+            if (!cleanPhone) { showToast('⚠️ رقم الهاتف غير صحيح', 'error'); return; }
+            const formattedDate = expiryDate ? formatDate(expiryDate) : 'غير محدد';
+            const msg = encodeURIComponent(
+                `مرحباً ${name} 👋\nنود إعلامك بأن عضويتك ستنتهي خلال ${daysLeft} يوم (${formattedDate})\nيرجى الاتصال بالإدارة لتجديد العضوية...\n💪 نتمنى لك دوام الصحة ونحن في انتظارك!`
+                );
+            window.open(`https://wa.me/${cleanPhone}?text=${msg}`, '_blank');
+            showToast(`📱 فتح WhatsApp لـ ${name}`, 'info');
+        }
 
-        
+        function sendWhatsAppExpiredEncouragement(phone, name, daysOverdue, expiryDate) {
+            if (!phone) { showToast('⚠️ هذا العضو ليس لديه رقم هاتف', 'warning'); return; }
+            const cleanPhone = formatPhoneForWhatsApp(phone);
+            if (!cleanPhone) { showToast('⚠️ رقم الهاتف غير صحيح', 'error'); return; }
+            const formattedDate = expiryDate ? formatDate(expiryDate) : 'غير محدد';
+            const msg = encodeURIComponent(
+                `مرحباً ${name} 👋\nلاحظنا أن عضويتك انتهت منذ ${daysOverdue} يوم (${formattedDate})\nندعوك للعودة وممارسة الرياضة مرة أخرى! 💪\nنتمنى لك صحة جيدة ونحن في انتظارك!`
+                );
+            window.open(`https://wa.me/${cleanPhone}?text=${msg}`, '_blank');
+            showToast(`📱 فتح WhatsApp لـ ${name}`, 'info');
+        }
+
+        function sendWhatsAppPaymentThanks(phone, name, amount, paymentDate, newExpiry) {
+            if (!phone) { showToast('⚠️ هذا العضو ليس لديه رقم هاتف', 'warning'); return; }
+            const cleanPhone = formatPhoneForWhatsApp(phone);
+            if (!cleanPhone) { showToast('⚠️ رقم الهاتف غير صحيح', 'error'); return; }
+            const formattedDate = paymentDate ? formatDate(paymentDate) : 'اليوم';
+            const formattedNewExpiry = newExpiry ? formatDate(newExpiry) : 'غير محدد';
+            const msg = encodeURIComponent(
+                `شكراً ${name} 🙏 على الدفع في الوقت المحدد!\nلقد استلمنا مبلغ ${amount} ج.م في ${formattedDate}\nتاريخ انتهاء الصلاحية الجديد هو ${formattedNewExpiry}\n💪 ننصحك بممارسة الرياضة يومياً لتحقيق أهدافك!`
+                );
+            window.open(`https://wa.me/${cleanPhone}?text=${msg}`, '_blank');
+            showToast(`📱 فتح WhatsApp لـ ${name}`, 'info');
+        }
+
+        function sendWhatsAppNewMemberUnpaid(phone, name, memberId, password, startDate, membershipType) {
+            if (!phone) { showToast('⚠️ هذا العضو ليس لديه رقم هاتف', 'warning'); return; }
+            const cleanPhone = formatPhoneForWhatsApp(phone);
+            if (!cleanPhone) { showToast('⚠️ رقم الهاتف غير صحيح', 'error'); return; }
+            const msg = encodeURIComponent(
+                `مرحباً ${name} 👋 مرحباً بك في Pro Gym!\nلقد تم تسجيلك (${memberId}) ولكن لم يتم الدفع بعد...\nيرجى الاتصال بالإدارة لإتمام الدفع\n💪 نحن في انتظارك بكل سرور! نتمنى لك النجاح في رحلة اللياقة!`
+                );
+            window.open(`https://wa.me/${cleanPhone}?text=${msg}`, '_blank');
+            showToast(`📱 فتح WhatsApp لـ ${name}`, 'info');
+        }
+
+        function sendWhatsAppExpiryReminderBulk() {
+            const today = getTodayStr();
+            const expiring = allMembers.filter(m => m.status === 'expiring_soon' && m.phone);
+            if (!expiring.length) { showToast('📭 لا يوجد أعضاء على وشك الانتهاء', 'info'); return; }
+            let count = 0;
+            expiring.forEach(m => {
+                const daysLeft = daysBetween(today, normalizeDate(m.expiry_date));
+                const wa = formatPhoneForWhatsApp(m.phone);
+                if (wa) {
+                    const msg = encodeURIComponent(
+                        `مرحباً ${m.full_name} 👋\nنود إعلامك بأن عضويتك ستنتهي خلال ${daysLeft} يوم (${formatDate(m.expiry_date)})\nيرجى الاتصال بالإدارة لتجديد العضوية... 💪`
+                        );
+                    setTimeout(() => { window.open(`https://wa.me/${wa}?text=${msg}`, '_blank'); }, count * 2000);
+                    count++;
+                }
+            });
+            showToast(`📤 فتح WhatsApp لـ ${count} عضو`, 'info');
+        }
+
+        function sendWhatsAppExpiredEncouragementBulk() {
+            const today = getTodayStr();
+            const expired = allMembers.filter(m => m.status === 'expired' && m.phone);
+            if (!expired.length) { showToast('📭 لا يوجد أعضاء منتهية صلاحيتهم', 'info'); return; }
+            let count = 0;
+            expired.forEach(m => {
+                const daysOver = daysBetween(normalizeDate(m.expiry_date), today);
+                const wa = formatPhoneForWhatsApp(m.phone);
+                if (wa) {
+                    const msg = encodeURIComponent(
+                        `مرحباً ${m.full_name} 👋\nلقد انتهت عضويتك منذ ${daysOver} يوم (${formatDate(m.expiry_date)})\nندعوك للعودة وممارسة الرياضة مرة أخرى! 💪`
+                        );
+                    setTimeout(() => { window.open(`https://wa.me/${wa}?text=${msg}`, '_blank'); }, count * 2000);
+                    count++;
+                }
+            });
+            showToast(`📤 فتح WhatsApp لـ ${count} عضو`, 'info');
+        }
+
+        function sendWhatsAppNewMemberUnpaidBulk() {
+            const thisMonth = getTodayStr().slice(0, 7);
+            const newUnpaid = allMembers.filter(m =>
+                m.start_date && normalizeDate(m.start_date).slice(0, 7) === thisMonth &&
+                (m.status === 'no_payment' || m.status === 'expired') &&
+                m.phone
+            );
+            if (!newUnpaid.length) { showToast('📭 لا يوجد أعضاء جدد غير مدفوع', 'info'); return; }
+            let count = 0;
+            newUnpaid.forEach(m => {
+                const wa = formatPhoneForWhatsApp(m.phone);
+                if (wa) {
+                    const msg = encodeURIComponent(
+                        `مرحباً ${m.full_name} 👋 مرحباً بك في Pro Gym!\nلقد تم تسجيلك (${m.member_id}) ولكن لم يتم الدفع بعد...\nيرجى الاتصال بالإدارة لإتمام الدفع 💪`
+                        );
+                    setTimeout(() => { window.open(`https://wa.me/${wa}?text=${msg}`, '_blank'); }, count * 2000);
+                    count++;
+                }
+            });
+            showToast(`📤 فتح WhatsApp لـ ${count} عضو`, 'info');
+        }
+
         // ============================================================
         // API
         // ============================================================
@@ -8700,319 +8814,111 @@ function generateProfileQR(memberId) {
             });
         }
 
-// ============================================================
-// WHATSAPP FUNCTIONS — ข้อความแบบใหม่ (ละเอียดขึ้น)
-// ============================================================
-
-// 1. ส่งข้อความถึงสมาชิก (ปุ่มในตาราง Members)
-function sendWhatsAppMember(member) {
-    if (!member) {
-        showToast('⚠️ لا توجد بيانات العضو', 'error');
-        return;
-    }
-    const phone = member.phone;
-    if (!phone) {
-        showToast('⚠️ هذا العضو ليس لديه رقم هاتف', 'warning');
-        return;
-    }
-    const wa = formatPhoneForWhatsApp(phone);
-    if (!wa) {
-        showToast('⚠️ رقم الهاتف غير صحيح', 'error');
-        return;
-    }
-    
-    // ตรวจสอบว่ามีประวัติการจ่ายหรือไม่
-    const hasPayment = allPayments.some(p => p.member_id === member.member_id);
-    let template = '';
-    
-    if (hasPayment) {
-        const payments = allPayments.filter(p => p.member_id === member.member_id);
-        const latest = payments.length > 0 ? payments[payments.length - 1] : null;
-        template = `مرحباً [اسم العضو] 👋،
-نحن سعداء بوجودك معنا في صالة Gym Pro الرياضية! 🏋️
-
-📋 بيانات عضويتك:
-━━━━━━━━━━━━━━━━
-• الاسم الكامل: [اسم العضو]
-• رقم العضو: [رقم العضو]
-• تاريخ التسجيل: [تاريخ التسجيل]
-• نوع العضوية: [نوع العضوية]
-• تاريخ انتهاء العضوية: [تاريخ الانتهاء]
-• كلمة المرور: [รหัสผ่าน]
-
-💰 آخر دفعة:
-• المبلغ: [المبلغ] ج.م
-• تاريخ الدفع: [تاريخ الدفع]
-
-💪 ننصحك بممارسة الرياضة يومياً لتحقيق أهدافك!
-نحن هنا لدعمك وتقديم الاستشارة في أي وقت.
-
-مع خالص التحية،
-إدارة صالة Gym Pro 🏋️`;
-        if (latest) {
-            template = template
-                .replace(/\[المبلغ\]/g, latest.amount || '0')
-                .replace(/\[تاريخ الدفع\]/g, formatDate(latest.payment_date) || '');
-        } else {
-            template = template
-                .replace(/\[المبلغ\]/g, '0')
-                .replace(/\[تاريخ الدفع\]/g, '');
+        // ============================================================
+        // WHATSAPP, QR, CSV HELPERS
+        // ============================================================
+        function sendWhatsAppMember(member) {
+            if (!member) { showToast('⚠️ لا توجد بيانات العضو', 'error'); return; }
+            const phone = member.phone;
+            const name = member.full_name || 'عضو';
+            if (!phone) { showToast('⚠️ هذا العضو ليس لديه رقم هاتف', 'warning'); return; }
+            const wa = formatPhoneForWhatsApp(phone);
+            const msg = encodeURIComponent(`👋 مرحباً ${name} من Pro Gym`);
+            window.open(`https://wa.me/${wa}?text=${msg}`, '_blank');
+            showToast(`📱 فتح WhatsApp لـ ${name}`, 'info');
         }
-    } else {
-        template = `مرحباً [اسم العضو] 👋،
-نرحب بك في صالة Gym Pro الرياضية! 🏋️
-نحن سعداء بانضمامك إلى عائلتنا الرياضية.
 
-📋 بيانات عضويتك:
-━━━━━━━━━━━━━━━━
-• الاسم الكامل: [اسم العضو]
-• رقم العضو: [رقم العضو]
-• تاريخ التسجيل: [تاريخ التسجيل]
-• نوع العضوية: [نوع العضوية]
-• كلمة المرور: [รหัสผ่าน]
+        function showMemberQR(id) {
+            const m = allMembers.find(a => a.member_id === id);
+            if (!m) { showToast('⚠️ لم يتم العثور على العضو', 'error'); return; }
+            const container = document.createElement('div');
+            container.style.textAlign = 'center';
+            const qrDiv = document.createElement('div');
+            qrDiv.id = 'adminQrTemp';
+            container.appendChild(qrDiv);
+            container.innerHTML += `<p style="margin-top:12px;font-weight:700;">${m.full_name} (${m.member_id})</p>`;
+            container.innerHTML +=
+                `<button class="btn btn-primary btn-sm" onclick="downloadAdminQR('${m.member_id}')"><i class="fas fa-download"></i> تنزيل QR</button>`;
+            openModal('QR Code: ' + m.member_id, container.innerHTML);
+            setTimeout(() => {
+                const el = document.getElementById('adminQrTemp');
+                if (el && typeof QRCode !== 'undefined') {
+                    try {
+                        new QRCode(el, { text: m.member_id, width: 160, height: 160, colorDark: '#0f172a',
+                            colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.H });
+                    } catch (e) { el.innerHTML = '⚠️ خطأ في QR'; }
+                }
+            }, 100);
+        }
 
-⚠️ تنبيه هام:
-لم يتم تسجيل أي دفعة لك حتى الآن.
-نرجو منك التوجه إلى الاستقبال لإتمام إجراءات الدفع.
+        function downloadAdminQR(id) {
+            const canvas = document.querySelector('#adminQrTemp canvas');
+            if (!canvas) { showToast('⚠️ لم يتم العثور على QR', 'error'); return; }
+            const link = document.createElement('a');
+            link.download = `qr_${id}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            showToast('✅ تم تنزيل QR', 'success');
+        }
 
-💪 نحن في انتظارك بكل ترحيب وحب!
-نتمنى لك رحلة رياضية موفقة وممتعة!
+        function exportMembersCSV() {
+            if (!allMembers.length) { showToast('⚠️ لا توجد بيانات الأعضاء', 'warning'); return; }
+            const headers = ['الرقم', 'الاسم', 'الهاتف', 'العمر', 'النوع', 'النقاط', 'XP', 'انتهاء الصلاحية'];
+            const rows = allMembers.map(m => [m.member_id, m.full_name, m.phone, m.age, m.membership_type, getPoints(m
+                .member_id), getXp(m.member_id), formatDate(m.expiry_date)]);
+            downloadCSV('members.csv', headers, rows);
+            showToast('✅ تم تصدير CSV', 'success');
+        }
 
-مع خالص التحية،
-إدارة صالة Gym Pro 🏋️`;
-    }
-    
-    let msg = template
-        .replace(/\[اسم العضو\]/g, member.full_name || '')
-        .replace(/\[رقم العضو\]/g, member.member_id || '')
-        .replace(/\[تاريخ التسجيل\]/g, formatDate(member.start_date) || '')
-        .replace(/\[نوع العضوية\]/g, member.membership_type || '')
-        .replace(/\[تاريخ الانتهاء\]/g, formatDate(member.expiry_date) || 'غير محدد')
-        .replace(/\[รหัสผ่าน\]/g, member.password || '1234');
-    
-    const encoded = encodeURIComponent(msg);
-    const url = `https://wa.me/${wa}?text=${encoded}`;
-    window.open(url, '_blank');
-    showToast(`📱 فتح WhatsApp لـ ${member.full_name}`, 'info');
-}
+        function exportPaymentsCSV() {
+            if (!allPayments.length) { showToast('⚠️ لا توجد بيانات المدفوعات', 'warning'); return; }
+            const headers = ['الرقم', 'العضو', 'الاسم', 'المبلغ', 'التاريخ', 'انتهاء الصلاحية'];
+            const rows = allPayments.map(p => {
+                const member = allMembers.find(m => m.member_id === p.member_id);
+                const name = member ? member.full_name : '-';
+                return [p.payment_id, p.member_id, name, p.amount, formatDate(p.payment_date), formatDate(p
+                    .expiry_date)];
+            });
+            downloadCSV('payments.csv', headers, rows);
+            showToast('✅ تم تصدير CSV', 'success');
+        }
 
-// 2. ข้อความเตือนใกล้หมดอายุ
-function sendWhatsAppExpiryReminder(phone, name, daysLeft, expiryDate) {
-    if (!phone) {
-        showToast('⚠️ هذا العضو ليس لديه رقم هاتف', 'warning');
-        return;
-    }
-    const cleanPhone = formatPhoneForWhatsApp(phone);
-    if (!cleanPhone) {
-        showToast('⚠️ رقم الهاتف غير صحيح', 'error');
-        return;
-    }
-    const formattedDate = expiryDate ? formatDate(expiryDate) : 'غير محدد';
-    const template = `مرحباً [اسم العضو] 👋،
+        function exportAnalyticsCSV() {
+            showToast('📊 جارٍ إنشاء التقرير...', 'info');
+            const rows = [
+                ['المؤشر', 'القيمة'],
+                ['معدل الاحتفاظ', $('kpiRetention').textContent],
+                ['معدل التوقف', $('kpiChurn').textContent],
+                ['متوسط الإيرادات/عضو', $('kpiAvgRevenue').textContent],
+                ['النمو', $('kpiGrowth').textContent],
+                ['متوسط الدخول/عضو', $('kpiAvgCheckins').textContent],
+                ['النوع الأكثر شيوعاً', $('kpiTopType').textContent],
+                ['', ''],
+                ['نشط', $('anaActive').textContent],
+                ['جديد', $('anaNew').textContent],
+                ['توقف', $('anaChurned').textContent],
+                ['النمو الصافي', $('anaNetGrowth').textContent],
+                ['', ''],
+                ['الإيرادات الكلية', $('anaTotalRevenue').textContent],
+                ['المتوسط الشهري', $('anaAvgMonthlyRevenue').textContent],
+                ['أعلى شهر', $('anaTopMonth').textContent],
+                ['توقع 3 أشهر', $('anaForecast').textContent]
+            ];
+            downloadCSV('analytics_report.csv', [], rows);
+            showToast('✅ تم تصدير تقرير التحليلات CSV', 'success');
+        }
 
-📢 تنبيه هام:
-نود إعلامك بأن عضويتك في صالة Gym Pro الرياضية ستنتهي خلال [عدد الأيام] يوم بتاريخ [تاريخ الانتهاء].
-
-⏳ الوقت المتبقي: [عدد الأيام] يوم
-
-💪 ننصحك بالتوجه إلى الاستقبال لتجديد العضوية والاستمرار في الاستفادة من خدماتنا المميزة.
-نحن في انتظارك لمواصلة رحلتك الرياضية!
-
-مع خالص التحية،
-إدارة صالة Gym Pro 🏋️`;
-    let msg = template
-        .replace(/\[اسم العضو\]/g, name || '')
-        .replace(/\[عدد الأيام\]/g, daysLeft || '0')
-        .replace(/\[تاريخ الانتهاء\]/g, formattedDate);
-    const encoded = encodeURIComponent(msg);
-    const url = `https://wa.me/${cleanPhone}?text=${encoded}`;
-    window.open(url, '_blank');
-    showToast(`📱 فتح WhatsApp لـ ${name}`, 'info');
-}
-
-// 3. ข้อความให้กำลังใจสมาชิกที่หมดอายุ
-function sendWhatsAppExpiredEncouragement(phone, name, daysOverdue, expiryDate) {
-    if (!phone) {
-        showToast('⚠️ هذا العضو ليس لديه رقم هاتف', 'warning');
-        return;
-    }
-    const cleanPhone = formatPhoneForWhatsApp(phone);
-    if (!cleanPhone) {
-        showToast('⚠️ رقم الهاتف غير صحيح', 'error');
-        return;
-    }
-    const formattedDate = expiryDate ? formatDate(expiryDate) : 'غير محدد';
-    const template = `مرحباً [اسم العضو] 👋،
-
-📢 ملاحظة:
-لاحظنا أن عضويتك في صالة Gym Pro الرياضية قد انتهت منذ [عدد الأيام] يوم (بتاريخ [تاريخ الانتهاء]).
-
-💪 ندعوك بحرارة للعودة وممارسة الرياضة من جديد!
-صحتك تهمنا، ونحن هنا لمساعدتك على تحقيق أهدافك اللياقية.
-
-🏋️ تفضل بزيارتنا لتجديد عضويتك والاستفادة من:
-• أحدث الأجهزة الرياضية
-• مدربين محترفين
-• برامج تدريبية مخصصة
-• بيئة رياضية محفزة
-
-نتمنى لك دوام الصحة والعافية، ونحن في انتظارك!
-
-مع خالص التحية،
-إدارة صالة Gym Pro 🏋️`;
-    let msg = template
-        .replace(/\[اسم العضو\]/g, name || '')
-        .replace(/\[عدد الأيام\]/g, daysOverdue || '0')
-        .replace(/\[تاريخ الانتهاء\]/g, formattedDate);
-    const encoded = encodeURIComponent(msg);
-    const url = `https://wa.me/${cleanPhone}?text=${encoded}`;
-    window.open(url, '_blank');
-    showToast(`📱 فتح WhatsApp لـ ${name}`, 'info');
-}
-
-// 4. ข้อความต้อนรับสมาชิกใหม่ (ยังไม่จ่าย)
-function sendWhatsAppNewMemberUnpaid(phone, name, memberId, password, startDate, membershipType) {
-    if (!phone) {
-        showToast('⚠️ هذا العضو ليس لديه رقم هاتف', 'warning');
-        return;
-    }
-    const cleanPhone = formatPhoneForWhatsApp(phone);
-    if (!cleanPhone) {
-        showToast('⚠️ رقم الهاتف غير صحيح', 'error');
-        return;
-    }
-    const template = `مرحباً [اسم العضو] 👋،
-
-🎉 مرحباً بك في صالة Gym Pro الرياضية!
-نحن سعداء بانضمامك إلى عائلتنا الرياضية.
-
-📋 بيانات عضويتك:
-━━━━━━━━━━━━━━━━
-• الاسم الكامل: [اسم العضو]
-• رقم العضو: [رقم العضو]
-• تاريخ التسجيل: [تاريخ التسجيل]
-• نوع العضوية: [نوع العضوية]
-• كلمة المرور: [รหัสผ่าน]
-
-⚠️ تنبيه هام:
-لم يتم تسجيل أي دفعة لك حتى الآن.
-نرجو منك التوجه إلى الاستقبال لإتمام إجراءات الدفع.
-
-💪 نحن في انتظارك بكل ترحيب وحب!
-نتمنى لك رحلة رياضية موفقة وممتعة.
-
-مع خالص التحية،
-إدارة صالة Gym Pro 🏋️`;
-    let msg = template
-        .replace(/\[اسم العضو\]/g, name || '')
-        .replace(/\[رقم العضو\]/g, memberId || '')
-        .replace(/\[تاريخ التسجيل\]/g, formatDate(startDate) || '')
-        .replace(/\[نوع العضوية\]/g, membershipType || 'عادي')
-        .replace(/\[รหัสผ่าน\]/g, password || '1234');
-    const encoded = encodeURIComponent(msg);
-    const url = `https://wa.me/${cleanPhone}?text=${encoded}`;
-    window.open(url, '_blank');
-    showToast(`📱 فتح WhatsApp لـ ${name}`, 'info');
-}
-
-// 5. ข้อความขอบคุณสมาชิกที่จ่ายเงิน
-function sendWhatsAppPaymentThanks(phone, name, amount, paymentDate, newExpiry) {
-    if (!phone) {
-        showToast('⚠️ هذا العضو ليس لديه رقم هاتف', 'warning');
-        return;
-    }
-    const cleanPhone = formatPhoneForWhatsApp(phone);
-    if (!cleanPhone) {
-        showToast('⚠️ رقم الهاتف غير صحيح', 'error');
-        return;
-    }
-    const formattedDate = paymentDate ? formatDate(paymentDate) : 'اليوم';
-    const formattedNewExpiry = newExpiry ? formatDate(newExpiry) : 'غير محدد';
-    const template = `شكراً لك [اسم العضو] 🙏 على دفعك في الوقت المحدد!
-
-💰 إيصال الدفع:
-━━━━━━━━━━━━━━━━
-• المبلغ المدفوع: [المبلغ] ج.م
-• تاريخ الدفع: [تاريخ الدفع]
-• تاريخ انتهاء العضوية الجديد: [تاريخ الانتهاء]
-
-💪 ننصحك بالاستمرار في ممارسة الرياضة يومياً لتحقيق أهدافك!
-نحن سعداء بتقديم الاستشارة والدعم لك دائماً.
-
-مع خالص التحية،
-إدارة صالة Gym Pro 🏋️`;
-    let msg = template
-        .replace(/\[اسم العضو\]/g, name || '')
-        .replace(/\[المبلغ\]/g, amount || '0')
-        .replace(/\[تاريخ الدفع\]/g, formattedDate)
-        .replace(/\[تاريخ الانتهاء\]/g, formattedNewExpiry);
-    const encoded = encodeURIComponent(msg);
-    const url = `https://wa.me/${cleanPhone}?text=${encoded}`;
-    window.open(url, '_blank');
-    showToast(`📱 فتح WhatsApp لـ ${name}`, 'info');
-}
-
-// ============================================================
-// ฟังก์ชันส่งแบบกลุ่ม (Bulk)
-// ============================================================
-
-function sendWhatsAppExpiryReminderBulk() {
-    const today = getTodayStr();
-    const expiring = allMembers.filter(m => m.status === 'expiring_soon' && m.phone);
-    if (!expiring.length) {
-        showToast('📭 لا يوجد أعضاء على وشك الانتهاء', 'info');
-        return;
-    }
-    let count = 0;
-    expiring.forEach(m => {
-        const daysLeft = daysBetween(today, normalizeDate(m.expiry_date));
-        setTimeout(() => {
-            sendWhatsAppExpiryReminder(m.phone, m.full_name, daysLeft, m.expiry_date);
-        }, count * 2000);
-        count++;
-    });
-    showToast(`📤 جارٍ فتح WhatsApp لـ ${count} عضو`, 'info');
-}
-
-function sendWhatsAppExpiredEncouragementBulk() {
-    const today = getTodayStr();
-    const expired = allMembers.filter(m => m.status === 'expired' && m.phone);
-    if (!expired.length) {
-        showToast('📭 لا يوجد أعضاء منتهية صلاحيتهم', 'info');
-        return;
-    }
-    let count = 0;
-    expired.forEach(m => {
-        const daysOver = daysBetween(normalizeDate(m.expiry_date), today);
-        setTimeout(() => {
-            sendWhatsAppExpiredEncouragement(m.phone, m.full_name, daysOver, m.expiry_date);
-        }, count * 2000);
-        count++;
-    });
-    showToast(`📤 جارٍ فتح WhatsApp لـ ${count} عضو`, 'info');
-}
-
-function sendWhatsAppNewMemberUnpaidBulk() {
-    const thisMonth = getTodayStr().slice(0, 7);
-    const newUnpaid = allMembers.filter(m =>
-        m.start_date && normalizeDate(m.start_date).slice(0, 7) === thisMonth &&
-        (m.status === 'no_payment' || m.status === 'expired') &&
-        m.phone
-    );
-    if (!newUnpaid.length) {
-        showToast('📭 لا يوجد أعضاء جدد غير مدفوع', 'info');
-        return;
-    }
-    let count = 0;
-    newUnpaid.forEach(m => {
-        setTimeout(() => {
-            sendWhatsAppNewMemberUnpaid(m.phone, m.full_name, m.member_id, m.password, m.start_date, m.membership_type);
-        }, count * 2000);
-        count++;
-    });
-    showToast(`📤 جارٍ فتح WhatsApp لـ ${count} عضو`, 'info');
-}
-        
+        function downloadCSV(filename, headers, rows) {
+            let content = '';
+            if (headers.length) content += headers.join(',') + '\n';
+            rows.forEach(r => { content += r.join(',') + '\n'; });
+            const blob = new Blob(['\uFEFF' + content], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+            URL.revokeObjectURL(link.href);
+        }
 
         // ============================================================
         // REGISTER MODALS
@@ -10055,9 +9961,6 @@ function copyMemberId() {
         showToast(`✅ คัดลอกเลข ${input.value} แล้ว`, 'success');
     });
 }
-
-
-        
     </script>
 </body>
 </html>
