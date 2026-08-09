@@ -6786,14 +6786,18 @@ case 'members': {
         break;
     }
 
-    // ✅ ฟังก์ชันหาสถานะของสมาชิก
+    // ✅ ฟังก์ชันหาสถานะของสมาชิก (แก้ไขแล้ว)
     function getMemberStatus(member) {
         const memberId = member.member_id;
         if (!memberId) return 'no_payment';
 
+        // 1. ตรวจสอบประวัติการจ่ายเงิน
         const memberPayments = payments.filter(p => p.member_id === memberId);
-        if (memberPayments.length === 0) return 'no_payment';
+        if (memberPayments.length === 0) {
+            return 'no_payment';  // ไม่เคยจ่ายเลย → ยังไม่จ่าย
+        }
 
+        // 2. หา expiry_date ล่าสุดจาก payment
         let latestExpiry = null;
         memberPayments.forEach(p => {
             if (p.expiry_date) {
@@ -6804,11 +6808,26 @@ case 'members': {
             }
         });
 
-        if (!latestExpiry) return 'no_payment';
+        // 3. ถ้าไม่มี expiry_date ใน payment → ให้ใช้ member.expiry_date (ถ้ามี)
+        if (!latestExpiry && member.expiry_date) {
+            latestExpiry = normalizeDate(member.expiry_date);
+        }
+
+        // 4. ถ้ายังไม่มี expiry_date → แปลงว่าข้อมูลไม่สมบูรณ์ → ถือว่าไม่จ่าย
+        if (!latestExpiry) {
+            return 'no_payment';
+        }
+
+        // 5. คำนวณสถานะจาก expiry_date
         const diff = daysBetween(todayStr, latestExpiry);
-        if (diff <= 0) return 'expired';
-        if (diff <= 7) return 'expiring_soon';
-        return 'active';
+
+        if (diff <= 0) {
+            return 'expired';        // หมดอายุแล้ว
+        } else if (diff <= 7) {
+            return 'expiring_soon';  // ใกล้หมดอายุ (7 วัน)
+        } else {
+            return 'active';         // กำลังใช้งาน
+        }
     }
 
     // ✅ ฟังก์ชันสร้างข้อความ WhatsApp ตามสถานะ
@@ -6820,80 +6839,16 @@ case 'members': {
 
         switch (status) {
             case 'expired':
-                return `مرحباً ${name} 👋،
-
-📢 ملاحظة هامة:
-لاحظنا أن عضويتك في صالة Gym Pro الرياضية قد انتهت (بتاريخ ${expiry}).
-
-💪 ندعوك بحرارة للعودة وممارسة الرياضة من جديد!
-صحتك تهمنا، ونحن هنا لمساعدتك على تحقيق أهدافك اللياقية.
-
-🏋️ مميزات العودة إلينا:
-• أحدث الأجهزة الرياضية
-• مدربين محترفين
-• برامج تدريبية مخصصة
-• بيئة رياضية محفزة
-
-📞 للتواصل والاستفسار يرجى الاتصال بنا.
-
-نتمنى لك دوام الصحة والعافية، ونحن في انتظارك!
-
-مع خالص التحية،
-إدارة صالة Gym Pro 🏋️`;
+                return `مرحباً ${name} 👋،\n\n📢 ملاحظة هامة:\nلاحظنا أن عضويتك في صالة Gym Pro الرياضية قد انتهت (بتاريخ ${expiry}).\n\n💪 ندعوك بحرارة للعودة وممارسة الرياضة من جديد!\nصحتك تهمنا، ونحن هنا لمساعدتك على تحقيق أهدافك اللياقية.\n\n🏋️ مميزات العودة إلينا:\n• أحدث الأجهزة الرياضية\n• مدربين محترفين\n• برامج تدريبية مخصصة\n• بيئة رياضية محفزة\n\n📞 للتواصل والاستفسار يرجى الاتصال بنا.\n\nنتمنى لك دوام الصحة والعافية، ونحن في انتظارك!\n\nمع خالص التحية،\nإدارة صالة Gym Pro 🏋️`;
 
             case 'expiring_soon':
-                return `مرحباً ${name} 👋،
-
-📢 تنبيه هام:
-نود إعلامك بأن عضويتك في صالة Gym Pro الرياضية ستنتهي خلال ${daysLeft} يوم بتاريخ ${expiry}.
-
-⏳ الوقت المتبقي: ${daysLeft} يوم
-
-💪 ننصحك بالتوجه إلى الاستقبال لتجديد العضوية والاستمرار في الاستفادة من خدماتنا المميزة.
-نحن في انتظارك لمواصلة رحلتك الرياضية!
-
-مع خالص التحية،
-إدارة صالة Gym Pro 🏋️`;
+                return `مرحباً ${name} 👋،\n\n📢 تنبيه هام:\nنود إعلامك بأن عضويتك في صالة Gym Pro الرياضية ستنتهي خلال ${daysLeft} يوم بتاريخ ${expiry}.\n\n⏳ الوقت المتبقي: ${daysLeft} يوم\n\n💪 ننصحك بالتوجه إلى الاستقبال لتجديد العضوية والاستمرار في الاستفادة من خدماتنا المميزة.\nنحن في انتظارك لمواصلة رحلتك الرياضية!\n\nمع خالص التحية،\nإدارة صالة Gym Pro 🏋️`;
 
             case 'no_payment':
-                return `مرحباً ${name} 👋،
-
-نرحب بك في صالة Gym Pro الرياضية! 🏋️
-نحن سعداء بانضمامك إلى عائلتنا الرياضية.
-
-📋 بيانات عضويتك:
-━━━━━━━━━━━━━━━━
-• الاسم الكامل: ${name}
-• رقم العضو: ${memberId}
-• تاريخ التسجيل: ${member.start_date ? formatDate(member.start_date) : 'غير محدد'}
-
-⚠️ تنبيه هام:
-لم يتم تسجيل أي دفعة لك حتى الآن.
-نرجو منك التوجه إلى الاستقبال لإتمام إجراءات الدفع.
-
-💪 نحن في انتظارك بكل ترحيب وحب!
-نتمنى لك رحلة رياضية موفقة وممتعة!
-
-مع خالص التحية،
-إدارة صالة Gym Pro 🏋️`;
+                return `مرحباً ${name} 👋،\n\nنرحب بك في صالة Gym Pro الرياضية! 🏋️\nنحن سعداء بانضمامك إلى عائلتنا الرياضية.\n\n📋 بيانات عضويتك:\n━━━━━━━━━━━━━━━━\n• الاسم الكامل: ${name}\n• رقم العضو: ${memberId}\n• تاريخ التسجيل: ${member.start_date ? formatDate(member.start_date) : 'غير محدد'}\n\n⚠️ تنبيه هام:\nلم يتم تسجيل أي دفعة لك حتى الآن.\nنرجو منك التوجه إلى الاستقبال لإتمام إجراءات الدفع.\n\n💪 نحن في انتظارك بكل ترحيب وحب!\nنتمنى لك رحلة رياضية موفقة وممتعة!\n\nمع خالص التحية،\nإدارة صالة Gym Pro 🏋️`;
 
             default:
-                return `مرحباً ${name} 👋،
-
-نحن سعداء بوجودك معنا في صالة Gym Pro الرياضية! 🏋️
-
-📋 بيانات عضويتك:
-━━━━━━━━━━━━━━━━
-• الاسم الكامل: ${name}
-• رقم العضو: ${memberId}
-• تاريخ التسجيل: ${member.start_date ? formatDate(member.start_date) : 'غير محدد'}
-• تاريخ انتهاء العضوية: ${expiry}
-
-💪 ننصحك بممارسة الرياضة يومياً لتحقيق أهدافك!
-نحن هنا لدعمك وتقديم الاستشارة في أي وقت.
-
-مع خالص التحية،
-إدارة صالة Gym Pro 🏋️`;
+                return `مرحباً ${name} 👋،\n\nنحن سعداء بوجودك معنا في صالة Gym Pro الرياضية! 🏋️\n\n📋 بيانات عضويتك:\n━━━━━━━━━━━━━━━━\n• الاسم الكامل: ${name}\n• رقم العضو: ${memberId}\n• تاريخ التسجيل: ${member.start_date ? formatDate(member.start_date) : 'غير محدد'}\n• تاريخ انتهاء العضوية: ${expiry}\n\n💪 ننصحك بممارسة الرياضة يومياً لتحقيق أهدافك!\nنحن هنا لدعمك وتقديم الاستشارة في أي وقت.\n\nمع خالص التحية،\nإدارة صالة Gym Pro 🏋️`;
         }
     }
 
@@ -6907,15 +6862,53 @@ case 'members': {
         return da < db ? 1 : -1;
     });
 
-    // ✅ สร้างตาราง
+    // ✅ ===== สรุปสถิติด้านบน =====
+    const statusMap = {};
+    members.forEach(m => {
+        statusMap[m.member_id] = getMemberStatus(m);
+    });
+
+    const activeCount = members.filter(m => statusMap[m.member_id] === 'active').length;
+    const expiredCount = members.filter(m => statusMap[m.member_id] === 'expired').length;
+    const expiringCount = members.filter(m => statusMap[m.member_id] === 'expiring_soon').length;
+    const noPaymentCount = members.filter(m => statusMap[m.member_id] === 'no_payment').length;
+    const newCount = members.filter(m => m.start_date && normalizeDate(m.start_date).slice(0, 7) === thisMonth).length;
+
+    const summaryHtml = `
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:14px;">
+            <div style="background:rgba(16,185,129,0.08);border-radius:8px;padding:6px;text-align:center;border:1px solid rgba(16,185,129,0.1);">
+                <div style="font-size:16px;font-weight:700;color:var(--success);">${activeCount}</div>
+                <div style="font-size:8px;color:var(--text-muted);"><i class="fas fa-check-circle" style="color:var(--success);"></i> نشط</div>
+            </div>
+            <div style="background:rgba(239,68,68,0.08);border-radius:8px;padding:6px;text-align:center;border:1px solid rgba(239,68,68,0.1);">
+                <div style="font-size:16px;font-weight:700;color:var(--danger);">${expiredCount}</div>
+                <div style="font-size:8px;color:var(--text-muted);"><i class="fas fa-circle-xmark" style="color:var(--danger);"></i> منتهي</div>
+            </div>
+            <div style="background:rgba(245,158,11,0.08);border-radius:8px;padding:6px;text-align:center;border:1px solid rgba(245,158,11,0.1);">
+                <div style="font-size:16px;font-weight:700;color:var(--warning);">${expiringCount}</div>
+                <div style="font-size:8px;color:var(--text-muted);"><i class="fas fa-clock" style="color:var(--warning);"></i> ينتهي قريباً</div>
+            </div>
+            <div style="background:rgba(148,163,184,0.08);border-radius:8px;padding:6px;text-align:center;border:1px solid rgba(148,163,184,0.1);">
+                <div style="font-size:16px;font-weight:700;color:var(--text-muted);">${noPaymentCount}</div>
+                <div style="font-size:8px;color:var(--text-muted);"><i class="fas fa-triangle-exclamation" style="color:var(--text-muted);"></i> غير مدفوع</div>
+            </div>
+            <div style="background:rgba(245,158,11,0.08);border-radius:8px;padding:6px;text-align:center;border:1px solid rgba(245,158,11,0.1);">
+                <div style="font-size:16px;font-weight:700;color:#f59e0b;">${newCount}</div>
+                <div style="font-size:8px;color:var(--text-muted);"><i class="fas fa-sparkles" style="color:#f59e0b;"></i> جديد</div>
+            </div>
+        </div>
+    `;
+
+    // ✅ ===== สร้างตาราง =====
     let table = `
-        <div class="table-wrap" style="border-radius:var(--radius-sm);border:1px solid var(--border-color);max-height:500px;overflow-y:auto;overflow-x:auto;">
+        ${summaryHtml}
+        <div class="table-wrap" style="border-radius:var(--radius-sm);border:1px solid var(--border-color);max-height:450px;overflow-y:auto;overflow-x:auto;">
             <table style="width:100%;border-collapse:collapse;font-size:13px;min-width:400px;">
                 <thead style="position:sticky;top:0;z-index:5;background:var(--bg-body);">
                     <tr>
                         <th style="width:30px;padding:4px 6px;text-align:center;">#</th>
-                        <th style="min-width:80px;padding:4px 6px;text-align:right;">الرقم</th>
                         <th style="min-width:90px;padding:4px 6px;text-align:right;">الاسم</th>
+                        <th style="min-width:80px;padding:4px 6px;text-align:center;">الرقم</th>
                         <th class="hide-phone" style="min-width:70px;padding:4px 6px;text-align:center;">الهاتف</th>
                         <th style="min-width:100px;padding:4px 6px;text-align:center;">الحالة</th>
                         <th style="width:40px;padding:4px 4px;text-align:center;">اتصال</th>
@@ -6932,15 +6925,9 @@ case 'members': {
         const encodedMsg = encodeURIComponent(message);
         const waLink = wa ? `https://wa.me/${wa}?text=${encodedMsg}` : '#';
 
-        // ✅ ตรวจสอบว่าเป็นสมาชิกใหม่เดือนนี้หรือไม่
         const isNew = m.start_date && normalizeDate(m.start_date).slice(0, 7) === thisMonth;
 
-        // ✅ Badge สถานะ
         let statusBadge = '';
-        let statusEmoji = '';
-        let statusText = '';
-        let badgeClass = '';
-
         if (status === 'active') {
             if (isNew) {
                 statusBadge = `<span class="status-badge" style="background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#0f172a;font-weight:700;"><i class="fas fa-sparkles"></i> جديد</span>`;
@@ -6955,22 +6942,19 @@ case 'members': {
             statusBadge = `<span class="status-badge no-payment"><i class="fas fa-triangle-exclamation"></i> غير مدفوع</span>`;
         }
 
-        // ✅ กำหนดสีแถวตามสถานะ
         let rowStyle = '';
         if (status === 'expired') rowStyle = 'background:rgba(239,68,68,0.04);';
         else if (status === 'no_payment') rowStyle = 'background:rgba(148,163,184,0.04);';
         else if (isNew) rowStyle = 'background:rgba(245,158,11,0.04);';
 
-        // ✅ แสดงผล (เรียง: #, الرقم, الاسم, (ซ่อนเบอร์), สถานะ, WhatsApp)
-        // ✅ บนมือถือ: "الاسم" มาก่อน "الرقم" (ใช้ display:flex บน td)
         table += `
             <tr style="${rowStyle}">
                 <td style="color:var(--text-muted);font-size:12px;text-align:center;padding:4px 6px;">${idx + 1}</td>
-                <td style="font-family:monospace;font-size:12px;text-align:center;padding:4px 6px;">
-                    <span style="display:inline-block;font-weight:600;">${m.member_id || '-'}</span>
-                </td>
                 <td style="text-align:right;padding:4px 6px;">
                     <span style="font-weight:600;font-size:13px;">${m.full_name || '-'}</span>
+                </td>
+                <td style="font-family:monospace;font-size:12px;text-align:center;padding:4px 6px;">
+                    <span style="display:inline-block;font-weight:600;">${m.member_id || '-'}</span>
                 </td>
                 <td class="hide-phone" style="font-size:12px;text-align:center;padding:4px 6px;color:var(--text-secondary);">${phone || '-'}</td>
                 <td style="text-align:center;padding:4px 6px;">${statusBadge}</td>
@@ -7013,10 +6997,6 @@ case 'members': {
 }
                 
                 
-
-
-        
-
             default: {
                 content = 'لا توجد بيانات';
             }
