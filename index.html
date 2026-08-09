@@ -9374,58 +9374,7 @@ async function registerMember() {
     if (!password || password.length < 4) { resultDiv.innerHTML = '<span style="color:var(--danger);"><i class="fas fa-exclamation-circle"></i> كلمة المرور >=4 أحرف</span>'; return; }
     if (password !== confirmPass) { resultDiv.innerHTML = '<span style="color:var(--danger);"><i class="fas fa-exclamation-circle"></i> كلمة المرور غير متطابقة</span>'; return; }
 
-    try {
-        // ✅ ส่งข้อมูลไป API โดยไม่ต้องตรวจสอบ ID ซ้ำ (ให้ API เป็นคนตอบ)
-        await apiCall('/members', {
-            method: 'POST',
-            body: JSON.stringify({
-                member_id: memberId,
-                full_name: fullName,
-                phone: phone || '',
-                age: age || '',
-                membership_type: membershipType,
-                password: password,
-                start_date: getTodayStr()
-            })
-        });
-
-        resultDiv.innerHTML = `<span style="color:var(--success);"><i class="fas fa-check-circle"></i> تم التسجيل بنجاح!<br>الرقم: <strong>${memberId}</strong> | كلمة المرور: <strong>${password}</strong></span>`;
-        resultDiv.style.background = 'rgba(16,185,129,0.06)';
-        showToast(`✅ تم تسجيل ${memberId} بنجاح`, 'success');
-
-        // ✅ ปิด Modal และเข้าสู่ระบบอัตโนมัติ
-        setTimeout(() => {
-            closeRegisterModal('registerMemberModal');
-            localStorage.setItem('gym_role', 'member');
-            localStorage.setItem('gym_user', memberId);
-            document.getElementById('loginPage').style.display = 'none';
-            document.getElementById('appMain').style.display = 'block';
-            showToast(`🔑 مرحباً ${fullName}!`, 'success');
-            checkAuth();  // โหลดหน้า Profile
-        }, 1500);
-
-    } catch (error) {
-        // ถ้า API บอกว่า ID ซ้ำ ให้แจ้งให้เปลี่ยน ID
-        if (error.message.includes('already exists') || error.message.includes('duplicate')) {
-            resultDiv.innerHTML = `<span style="color:var(--danger);"><i class="fas fa-times-circle"></i> الرقم ${memberId} موجود بالفعل، يرجى تغيير الرقم</span>`;
-            // สร้าง ID ใหม่ให้
-            const newId = generateNewMemberId(allMembers);
-            document.getElementById('regMemberId').value = newId;
-            showToast('🔄 تم إنشاء رقم جديد تلقائياً', 'info');
-        } else {
-            resultDiv.innerHTML = `<span style="color:var(--danger);"><i class="fas fa-times-circle"></i> ${error.message}</span>`;
-            showToast('❌ ' + error.message, 'error');
-        }
-        resultDiv.style.background = 'rgba(239,68,68,0.06)';
-    }
-}
-
-        // ============================================================
-        // LOGIN / LOGOUT
-        // ============================================================
-// ============================================================
-// CHECK AUTH — ตรวจสอบสิทธิ์และโหลดหน้า
-// ============================================================
+        
 // ============================================================
 // CHECK AUTH — ตรวจสอบสิทธิ์และโหลดหน้า (Member Fix)
 // ============================================================
