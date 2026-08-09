@@ -5528,7 +5528,7 @@ function sendWhatsAppMember(member) {
 }
 
 // ============================================================
-// 2. ข้อความเตือนใกล้หมดอายุ (ปุ่มใน Dashboard)
+// 2. ข้อความเตือนใกล้หมดอายุ (ปุ่มใน Dashboard / Bulk)
 // ============================================================
 function sendWhatsAppExpiryReminder(phone, name, daysLeft, expiryDate) {
     if (!phone) {
@@ -5551,8 +5551,10 @@ function sendWhatsAppExpiryReminder(phone, name, daysLeft, expiryDate) {
 
 ⏳ الوقت المتبقي: [عدد الأيام] يوم
 
-💪 ننصحك بالتوجه إلى الاستقبال لتجديد العضوية والاستمرار في الاستفادة من خدماتنا المميزة.
-نحن في انتظارك لمواصلة رحلتك الرياضية!
+📋 لتجديد العضوية يرجى زيارة الاستقبال أو الاتصال بنا على الرقم التالي.
+
+💪 لا تفوت فرصة الاستمرار في رحلتك الرياضية!
+نحن في انتظارك لمواصلة تحقيق أهدافك.
 
 مع خالص التحية،
 إدارة صالة Gym Pro 🏋️`;
@@ -5569,7 +5571,7 @@ function sendWhatsAppExpiryReminder(phone, name, daysLeft, expiryDate) {
 }
 
 // ============================================================
-// 3. ข้อความให้กำลังใจสมาชิกที่หมดอายุ (ปุ่มใน Dashboard)
+// 3. ข้อความให้กำลังใจสมาชิกที่หมดอายุ (ปุ่มใน Dashboard / Bulk)
 // ============================================================
 function sendWhatsAppExpiredEncouragement(phone, name, daysOverdue, expiryDate) {
     if (!phone) {
@@ -5587,17 +5589,19 @@ function sendWhatsAppExpiredEncouragement(phone, name, daysOverdue, expiryDate) 
     
     const template = `مرحباً [اسم العضو] 👋،
 
-📢 ملاحظة:
+📢 ملاحظة هامة:
 لاحظنا أن عضويتك في صالة Gym Pro الرياضية قد انتهت منذ [عدد الأيام] يوم (بتاريخ [تاريخ الانتهاء]).
 
 💪 ندعوك بحرارة للعودة وممارسة الرياضة من جديد!
 صحتك تهمنا، ونحن هنا لمساعدتك على تحقيق أهدافك اللياقية.
 
-🏋️ تفضل بزيارتنا لتجديد عضويتك والاستفادة من:
+🏋️ مميزات العودة إلينا:
 • أحدث الأجهزة الرياضية
 • مدربين محترفين
 • برامج تدريبية مخصصة
 • بيئة رياضية محفزة
+
+📞 للتواصل والاستفسار يرجى الاتصال بنا على الرقم التالي.
 
 نتمنى لك دوام الصحة والعافية، ونحن في انتظارك!
 
@@ -5616,7 +5620,7 @@ function sendWhatsAppExpiredEncouragement(phone, name, daysOverdue, expiryDate) 
 }
 
 // ============================================================
-// 4. ข้อความต้อนรับสมาชิกใหม่ (ยังไม่จ่าย) — ปุ่มใน Dashboard
+// 4. ข้อความต้อนรับสมาชิกใหม่ (ยังไม่จ่าย) — ปุ่มใน Dashboard / Bulk
 // ============================================================
 function sendWhatsAppNewMemberUnpaid(phone, name, memberId, password, startDate, membershipType) {
     if (!phone) {
@@ -5694,6 +5698,10 @@ function sendWhatsAppPaymentThanks(phone, name, amount, paymentDate, newExpiry) 
 
 💪 ننصحك بالاستمرار في ممارسة الرياضة يومياً لتحقيق أهدافك!
 نحن سعداء بتقديم الاستشارة والدعم لك دائماً.
+
+📋 نذكرك بمواعيد العمل:
+• السبت - الخميس: 6 صباحاً - 12 منتصف الليل
+• الجمعة: 8 صباحاً - 10 مساءً
 
 مع خالص التحية،
 إدارة صالة Gym Pro 🏋️`;
@@ -5782,6 +5790,98 @@ function sendWhatsAppNewMemberUnpaidBulk() {
     
     showToast(`📤 جارٍ فتح WhatsApp لـ ${count} عضو`, 'info');
 }
+
+// 6.4 ส่งต้อนรับสมาชิกใหม่ (จ่ายแล้ว) แบบกลุ่ม
+function sendWhatsAppNewMemberPaidBulk() {
+    const thisMonth = getTodayStr().slice(0, 7);
+    const newPaid = allMembers.filter(m =>
+        m.start_date && normalizeDate(m.start_date).slice(0, 7) === thisMonth &&
+        allPayments.some(p => p.member_id === m.member_id) &&
+        m.phone
+    );
+    
+    if (!newPaid.length) {
+        showToast('📭 لا يوجد أعضاء جدد مدفوع', 'info');
+        return;
+    }
+    
+    let count = 0;
+    newPaid.forEach(m => {
+        const payments = allPayments.filter(p => p.member_id === m.member_id);
+        const latest = payments.length > 0 ? payments[payments.length - 1] : null;
+        
+        setTimeout(() => {
+            const template = `مرحباً [اسم العضو] 👋،
+نرحب بك في صالة Gym Pro الرياضية! 🏋️
+نحن سعداء بانضمامك إلى عائلتنا الرياضية.
+
+📋 بيانات عضويتك:
+━━━━━━━━━━━━━━━━
+• الاسم الكامل: [اسم العضو]
+• رقم العضو: [رقم العضو]
+• تاريخ التسجيل: [تاريخ التسجيل]
+• نوع العضوية: [نوع العضوية]
+• المبلغ المدفوع: [المبلغ] ج.م
+• تاريخ الدفع: [تاريخ الدفع]
+• تاريخ انتهاء العضوية: [تاريخ الانتهاء]
+• كلمة المرور: [รหัสผ่าน]
+
+💪 نتمنى لك رحلة رياضية موفقة وممتعة!
+نحن هنا لدعمك وتقديم الاستشارة في أي وقت.
+
+مع خالص التحية،
+إدارة صالة Gym Pro 🏋️`;
+            
+            let msg = template
+                .replace(/\[اسم العضو\]/g, m.full_name || '')
+                .replace(/\[رقم العضو\]/g, m.member_id || '')
+                .replace(/\[تاريخ التسجيل\]/g, formatDate(m.start_date) || '')
+                .replace(/\[نوع العضوية\]/g, m.membership_type || '')
+                .replace(/\[المبلغ\]/g, latest?.amount || '0')
+                .replace(/\[تاريخ الدفع\]/g, formatDate(latest?.payment_date) || '')
+                .replace(/\[تاريخ الانتهاء\]/g, formatDate(latest?.expiry_date) || 'غير محدد')
+                .replace(/\[รหัสผ่าน\]/g, m.password || '1234');
+            
+            const wa = formatPhoneForWhatsApp(m.phone);
+            if (wa) {
+                const encoded = encodeURIComponent(msg);
+                const url = `https://wa.me/${wa}?text=${encoded}`;
+                window.open(url, '_blank');
+            }
+        }, count * 2000);
+        count++;
+    });
+    
+    showToast(`📤 جارٍ فتح WhatsApp لـ ${count} عضو`, 'info');
+}
+
+// 6.5 ส่งขอบคุณสมาชิกที่จ่ายวันนี้ แบบกลุ่ม
+function sendWhatsAppPaidTodayBulk() {
+    const today = getTodayStr();
+    const paidToday = allPayments.filter(p => {
+        if (!p.payment_date) return false;
+        return normalizeDate(p.payment_date) === today;
+    });
+    
+    if (!paidToday.length) {
+        showToast('📭 لا توجد مدفوعات اليوم', 'info');
+        return;
+    }
+    
+    let count = 0;
+    paidToday.forEach(p => {
+        const member = allMembers.find(m => m.member_id === p.member_id);
+        if (!member || !member.phone) return;
+        
+        setTimeout(() => {
+            sendWhatsAppPaymentThanks(member.phone, member.full_name, p.amount, p.payment_date, p.expiry_date);
+        }, count * 2000);
+        count++;
+    });
+    
+    showToast(`📤 جارٍ فتح WhatsApp لـ ${count} عضو`, 'info');
+}
+        
 
         
         // ============================================================
