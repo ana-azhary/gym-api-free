@@ -6355,7 +6355,7 @@ case 'newMembers': {
         const activeCount = newMembers.filter(m => getMemberStatus(m) === 'active').length;
         const noPaymentCount = newMembers.filter(m => getMemberStatus(m) === 'no_payment').length;
         
-        // ✅ สรุปสถิติแบบ 2 การ์ด (ตัด ينتهي قريباً و منتهي)
+        // ✅ สรุปสถิติแบบ 2 การ์ด (ไม่มี ينتهي قريباً و منتهي)
         let summaryHtml = `
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;max-width:400px;margin-left:auto;margin-right:auto;">
                 <div style="background:rgba(16,185,129,0.08);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(16,185,129,0.1);">
@@ -6369,12 +6369,12 @@ case 'newMembers': {
             </div>
         `;
         
-        // ✅ Badge Map: เปลี่ยน "غير مدفوع" เป็นข้อความปกติ (ไม่มีพื้นหลัง)
+        // ✅ Badge Map: "غير مدفوع" กลับมาเป็น Badge สีเทาแบบเดิม
         const statusBadgeMap = {
             'active': '<span class="status-badge active"><i class="fas fa-check-circle"></i> نشط</span>',
             'expired': '<span class="status-badge expired"><i class="fas fa-circle-xmark"></i> منتهي</span>',
             'expiring_soon': '<span class="status-badge expiring"><i class="fas fa-clock"></i> ينتهي قريباً</span>',
-            'no_payment': '<span style="color:var(--text-primary);font-weight:500;"><i class="fas fa-circle" style="color:var(--text-muted);font-size:8px;"></i> غير مدفوع</span>'  // ✅ สีปกติ
+            'no_payment': '<span class="status-badge no-payment"><i class="fas fa-triangle-exclamation"></i> غير مدفوع</span>'  // ✅ กลับมาใช้ Badge สีเทา
         };
         
         // ✅ สร้างตาราง
@@ -6457,6 +6457,8 @@ case 'newMembers': {
     }
     break;
 }
+
+                        
                         
 case 'expired': {
     title = '🚫 الأعضاء منتهي الصلاحية';
