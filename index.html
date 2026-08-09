@@ -6428,10 +6428,16 @@ case 'newMembers': {
                 expiryDisplay = formatDate(m.expiry_date);
             }
             
-            // ✅ ไฮไลต์แถวที่หมดอายุหรือไม่จ่าย
-            const isExpired = (status === 'expired');
-            const isNoPayment = (status === 'no_payment');
-            const rowClass = (isExpired || isNoPayment) ? 'member-row-expired' : '';
+const isExpired = (status === 'expired');
+const isNoPayment = (status === 'no_payment');
+let rowClass = '';
+let bgStyle = '';
+if (isExpired) {
+    rowClass = 'member-row-expired';
+    bgStyle = 'background:rgba(239,68,68,0.04);';
+} else if (isNoPayment) {
+    rowClass = 'member-row-no-payment';  // ✅ ใช้คลาสนี้เพื่อให้ตัวหนังสือดำ
+    bgStyle = ''; // ไม่มีพื้นหลัง
             
             // ✅ หมวดหมู่ของสมาชิก
             const typeMap = {
