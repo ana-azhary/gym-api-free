@@ -6308,148 +6308,193 @@ case 'todayPayments': {
 }
 
                     
-case 'newMembers': {
-    title = '➕ الأعضاء الجدد هذا الشهر';
+case 'expired': {
+    title = '🚫 الأعضاء منتهي الصلاحية';
     const todayStr = getTodayStr();
-    const thisMonth = todayStr.slice(0, 7);
-    const allMembersFresh = await fetchMembersWithExpiry();
-    const newMembers = allMembersFresh.filter(m => m.start_date && normalizeDate(m.start_date).slice(0, 7) === thisMonth);
-    
-    // ✅ เรียงลำดับ: คนที่สมัครล่าสุดอยู่ด้านบนสุด
-    newMembers.sort((a, b) => {
-        const da = normalizeDate(a.start_date);
-        const db = normalizeDate(b.start_date);
-        if (!da && !db) return 0;
-        if (!da) return 1;
-        if (!db) return -1;
-        return da < db ? 1 : -1;
+
+    if (!allMembers || allMembers.length === 0) {
+        const res = await apiCall('/members');
+        allMembers = res.data || [];
+    }
+    if (!allPayments || allPayments.length === 0) {
+        const res = await apiCall('/payments');
+        allPayments = res.data || [];
+    }
+
+    function getLatestExpiry(memberId) {
+        const payments = allPayments.filter(p => p.member_id === memberId);
+        if (payments.length === 0) return null;
+        let latest = null;
+        payments.forEach(p => {
+            if (p.expiry_date) {
+                const exp = normalizeDate(p.expiry_date);
+                if (exp && (!latest || exp > latest)) latest = exp;
+            }
+        });
+        return latest;
+    }
+
+    const expiredMembers = [];
+    allMembers.forEach(m => {
+        let expiry = getLatestExpiry(m.member_id);
+        if (!expiry) expiry = m.expiry_date ? normalizeDate(m.expiry_date) : null;
+        if (!expiry) return;
+
+        const diff = daysBetween(todayStr, expiry);
+        if (diff <= 0) {
+            const daysOver = Math.abs(diff);
+            expiredMembers.push({
+                ...m,
+                daysOver: daysOver,
+                expiry: expiry
+            });
+        }
     });
-    
-    // ✅ อัปเดต lastData และการ์ด
+
+    expiredMembers.sort((a, b) => a.daysOver - b.daysOver);
+
     if (lastData) {
         if (!lastData.summary) lastData.summary = {};
-        lastData.summary.new_members_this_month = newMembers.length;
-        lastData.members = allMembersFresh;
+        lastData.summary.expired_members = expiredMembers.length;
         updateDashboardCards(lastData.summary);
     }
-    $('statNewMembers').textContent = newMembers.length;
-    
-    if (!newMembers.length) {
+    $('statExpired').textContent = expiredMembers.length;
+
+    if (!expiredMembers.length) {
         content = `
             <div style="text-align:center;padding:30px 0;color:var(--text-muted);">
-                <div style="font-size:48px;margin-bottom:12px;">📭</div>
-                <p style="font-size:16px;font-weight:500;">لا يوجد أعضاء جدد هذا الشهر</p>
+                <div style="font-size:48px;margin-bottom:12px;">🎉</div>
+                <p style="font-size:16px;font-weight:500;">لا يوجد أعضاء منتهي الصلاحية</p>
+                <p style="font-size:13px;margin-top:4px;">جميع الأعضاء لديهم عضوية سارية</p>
             </div>
         `;
     } else {
-        // ✅ ฟังก์ชันตรวจสอบสถานะ
-        function getMemberStatus(m) {
-            const hasPayment = allPayments.some(p => p.member_id === m.member_id);
-            if (!m.expiry_date || m.expiry_date === '') return 'no_payment';
-            if (m.start_date && normalizeDate(m.start_date) === normalizeDate(m.expiry_date)) return 'no_payment';
-            if (!hasPayment) return 'no_payment';
-            return m.status || 'no_payment';
-        }
-        
-        // ✅ คำนวณเฉพาะจำนวน "نشط" และ "غير مدفوع"
-        const activeCount = newMembers.filter(m => getMemberStatus(m) === 'active').length;
-        const noPaymentCount = newMembers.filter(m => getMemberStatus(m) === 'no_payment').length;
-        
-        // ✅ สรุปสถิติแบบ 2 การ์ด (ไม่มี ينتهي قريباً و منتهي)
-        let summaryHtml = `
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;max-width:400px;margin-left:auto;margin-right:auto;">
-                <div style="background:rgba(16,185,129,0.08);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(16,185,129,0.1);">
-                    <div style="font-size:18px;font-weight:700;color:var(--success);">${activeCount}</div>
-                    <div style="font-size:10px;color:var(--text-muted);"><i class="fas fa-check-circle" style="color:var(--success);"></i> نشط</div>
+        const day0 = expiredMembers.filter(m => m.daysOver === 0).length;
+        const day1_7 = expiredMembers.filter(m => m.daysOver >= 1 && m.daysOver <= 7).length;
+        const day8plus = expiredMembers.filter(m => m.daysOver > 7).length;
+
+        const summaryHtml = `
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;">
+                <div style="background:rgba(220,38,38,0.08);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(220,38,38,0.1);">
+                    <div style="font-size:18px;font-weight:700;color:#dc2626;">${day0}</div>
+                    <div style="font-size:9px;color:var(--text-muted);"><i class="fas fa-circle-exclamation" style="color:#dc2626;"></i> اليوم</div>
                 </div>
-                <div style="background:rgba(148,163,184,0.08);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(148,163,184,0.1);">
-                    <div style="font-size:18px;font-weight:700;color:var(--text-muted);">${noPaymentCount}</div>
-                    <div style="font-size:10px;color:var(--text-muted);"><i class="fas fa-triangle-exclamation" style="color:var(--text-muted);"></i> غير مدفوع</div>
+                <div style="background:rgba(245,158,11,0.08);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(245,158,11,0.1);">
+                    <div style="font-size:18px;font-weight:700;color:#f59e0b;">${day1_7}</div>
+                    <div style="font-size:9px;color:var(--text-muted);"><i class="fas fa-clock" style="color:#f59e0b;"></i> 1-7 أيام</div>
+                </div>
+                <div style="background:rgba(107,114,128,0.08);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(107,114,128,0.1);">
+                    <div style="font-size:18px;font-weight:700;color:#6b7280;">${day8plus}</div>
+                    <div style="font-size:9px;color:var(--text-muted);"><i class="fas fa-calendar-minus" style="color:#6b7280;"></i> 8+ أيام</div>
+                </div>
+                <div style="background:rgba(15,59,94,0.08);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(15,59,94,0.1);">
+                    <div style="font-size:18px;font-weight:700;color:var(--primary);">${expiredMembers.length}</div>
+                    <div style="font-size:9px;color:var(--text-muted);"><i class="fas fa-users" style="color:var(--primary);"></i> الإجمالي</div>
                 </div>
             </div>
         `;
-        
-        // ✅ Badge Map: "غير مدفوع" กลับมาเป็น Badge สีเทาแบบเดิม
-        const statusBadgeMap = {
-            'active': '<span class="status-badge active"><i class="fas fa-check-circle"></i> نشط</span>',
-            'expired': '<span class="status-badge expired"><i class="fas fa-circle-xmark"></i> منتهي</span>',
-            'expiring_soon': '<span class="status-badge expiring"><i class="fas fa-clock"></i> ينتهي قريباً</span>',
-            'no_payment': '<span class="status-badge no-payment"><i class="fas fa-triangle-exclamation"></i> غير مدفوع</span>'  // ✅ กลับมาใช้ Badge สีเทา
-        };
-        
-        // ✅ สร้างตาราง
+
+        // ✅ ฟังก์ชันสร้างข้อความให้กำลังใจแบบใหม่
+        function generateExpiredMessage(member, daysOver) {
+            return `مرحباً ${member.full_name} 👋،
+
+📢 ملاحظة هامة:
+لاحظنا أن عضويتك في صالة Gym Pro الرياضية قد انتهت منذ ${daysOver} يوم (بتاريخ ${formatDate(member.expiry)}).
+
+💪 ندعوك بحرارة للعودة وممارسة الرياضة من جديد!
+صحتك تهمنا، ونحن هنا لمساعدتك على تحقيق أهدافك اللياقية.
+
+🏋️ مميزات العودة إلينا:
+• أحدث الأجهزة الرياضية
+• مدربين محترفين
+• برامج تدريبية مخصصة
+• بيئة رياضية محفزة
+
+📞 للتواصل والاستفسار يرجى الاتصال بنا.
+
+نتمنى لك دوام الصحة والعافية، ونحن في انتظارك!
+
+مع خالص التحية،
+إدارة صالة Gym Pro 🏋️`;
+        }
+
         let table = `
             ${summaryHtml}
-            <div class="table-wrap" style="border-radius:var(--radius-sm);border:1px solid var(--border-color);">
-                <table class="rank-table" style="min-width:550px;">
-                    <thead>
+            <div class="table-wrap" style="border-radius:var(--radius-sm);border:1px solid var(--border-color);max-height:450px;overflow-y:auto;overflow-x:auto;">
+                <table class="rank-table" style="min-width:380px;width:100%;font-size:12px;table-layout:auto;">
+                    <thead style="position:sticky;top:0;z-index:5;background:var(--bg-body);">
                         <tr>
-                            <th style="width:30px;">#</th>
-                            <th style="min-width:100px;">الاسم</th>
-                            <th style="min-width:80px;">الرقم</th>
-                            <th style="min-width:90px;">تاريخ التسجيل</th>
-                            <th style="min-width:70px;">النوع</th>
-                            <th style="min-width:110px;">الحالة</th>
-                            <th style="min-width:80px;">انتهاء الصلاحية</th>
-                            <th style="width:40px;">اتصال</th>
+                            <th style="width:30px;padding:4px 4px;text-align:center;">#</th>
+                            <th style="min-width:80px;padding:4px 6px;text-align:right;">الاسم</th>
+                            <th style="min-width:90px;padding:4px 6px;text-align:center;">تاريخ الانتهاء</th>
+                            <th style="min-width:80px;padding:4px 6px;text-align:center;">الحالة</th>
+                            <th style="width:36px;padding:4px 4px;text-align:center;">اتصال</th>
                         </tr>
                     </thead>
                     <tbody>
         `;
-        
-        newMembers.slice(0, 50).forEach((m, idx) => {
-            const status = getMemberStatus(m);
-            const statusBadge = statusBadgeMap[status] || status;
+
+        expiredMembers.slice(0, 100).forEach((m, idx) => {
+            const daysOver = m.daysOver;
+            const expiry = m.expiry;
             const phone = m.phone || '';
             const wa = formatPhoneForWhatsApp(phone);
-            const msg = encodeURIComponent(`👋 مرحباً ${m.full_name}، مرحباً بك في Pro Gym! نحن سعداء بانضمامك إلينا! 💪`);
-            const waLink = wa ? `https://wa.me/${wa}?text=${msg}` : '#';
-            
-            let expiryDisplay = 'غير مدفوع';
-            if (m.expiry_date && m.expiry_date !== '' && status !== 'no_payment') {
-                expiryDisplay = formatDate(m.expiry_date);
+            // ✅ ใช้ข้อความใหม่
+            const newMsg = generateExpiredMessage(m, daysOver);
+            const encodedMsg = encodeURIComponent(newMsg);
+            const waLink = wa ? `https://wa.me/${wa}?text=${encodedMsg}` : '#';
+
+            let badgeColor = '';
+            let emoji = '🟡';
+            let statusText = '';
+            if (daysOver === 0) {
+                badgeColor = 'background:rgba(220,38,38,0.12);color:#dc2626;border-color:rgba(220,38,38,0.2);';
+                emoji = '🔴';
+                statusText = 'اليوم';
+            } else if (daysOver <= 7) {
+                badgeColor = 'background:rgba(245,158,11,0.12);color:#f59e0b;border-color:rgba(245,158,11,0.2);';
+                emoji = '🟠';
+                statusText = `منذ ${daysOver} يوم`;
+            } else {
+                badgeColor = 'background:rgba(107,114,128,0.12);color:#6b7280;border-color:rgba(107,114,128,0.2);';
+                emoji = '⚪';
+                statusText = `منذ ${daysOver} يوماً`;
             }
-            
-            const isExpired = (status === 'expired');
-            const isNoPayment = (status === 'no_payment');
-            const rowClass = (isExpired || isNoPayment) ? 'member-row-expired' : '';
-            
-            const typeMap = {
-                'عادي': '🏋️ عادي',
-                'متوسط': '⭐ متوسط',
-                'مميز': '👑 مميز'
-            };
-            const typeDisplay = typeMap[m.membership_type] || m.membership_type || '-';
-            
+
+            let bgRow = '';
+            if (daysOver === 0) bgRow = 'background:rgba(220,38,38,0.03);';
+            else if (daysOver <= 7) bgRow = 'background:rgba(245,158,11,0.03);';
+
             table += `
-                <tr class="${rowClass}" style="${isExpired ? 'background:rgba(239,68,68,0.04);' : ''}">
-                    <td style="color:var(--text-muted);font-size:12px;">${idx + 1}</td>
-                    <td><strong>${m.full_name}</strong></td>
-                    <td style="font-family:monospace;font-size:12px;">${m.member_id}</td>
-                    <td style="font-size:12px;">${formatDate(m.start_date)}</td>
-                    <td style="font-size:12px;">${typeDisplay}</td>
-                    <td>${statusBadge}</td>
-                    <td style="font-size:12px;${status === 'no_payment' ? 'color:var(--text-muted);' : ''}">${expiryDisplay}</td>
-                    <td>${wa ? `<a href="${waLink}" target="_blank" class="btn btn-whatsapp btn-sm" style="padding:2px 8px;font-size:10px;"><i class="fab fa-whatsapp"></i></a>` : '-'}</td>
+                <tr style="${bgRow}">
+                    <td style="color:var(--text-muted);font-size:12px;text-align:center;">${idx + 1}</td>
+                    <td style="font-weight:600;font-size:12px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px;">${m.full_name || '-'}</td>
+                    <td style="font-size:11px;text-align:center;">${expiry ? formatDate(expiry) : '-'}</td>
+                    <td style="text-align:center;">
+                        <span class="expiry-badge" style="${badgeColor}">
+                            ${emoji} ${statusText}
+                        </span>
+                    </td>
+                    <td style="text-align:center;">${wa ? `<a href="${waLink}" target="_blank" class="btn btn-whatsapp btn-sm" style="padding:1px 6px;font-size:10px;"><i class="fab fa-whatsapp"></i></a>` : '-'}</td>
                 </tr>
             `;
         });
-        
+
         table += `
                     </tbody>
                 </table>
             </div>
         `;
-        
+
         content = `
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
                 <span style="font-size:14px;font-weight:700;">
-                    <i class="fas fa-users" style="color:var(--accent);"></i>
-                    العدد: <strong style="color:var(--primary);">${newMembers.length}</strong> عضو
-                    <span style="font-size:12px;color:var(--text-muted);font-weight:400;">(عرض ${Math.min(50, newMembers.length)})</span>
+                    <i class="fas fa-user-slash" style="color:var(--danger);"></i>
+                    العدد: <strong style="color:var(--danger);">${expiredMembers.length}</strong> عضو
+                    <span style="font-size:12px;color:var(--text-muted);font-weight:400;">(عرض ${Math.min(100, expiredMembers.length)})</span>
                 </span>
                 <span style="font-size:11px;color:var(--text-muted);">
-                    <i class="fas fa-calendar-alt"></i> ${formatDate(todayStr.slice(0,7)+'-01')} - ${formatDate(todayStr)}
+                    <i class="fas fa-calendar-alt"></i> ${formatDate(todayStr)}
                 </span>
             </div>
             ${table}
@@ -6457,6 +6502,7 @@ case 'newMembers': {
     }
     break;
 }
+                        
 
                         
                         
