@@ -4437,6 +4437,50 @@
         font-size: 10px;
     }
 }
+
+        /* ============================================================
+   WHATSAPP PAGE STYLES
+   ============================================================ */
+#page-whatsapp .msg-box {
+    background: var(--bg-body);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    border: 1px solid rgba(0,0,0,0.04);
+    font-size: 13px;
+    line-height: 1.8;
+    white-space: pre-wrap;
+    direction: rtl;
+    text-align: right;
+    margin-bottom: 10px;
+    font-family: 'Cairo', sans-serif;
+}
+
+#page-whatsapp .card-panel {
+    margin-bottom: 16px;
+}
+
+#page-whatsapp .card-panel .card-header .badge {
+    font-size: 10px;
+    padding: 2px 12px;
+    border-radius: 30px;
+    font-weight: 700;
+}
+
+#page-whatsapp .actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+#page-whatsapp .btn-whatsapp {
+    background: linear-gradient(135deg, #25D366, #1ebe5c);
+    color: #fff;
+}
+
+#page-whatsapp .btn-whatsapp:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(37, 211, 102, 0.25);
+}
         
 
     </style>
@@ -9540,6 +9584,217 @@ async function handleLogin() {
             }
         });
 
+        
+// ============================================================
+// WHATSAPP PAGE FUNCTIONS
+// ============================================================
+
+// ============================================================
+// COPY WHATSAPP TEXT — คัดลอกข้อความ
+// ============================================================
+function copyWhatsAppText(btn) {
+    const card = btn.closest('.card-panel');
+    if (!card) return;
+    const msgBox = card.querySelector('.msg-box');
+    if (!msgBox) return;
+    const text = msgBox.textContent.trim();
+    
+    navigator.clipboard.writeText(text).then(() => {
+        const original = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check"></i> คัดลอกแล้ว!';
+        setTimeout(() => { btn.innerHTML = original; }, 2000);
+        showToast('✅ คัดลอกข้อความแล้ว', 'success');
+    }).catch(() => {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        textarea.remove();
+        showToast('✅ คัดลอกข้อความแล้ว', 'success');
+    });
+}
+
+// ============================================================
+// SEND WHATSAPP NEW MEMBER (PAID) — กลุ่ม
+// ============================================================
+function sendWhatsAppNewMemberPaidBulk() {
+    const today = getTodayStr();
+    const thisMonth = today.slice(0, 7);
+    const newPaid = allMembers.filter(m => {
+        if (!m.start_date) return false;
+        const startMonth = normalizeDate(m.start_date).slice(0, 7);
+        if (startMonth !== thisMonth) return false;
+        const hasPayment = allPayments.some(p => p.member_id === m.member_id);
+        return hasPayment && m.phone;
+    });
+    
+    if (newPaid.length === 0) {
+        showToast('📭 ไม่มีสมาชิกใหม่ที่จ่ายแล้ว', 'info');
+        return;
+    }
+    
+    const template = `مرحباً [اسم العضو] 👋،
+نرحب بك في صالة Gym Pro الرياضية! 🏋️
+نحن سعداء بانضمامك إلى عائلتنا الرياضية.
+
+📋 بيانات عضويتك:
+• الاسم: [اسم العضو]
+• رقم العضو: [رقم العضو]
+• تاريخ التسجيل: [تاريخ التسجيل]
+• نوع العضوية: [نوع العضوية]
+• المبلغ المدفوع: [المبلغ] ج.م
+• تاريخ الدفع: [تاريخ الدفع]
+• تاريخ انتهاء العضوية: [تاريخ الانتهاء]
+• كلمة المرور: [รหัสผ่าน]
+
+💪 نتمنى لك رحلة رياضية موفقة وممتعة!`;
+    
+    sendWhatsAppBulk(newPaid, template);
+}
+
+// ============================================================
+// SEND WHATSAPP PAID TODAY — กลุ่ม
+// ============================================================
+function sendWhatsAppPaidTodayBulk() {
+    const today = getTodayStr();
+    const paidToday = allPayments.filter(p => {
+        if (!p.payment_date) return false;
+        return normalizeDate(p.payment_date) === today;
+    });
+    
+    if (paidToday.length === 0) {
+        showToast('📭 ไม่มีการชำระเงินวันนี้', 'info');
+        return;
+    }
+    
+    const members = paidToday.map(p => {
+        const m = allMembers.find(mem => mem.member_id === p.member_id);
+        return { ...m, payment: p };
+    }).filter(m => m && m.phone);
+    
+    if (members.length === 0) {
+        showToast('📭 ไม่มีสมาชิกที่จ่ายวันนี้ที่มีเบอร์โทร', 'info');
+        return;
+    }
+    
+    const template = `شكراً لك [اسم العضو] 🙏 على دفعك في الوقت المحدد!
+تم استلام مبلغ [المبلغ] ج.م بتاريخ [تاريخ الدفع] الساعة [الوقت].
+تاريخ انتهاء عضويتك القادم هو [تاريخ الانتهاء].
+ننصحك بالاستمرار في ممارسة الرياضة يومياً لتحقيق أهدافك! 💪
+
+مع خالص التحية، إدارة صالة Gym Pro`;
+    
+    let count = 0;
+    members.forEach((m) => {
+        const phone = m.phone;
+        if (!phone) return;
+        const wa = formatPhoneForWhatsApp(phone);
+        if (!wa) return;
+        
+        let msg = template
+            .replace(/\[اسم العضو\]/g, m.full_name || '')
+            .replace(/\[المبلغ\]/g, m.payment?.amount || '0')
+            .replace(/\[تاريخ الدفع\]/g, formatDate(m.payment?.payment_date) || '')
+            .replace(/\[تاريخ الانتهاء\]/g, formatDate(m.payment?.expiry_date) || '')
+            .replace(/\[الوقت\]/g, m.payment?.payment_time || new Date().toLocaleTimeString('ar-EG'));
+        
+        const encoded = encodeURIComponent(msg);
+        const url = `https://wa.me/${wa}?text=${encoded}`;
+        
+        setTimeout(() => { window.open(url, '_blank'); }, count * 1500);
+        count++;
+    });
+    
+    showToast(`📤 กำลังเปิด WhatsApp สำหรับ ${count} คน`, 'info');
+}
+
+// ============================================================
+// SEND WHATSAPP BULK — ฟังก์ชันหลักส่งข้อความกลุ่ม
+// ============================================================
+function sendWhatsAppBulk(members, messageTemplate) {
+    if (!members || members.length === 0) {
+        showToast('📭 ไม่มีสมาชิกในกลุ่มนี้', 'warning');
+        return;
+    }
+    
+    let count = 0;
+    members.forEach((m, index) => {
+        const phone = m.phone;
+        if (!phone) return;
+        const wa = formatPhoneForWhatsApp(phone);
+        if (!wa) return;
+        
+        let msg = messageTemplate
+            .replace(/\[اسم العضو\]/g, m.full_name || '')
+            .replace(/\[رقم العضو\]/g, m.member_id || '')
+            .replace(/\[تاريخ التسجيل\]/g, formatDate(m.start_date) || '')
+            .replace(/\[نوع العضوية\]/g, m.membership_type || '')
+            .replace(/\[المبلغ\]/g, '0')
+            .replace(/\[تاريخ الدفع\]/g, '')
+            .replace(/\[تاريخ الانتهاء\]/g, formatDate(m.expiry_date) || '')
+            .replace(/\[รหัสผ่าน\]/g, m.password || '1234')
+            .replace(/\[عدد الأيام\]/g, '0')
+            .replace(/\[วันที่หมดอายุ\]/g, formatDate(m.expiry_date) || '');
+        
+        const encoded = encodeURIComponent(msg);
+        const url = `https://wa.me/${wa}?text=${encoded}`;
+        
+        setTimeout(() => { window.open(url, '_blank'); }, count * 1500);
+        count++;
+    });
+    
+    showToast(`📤 กำลังเปิด WhatsApp สำหรับ ${count} คน`, 'info');
+}
+
+// ============================================================
+// UPDATE WHATSAPP COUNTS — อัปเดตจำนวนในหน้า WhatsApp
+// ============================================================
+function updateWhatsAppCounts() {
+    const today = getTodayStr();
+    const thisMonth = today.slice(0, 7);
+    
+    // Expiring
+    const expiring = allMembers.filter(m => m.status === 'expiring_soon' && m.phone);
+    const expiringEl = document.getElementById('waExpiringCount');
+    if (expiringEl) expiringEl.textContent = `(${expiring.length} คน)`;
+    
+    // New Paid
+    const newPaid = allMembers.filter(m => {
+        if (!m.start_date) return false;
+        const startMonth = normalizeDate(m.start_date).slice(0, 7);
+        if (startMonth !== thisMonth) return false;
+        const hasPayment = allPayments.some(p => p.member_id === m.member_id);
+        return hasPayment && m.phone;
+    });
+    const newPaidEl = document.getElementById('waNewPaidCount');
+    if (newPaidEl) newPaidEl.textContent = `(${newPaid.length} คน)`;
+    
+    // New Unpaid
+    const newUnpaid = allMembers.filter(m => {
+        if (!m.start_date) return false;
+        const startMonth = normalizeDate(m.start_date).slice(0, 7);
+        if (startMonth !== thisMonth) return false;
+        const hasPayment = allPayments.some(p => p.member_id === m.member_id);
+        return !hasPayment && m.phone;
+    });
+    const newUnpaidEl = document.getElementById('waNewUnpaidCount');
+    if (newUnpaidEl) newUnpaidEl.textContent = `(${newUnpaid.length} คน)`;
+    
+    // Expired
+    const expired = allMembers.filter(m => m.status === 'expired' && m.phone);
+    const expiredEl = document.getElementById('waExpiredCount');
+    if (expiredEl) expiredEl.textContent = `(${expired.length} คน)`;
+    
+    // Paid Today
+    const paidToday = allPayments.filter(p => {
+        if (!p.payment_date) return false;
+        return normalizeDate(p.payment_date) === today;
+    });
+    const paidTodayEl = document.getElementById('waPaidTodayCount');
+    if (paidTodayEl) paidTodayEl.textContent = `(${paidToday.length} คน)`;
+}
+        
         // ============================================================
         // INIT
         // ============================================================
