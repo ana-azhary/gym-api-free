@@ -4946,6 +4946,177 @@
                 <div style="margin-top:12px;max-height:180px;"><canvas id="weightChart"></canvas></div>
             </div>
         </div> <!-- end page-profile -->
+        <!-- ============================================================ -->
+<!-- PAGE: WHATSAPP — ระบบข้อความ WhatsApp -->
+<!-- ============================================================ -->
+<div id="page-whatsapp" class="page-section">
+    <div class="flex-center" style="justify-content:space-between; flex-wrap:wrap; gap:6px; margin-bottom:12px;">
+        <h3 style="font-size:18px;font-weight:700;">
+            <i class="fab fa-whatsapp" style="color:#25D366;"></i>
+            ระบบส่งข้อความ WhatsApp
+        </h3>
+        <span class="text-muted text-sm">📱 ข้อความทั้งหมดที่ใช้สื่อสารกับสมาชิก</span>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 1. Expiring Members -->
+    <!-- ============================================================ -->
+    <div class="card-panel" id="wa-expiring">
+        <div class="card-header">
+            <h3><i class="fas fa-clock" style="color:var(--accent);"></i> ข้อความเตือนใกล้หมดอายุ</h3>
+            <span class="badge" style="background:var(--accent);color:#fff;">Expiring</span>
+        </div>
+        <div class="text-muted text-sm" style="margin-bottom:8px;">
+            <i class="fas fa-users"></i> กลุ่มเป้าหมาย: สมาชิกที่เหลือ 1–7 วัน
+            <span style="margin-right:12px;" id="waExpiringCount">(0 คน)</span>
+        </div>
+        <div class="msg-box" style="background:var(--bg-body);border-radius:var(--radius-sm);padding:12px 16px;border:1px solid rgba(0,0,0,0.04);font-size:13px;line-height:1.8;white-space:pre-wrap;direction:rtl;text-align:right;margin-bottom:10px;">
+مرحباً [اسم العضو] 👋،
+نود تذكيرك بأن عضويتك في صالة Gym Pro ستنتهي خلال [عدد الأيام] يوم ([تاريخ الانتهاء]).
+نرجو منك التوجه لاستقبال الإدارة لتجديد العضوية والاستمرار في الاستفادة من خدماتنا.
+
+💪 نتمنى لك دوام الصحة والعافية، ونحن في انتظارك!
+        </div>
+        <div class="actions" style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-whatsapp btn-sm" onclick="sendWhatsAppExpiryReminderBulk()">
+                <i class="fab fa-whatsapp"></i> ส่ง WhatsApp กลุ่ม
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="copyWhatsAppText(this)"><i class="fas fa-copy"></i> คัดลอกข้อความ</button>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 2. New Member (Paid) -->
+    <!-- ============================================================ -->
+    <div class="card-panel" id="wa-new-paid">
+        <div class="card-header">
+            <h3><i class="fas fa-user-plus" style="color:var(--success);"></i> ข้อความต้อนรับสมาชิกใหม่ (จ่ายแล้ว)</h3>
+            <span class="badge" style="background:var(--success);color:#fff;">Paid</span>
+        </div>
+        <div class="text-muted text-sm" style="margin-bottom:8px;">
+            <i class="fas fa-users"></i> กลุ่มเป้าหมาย: สมาชิกใหม่ที่มีประวัติการจ่าย
+            <span style="margin-right:12px;" id="waNewPaidCount">(0 คน)</span>
+        </div>
+        <div class="msg-box" style="background:var(--bg-body);border-radius:var(--radius-sm);padding:12px 16px;border:1px solid rgba(0,0,0,0.04);font-size:13px;line-height:1.8;white-space:pre-wrap;direction:rtl;text-align:right;margin-bottom:10px;">
+مرحباً [اسم العضو] 👋،
+نرحب بك في صالة Gym Pro الرياضية! 🏋️
+نحن سعداء بانضمامك إلى عائلتنا الرياضية.
+
+📋 بيانات عضويتك:
+• الاسم: [اسم العضو]
+• رقم العضو: [رقم العضو]
+• تاريخ التسجيل: [تاريخ التسجيل]
+• نوع العضوية: [نوع العضوية]
+• المبلغ المدفوع: [المبلغ] ج.م
+• تاريخ الدفع: [تاريخ الدفع]
+• تاريخ انتهاء العضوية: [تاريخ الانتهاء]
+• كلمة المرور: [รหัสผ่าน]
+
+💪 نتمنى لك رحلة رياضية موفقة وممتعة!
+        </div>
+        <div class="actions" style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-whatsapp btn-sm" onclick="sendWhatsAppNewMemberPaidBulk()">
+                <i class="fab fa-whatsapp"></i> ส่ง WhatsApp กลุ่ม
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="copyWhatsAppText(this)"><i class="fas fa-copy"></i> คัดลอกข้อความ</button>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 3. New Member (Unpaid) -->
+    <!-- ============================================================ -->
+    <div class="card-panel" id="wa-new-unpaid">
+        <div class="card-header">
+            <h3><i class="fas fa-user-plus" style="color:var(--warning);"></i> ข้อความต้อนรับสมาชิกใหม่ (ยังไม่จ่าย)</h3>
+            <span class="badge" style="background:var(--warning);color:#fff;">Unpaid</span>
+        </div>
+        <div class="text-muted text-sm" style="margin-bottom:8px;">
+            <i class="fas fa-users"></i> กลุ่มเป้าหมาย: สมาชิกใหม่ที่ยังไม่มีประวัติการจ่าย
+            <span style="margin-right:12px;" id="waNewUnpaidCount">(0 คน)</span>
+        </div>
+        <div class="msg-box" style="background:var(--bg-body);border-radius:var(--radius-sm);padding:12px 16px;border:1px solid rgba(0,0,0,0.04);font-size:13px;line-height:1.8;white-space:pre-wrap;direction:rtl;text-align:right;margin-bottom:10px;">
+مرحباً [اسم العضو] 👋،
+نرحب بك في صالة Gym Pro الرياضية! 🏋️
+سجلت كعضو جديد ([رقم العضو]) ونحن متحمسون لرؤيتك في الصالة.
+
+📋 بيانات عضويتك:
+• الاسم: [اسم العضو]
+• رقم العضو: [رقم العضو]
+• تاريخ التسجيل: [تاريخ التسجيل]
+• نوع العضوية: [نوع العضوية]
+• كلمة المرور: [รหัสผ่าน]
+
+⚠️ نود تذكيرك بأنه لم يتم تسجيل أي دفعة لك حتى الآن.
+نرجو منك التوجه إلى الإدارة لاستكمال إجراءات الدفع.
+نحن في انتظارك بكل ترحيب! 🤗
+
+💪 نتمنى لك رحلة رياضية موفقة!
+        </div>
+        <div class="actions" style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-whatsapp btn-sm" onclick="sendWhatsAppNewMemberUnpaidBulk()">
+                <i class="fab fa-whatsapp"></i> ส่ง WhatsApp กลุ่ม
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="copyWhatsAppText(this)"><i class="fas fa-copy"></i> คัดลอกข้อความ</button>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 4. Expired Members -->
+    <!-- ============================================================ -->
+    <div class="card-panel" id="wa-expired">
+        <div class="card-header">
+            <h3><i class="fas fa-ban" style="color:var(--danger);"></i> ข้อความให้กำลังใจสมาชิกที่หมดอายุ</h3>
+            <span class="badge" style="background:var(--danger);color:#fff;">Expired</span>
+        </div>
+        <div class="text-muted text-sm" style="margin-bottom:8px;">
+            <i class="fas fa-users"></i> กลุ่มเป้าหมาย: สมาชิกที่หมดอายุแล้ว
+            <span style="margin-right:12px;" id="waExpiredCount">(0 คน)</span>
+        </div>
+        <div class="msg-box" style="background:var(--bg-body);border-radius:var(--radius-sm);padding:12px 16px;border:1px solid rgba(0,0,0,0.04);font-size:13px;line-height:1.8;white-space:pre-wrap;direction:rtl;text-align:right;margin-bottom:10px;">
+مرحباً [اسم العضو] 👋،
+نلاحظ أن عضويتك في صالة Gym Pro قد انتهت منذ [عدد الأيام] يوم ([วันที่หมดอายุ]).
+نود دعوتك للعودة وممارسة الرياضة من جديد! 💪
+تفضل بزيارتنا لتجديد عضويتك والاستفادة من خدماتنا. 🏋️
+
+نتمنى لك دوام الصحة والعافية، ونحن في انتظارك!
+        </div>
+        <div class="actions" style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-whatsapp btn-sm" onclick="sendWhatsAppExpiredEncouragementBulk()">
+                <i class="fab fa-whatsapp"></i> ส่ง WhatsApp กลุ่ม
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="copyWhatsAppText(this)"><i class="fas fa-copy"></i> คัดลอกข้อความ</button>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 5. Paid Today -->
+    <!-- ============================================================ -->
+    <div class="card-panel" id="wa-paid-today">
+        <div class="card-header">
+            <h3><i class="fas fa-coins" style="color:var(--success);"></i> ข้อความขอบคุณสมาชิกที่จ่ายเงินวันนี้</h3>
+            <span class="badge" style="background:var(--success);color:#fff;">Paid Today</span>
+        </div>
+        <div class="text-muted text-sm" style="margin-bottom:8px;">
+            <i class="fas fa-users"></i> กลุ่มเป้าหมาย: สมาชิกที่ชำระเงินวันนี้
+            <span style="margin-right:12px;" id="waPaidTodayCount">(0 คน)</span>
+        </div>
+        <div class="msg-box" style="background:var(--bg-body);border-radius:var(--radius-sm);padding:12px 16px;border:1px solid rgba(0,0,0,0.04);font-size:13px;line-height:1.8;white-space:pre-wrap;direction:rtl;text-align:right;margin-bottom:10px;">
+شكراً لك [اسم العضو] 🙏 على دفعك في الوقت المحدد!
+تم استلام مبلغ [المبلغ] ج.م بتاريخ [تاريخ الدفع] الساعة [الوقت].
+تاريخ انتهاء عضويتك القادم هو [تاريخ الانتهاء].
+ننصحك بالاستمرار في ممارسة الرياضة يومياً لتحقيق أهدافك! 💪
+
+مع خالص التحية، إدارة صالة Gym Pro
+        </div>
+        <div class="actions" style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-whatsapp btn-sm" onclick="sendWhatsAppPaidTodayBulk()">
+                <i class="fab fa-whatsapp"></i> ส่ง WhatsApp กลุ่ม
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="copyWhatsAppText(this)"><i class="fas fa-copy"></i> คัดลอกข้อความ</button>
+        </div>
+    </div>
+</div>
+<!-- END PAGE: WHATSAPP -->
 
     </main> <!-- end app-main -->
 
