@@ -5782,15 +5782,12 @@ function renderDashMemberTable(members) {
             status = 'expired';
         }
         
-        // ✅ กำหนด CSS class ตามสถานะ
-        const isExpired = (status === 'expired');
-        const isNoPayment = (status === 'no_payment');
-        let rowClass = '';
-        if (isExpired) {
-            rowClass = 'member-row-expired';      // หมดอายุ → พื้นหลังสีแดงจาง
-        } else if (isNoPayment) {
-            rowClass = 'member-row-no-payment';   // ไม่จ่าย → เฉพาะตัวหนังสือแดง
+        // ✅ แถวที่ไม่ใช่ expired จะไม่มีพื้นหลัง
+const isExpired = (status === 'expired');
+const rowStyle = isExpired ? 'background:rgba(239,68,68,0.04);' : '';
+   // ไม่จ่าย → เฉพาะตัวหนังสือแดง
         }
+                                               
         
         const statusMap = {
             'active': '<span class="status-badge active"><i class="fas fa-check-circle"></i> نشط</span>',
