@@ -3905,147 +3905,55 @@
 }
 
 /* ============================================================
-   FIX: ADMIN TABLES — แสดงเต็มความสูงจอ
+   FIX: STICKY HEADER FOR ADMIN TABLES (เหมือนโค้ดเก่าที่ใช้ได้)
    ============================================================ */
 
-/* ✅ ลบ max-height ที่จำกัดออก และให้แสดงเต็มพื้นที่ */
-#page-members .table-wrap,
-#page-checkin .table-wrap,
-#page-payments .table-wrap {
-    max-height: none !important;
-    height: auto !important;
-    min-height: 400px;
-    overflow-y: visible !important;
-}
-
-/* ✅ ทำให้ตารางขยายเต็มพื้นที่ที่เหลือ */
-#page-members .card-panel,
-#page-checkin .card-panel,
-#page-payments .card-panel {
-    height: auto !important;
-    min-height: 500px;
-    display: flex;
-    flex-direction: column;
-}
-
-#page-members .card-panel .table-wrap,
-#page-checkin .card-panel .table-wrap,
-#page-payments .card-panel .table-wrap {
-    flex: 1;
-    min-height: 350px;
-    max-height: none !important;
-}
-
-/* ✅ ถ้าต้องการให้เต็มจอจริง ๆ */
-@media (min-height: 700px) {
-    #page-members .card-panel .table-wrap,
-    #page-checkin .card-panel .table-wrap,
-    #page-payments .card-panel .table-wrap {
-        min-height: 500px !important;
-    }
-}
-
-/* ✅ Responsive: มือถือ */
-@media (max-width: 768px) {
-    #page-members .card-panel,
-    #page-checkin .card-panel,
-    #page-payments .card-panel {
-        min-height: 350px !important;
-    }
-    #page-members .card-panel .table-wrap,
-    #page-checkin .card-panel .table-wrap,
-    #page-payments .card-panel .table-wrap {
-        min-height: 250px !important;
-    }
-}
-
-@media (max-width: 480px) {
-    #page-members .card-panel,
-    #page-checkin .card-panel,
-    #page-payments .card-panel {
-        min-height: 280px !important;
-    }
-    #page-members .card-panel .table-wrap,
-    #page-checkin .card-panel .table-wrap,
-    #page-payments .card-panel .table-wrap {
-        min-height: 200px !important;
-    }
-}
-/* ============================================================
-   FIX: ADMIN & DAILY TABLES — แสดงเต็มความสูงจอ
-   ============================================================ */
-
-/* ✅ ทุกหน้าที่มีตาราง (Members, Check-in, Payments, Daily Report) */
+/* ✅ เปิดการเลื่อนแนวตั้ง เพื่อให้ Sticky Header ทำงาน */
 #page-members .table-wrap,
 #page-checkin .table-wrap,
 #page-payments .table-wrap,
 #page-daily .table-wrap {
-    max-height: none !important;
-    height: auto !important;
-    min-height: 400px;
-    overflow-y: visible !important;
+    max-height: 500px !important;
+    min-height: 300px !important;
+    overflow-y: auto !important;
+    overflow-x: auto !important;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: var(--radius-sm);
 }
 
-/* ✅ ทำให้ card-panel ขยายเต็มพื้นที่ */
-#page-members .card-panel,
-#page-checkin .card-panel,
-#page-payments .card-panel,
-#page-daily .card-panel {
-    height: auto !important;
-    min-height: 500px;
-    display: flex;
-    flex-direction: column;
+/* ✅ หัวตารางตรึงอยู่ด้านบน */
+#page-members .table-wrap table thead,
+#page-checkin .table-wrap table thead,
+#page-payments .table-wrap table thead,
+#page-daily .table-wrap table thead {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 5 !important;
+    background: var(--bg-body) !important;
 }
 
-#page-members .card-panel .table-wrap,
-#page-checkin .card-panel .table-wrap,
-#page-payments .card-panel .table-wrap,
-#page-daily .card-panel .table-wrap {
-    flex: 1;
-    min-height: 350px;
-    max-height: none !important;
-}
-
-/* ✅ ถ้าต้องการให้เต็มจอจริง ๆ (Desktop) */
-@media (min-height: 700px) {
-    #page-members .card-panel .table-wrap,
-    #page-checkin .card-panel .table-wrap,
-    #page-payments .card-panel .table-wrap,
-    #page-daily .card-panel .table-wrap {
-        min-height: 500px !important;
-    }
-}
-
-/* ✅ Responsive: มือถือ */
+/* ✅ ปรับความสูงสำหรับแท็บเล็ต */
 @media (max-width: 768px) {
-    #page-members .card-panel,
-    #page-checkin .card-panel,
-    #page-payments .card-panel,
-    #page-daily .card-panel {
-        min-height: 350px !important;
-    }
-    #page-members .card-panel .table-wrap,
-    #page-checkin .card-panel .table-wrap,
-    #page-payments .card-panel .table-wrap,
-    #page-daily .card-panel .table-wrap {
-        min-height: 250px !important;
-    }
-}
-
-@media (max-width: 480px) {
-    #page-members .card-panel,
-    #page-checkin .card-panel,
-    #page-payments .card-panel,
-    #page-daily .card-panel {
-        min-height: 280px !important;
-    }
-    #page-members .card-panel .table-wrap,
-    #page-checkin .card-panel .table-wrap,
-    #page-payments .card-panel .table-wrap,
-    #page-daily .card-panel .table-wrap {
+    #page-members .table-wrap,
+    #page-checkin .table-wrap,
+    #page-payments .table-wrap,
+    #page-daily .table-wrap {
+        max-height: 350px !important;
         min-height: 200px !important;
     }
 }
+
+/* ✅ ปรับความสูงสำหรับมือถือ */
+@media (max-width: 480px) {
+    #page-members .table-wrap,
+    #page-checkin .table-wrap,
+    #page-payments .table-wrap,
+    #page-daily .table-wrap {
+        max-height: 280px !important;
+        min-height: 150px !important;
+    }
+}
+        
 /* ============================================================
    TOP 8 TABLE — ดีไซน์หรูหรา พร้อมเลื่อน
    ============================================================ */
