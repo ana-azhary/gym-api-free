@@ -4406,6 +4406,38 @@
     }
 }
 
+        /* ============================================================
+   FIX: แสดงปุ่ม WhatsApp บนมือถือ (เฉพาะโมดัล expired)
+   ============================================================ */
+
+/* ✅ ให้คอลัมน์ WhatsApp แสดงบนมือถือ */
+@media (max-width: 768px) {
+    #tempModal .table-wrap table td:last-child,
+    #tempModal .table-wrap table th:last-child {
+        display: table-cell !important;
+        min-width: 40px;
+    }
+    
+    #tempModal .table-wrap table td:last-child .btn-whatsapp {
+        display: inline-flex !important;
+        padding: 2px 6px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    #tempModal .table-wrap table td:last-child,
+    #tempModal .table-wrap table th:last-child {
+        display: table-cell !important;
+        min-width: 32px;
+    }
+    
+    #tempModal .table-wrap table td:last-child .btn-whatsapp {
+        padding: 1px 4px;
+        font-size: 10px;
+    }
+}
+        
 
     </style>
 </head>
