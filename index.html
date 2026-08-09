@@ -9524,6 +9524,28 @@ async function handleLogin() {
             if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
         }
 
+const titles = {
+    dashboard: { title: 'لوحة التحكم', sub: 'ملخص آخر البيانات' },
+    daily: { title: 'تقرير اليوم', sub: 'إحصائيات اليوم' },
+    members: { title: 'الأعضاء', sub: 'إدارة بيانات الأعضاء' },
+    checkin: { title: 'تسجيل الدخول', sub: 'تسجيل وعرض سجل الدخول' },
+    payments: { title: 'المدفوعات', sub: 'إدارة سجل المدفوعات' },
+    analytics: { title: 'التحليلات', sub: 'رؤى واتجاهات' },
+    profile: { title: 'الملف الشخصي', sub: 'بياناتك الشخصية وإحصائياتك' },
+    whatsapp: { title: 'WhatsApp', sub: '📱 ระบบส่งข้อความ WhatsApp' }  // ✅ เพิ่ม
+};
+
+// และในส่วน if
+if (page === 'dashboard') refreshDashboard();
+else if (page === 'daily') loadDailyReport();
+else if (page === 'members') fetchMembers();
+else if (page === 'checkin') fetchCheckins();
+else if (page === 'payments') fetchPayments();
+else if (page === 'analytics') loadAnalytics();
+else if (page === 'profile') loadProfile();
+else if (page === 'whatsapp') updateWhatsAppCounts();  // ✅ เพิ่ม
+        
+        
         // ============================================================
         // TEST CONNECTION, DEBUG
         // ============================================================
