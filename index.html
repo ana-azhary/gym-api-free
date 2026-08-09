@@ -6342,57 +6342,40 @@ case 'newMembers': {
             </div>
         `;
     } else {
-        // ✅ Font Awesome Icons แทน Emoji
+        // ✅ ฟังก์ชันตรวจสอบสถานะ
+        function getMemberStatus(m) {
+            const hasPayment = allPayments.some(p => p.member_id === m.member_id);
+            if (!m.expiry_date || m.expiry_date === '') return 'no_payment';
+            if (m.start_date && normalizeDate(m.start_date) === normalizeDate(m.expiry_date)) return 'no_payment';
+            if (!hasPayment) return 'no_payment';
+            return m.status || 'no_payment';
+        }
+        
+        // ✅ คำนวณเฉพาะจำนวน "نشط" และ "غير مدفوع"
+        const activeCount = newMembers.filter(m => getMemberStatus(m) === 'active').length;
+        const noPaymentCount = newMembers.filter(m => getMemberStatus(m) === 'no_payment').length;
+        
+        // ✅ สรุปสถิติแบบ 2 การ์ด (ไม่มี ينتهي قريباً و منتهي)
+        let summaryHtml = `
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;max-width:400px;margin-left:auto;margin-right:auto;">
+                <div style="background:rgba(16,185,129,0.08);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(16,185,129,0.1);">
+                    <div style="font-size:18px;font-weight:700;color:var(--success);">${activeCount}</div>
+                    <div style="font-size:10px;color:var(--text-muted);"><i class="fas fa-check-circle" style="color:var(--success);"></i> نشط</div>
+                </div>
+                <div style="background:rgba(148,163,184,0.08);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(148,163,184,0.1);">
+                    <div style="font-size:18px;font-weight:700;color:var(--text-muted);">${noPaymentCount}</div>
+                    <div style="font-size:10px;color:var(--text-muted);"><i class="fas fa-triangle-exclamation" style="color:var(--text-muted);"></i> غير مدفوع</div>
+                </div>
+            </div>
+        `;
+        
+        // ✅ Badge Map: "غير مدفوع" กลับมาเป็น Badge สีเทาแบบเดิม
         const statusBadgeMap = {
             'active': '<span class="status-badge active"><i class="fas fa-check-circle"></i> نشط</span>',
             'expired': '<span class="status-badge expired"><i class="fas fa-circle-xmark"></i> منتهي</span>',
             'expiring_soon': '<span class="status-badge expiring"><i class="fas fa-clock"></i> ينتهي قريباً</span>',
-            'no_payment': '<span class="status-badge no-payment"><i class="fas fa-triangle-exclamation"></i> غير مدفوع</span>'
+            'no_payment': '<span class="status-badge no-payment"><i class="fas fa-triangle-exclamation"></i> غير مدفوع</span>'  // ✅ กลับมาใช้ Badge สีเทา
         };
-        
-        // ✅ ฟังก์ชันตรวจสอบสถานะ
-        function getMemberStatus(m) {
-            const hasPayment = allPayments.some(p => p.member_id === m.member_id);
-            
-            // ถ้า expiry_date = start_date หรือไม่มี expiry_date → ยังไม่จ่าย
-            if (!m.expiry_date || m.expiry_date === '') {
-                return 'no_payment';
-            }
-            if (m.start_date && normalizeDate(m.start_date) === normalizeDate(m.expiry_date)) {
-                return 'no_payment';
-            }
-            if (!hasPayment) {
-                return 'no_payment';
-            }
-            return m.status || 'no_payment';
-        }
-        
-        // ✅ แสดงสถิติสรุปด้านบน (ใช้ Font Awesome)
-        const activeCount = newMembers.filter(m => getMemberStatus(m) === 'active').length;
-        const expiredCount = newMembers.filter(m => getMemberStatus(m) === 'expired').length;
-        const expiringCount = newMembers.filter(m => getMemberStatus(m) === 'expiring_soon').length;
-        const noPaymentCount = newMembers.filter(m => getMemberStatus(m) === 'no_payment').length;
-        
-        let summaryHtml = `
-            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;">
-                <div style="background:rgba(16,185,129,0.08);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(16,185,129,0.1);">
-                    <div style="font-size:18px;font-weight:700;color:var(--success);">${activeCount}</div>
-                    <div style="font-size:9px;color:var(--text-muted);"><i class="fas fa-check-circle" style="color:var(--success);"></i> نشط</div>
-                </div>
-                <div style="background:rgba(245,158,11,0.08);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(245,158,11,0.1);">
-                    <div style="font-size:18px;font-weight:700;color:var(--warning);">${expiringCount}</div>
-                    <div style="font-size:9px;color:var(--text-muted);"><i class="fas fa-clock" style="color:var(--warning);"></i> ينتهي قريباً</div>
-                </div>
-                <div style="background:rgba(239,68,68,0.08);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(239,68,68,0.1);">
-                    <div style="font-size:18px;font-weight:700;color:var(--danger);">${expiredCount}</div>
-                    <div style="font-size:9px;color:var(--text-muted);"><i class="fas fa-circle-xmark" style="color:var(--danger);"></i> منتهي</div>
-                </div>
-                <div style="background:rgba(148,163,184,0.08);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(148,163,184,0.1);">
-                    <div style="font-size:18px;font-weight:700;color:var(--text-muted);">${noPaymentCount}</div>
-                    <div style="font-size:9px;color:var(--text-muted);"><i class="fas fa-triangle-exclamation" style="color:var(--text-muted);"></i> غير مدفوع</div>
-                </div>
-            </div>
-        `;
         
         // ✅ สร้างตาราง
         let table = `
@@ -6422,18 +6405,15 @@ case 'newMembers': {
             const msg = encodeURIComponent(`👋 مرحباً ${m.full_name}، مرحباً بك في Pro Gym! نحن سعداء بانضمامك إلينا! 💪`);
             const waLink = wa ? `https://wa.me/${wa}?text=${msg}` : '#';
             
-            // ✅ แสดง expiry_date
             let expiryDisplay = 'غير مدفوع';
             if (m.expiry_date && m.expiry_date !== '' && status !== 'no_payment') {
                 expiryDisplay = formatDate(m.expiry_date);
             }
             
-            // ✅ ไฮไลต์แถวที่หมดอายุหรือไม่จ่าย
             const isExpired = (status === 'expired');
             const isNoPayment = (status === 'no_payment');
             const rowClass = (isExpired || isNoPayment) ? 'member-row-expired' : '';
             
-            // ✅ หมวดหมู่ของสมาชิก
             const typeMap = {
                 'عادي': '🏋️ عادي',
                 'متوسط': '⭐ متوسط',
@@ -6477,6 +6457,9 @@ case 'newMembers': {
     }
     break;
 }
+
+                        
+                        
 case 'expired': {
     title = '🚫 الأعضاء منتهي الصلاحية';
     const todayStr = getTodayStr();
