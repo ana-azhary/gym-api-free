@@ -3905,23 +3905,36 @@
 }
 
 /* ============================================================
-   FIX: STICKY HEADER FOR ADMIN TABLES (เหมือนโค้ดเก่าที่ใช้ได้)
+   FIX: STICKY HEADER + FULL WIDTH + MOBILE COMPACT
    ============================================================ */
 
-/* ✅ เปิดการเลื่อนแนวตั้ง เพื่อให้ Sticky Header ทำงาน */
+/* ✅ ตารางเต็มจอ มีแถบเลื่อน หัวตรึง */
 #page-members .table-wrap,
 #page-checkin .table-wrap,
 #page-payments .table-wrap,
 #page-daily .table-wrap {
-    max-height: 500px !important;
-    min-height: 300px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 70vh !important;        /* สูง 70% ของหน้าจอ */
+    min-height: 200px !important;
     overflow-y: auto !important;
     overflow-x: auto !important;
     border: 1px solid rgba(0, 0, 0, 0.06);
     border-radius: var(--radius-sm);
+    background: var(--bg-body);
 }
 
-/* ✅ หัวตารางตรึงอยู่ด้านบน */
+/* ✅ ตารางยืดเต็มพื้นที่ */
+#page-members .table-wrap table,
+#page-checkin .table-wrap table,
+#page-payments .table-wrap table,
+#page-daily .table-wrap table {
+    width: 100% !important;
+    min-width: 600px;
+    border-collapse: collapse;
+}
+
+/* ✅ หัวตารางตรึง */
 #page-members .table-wrap table thead,
 #page-checkin .table-wrap table thead,
 #page-payments .table-wrap table thead,
@@ -3932,27 +3945,122 @@
     background: var(--bg-body) !important;
 }
 
-/* ✅ ปรับความสูงสำหรับแท็บเล็ต */
+/* ✅ หัวตาราง */
+#page-members .table-wrap table th,
+#page-checkin .table-wrap table th,
+#page-payments .table-wrap table th,
+#page-daily .table-wrap table th {
+    background: var(--bg-body) !important;
+    padding: 6px 8px !important;
+    font-size: 11px !important;
+    white-space: nowrap;
+    border-bottom: 2px solid rgba(0,0,0,0.06);
+}
+
+/* ✅ ข้อมูลในตาราง */
+#page-members .table-wrap table td,
+#page-checkin .table-wrap table td,
+#page-payments .table-wrap table td,
+#page-daily .table-wrap table td {
+    padding: 5px 8px !important;
+    font-size: 12px !important;
+    white-space: nowrap;
+}
+
+/* ✅ ปุ่มเล็ก */
+#page-members .table-wrap table .btn-sm,
+#page-checkin .table-wrap table .btn-sm,
+#page-payments .table-wrap table .btn-sm {
+    font-size: 9px !important;
+    padding: 2px 6px !important;
+}
+
+/* ============================================================
+   MOBILE: กระชับและเต็มจอ
+   ============================================================ */
+
+/* ✅ แท็บเล็ตและมือถือ (จอ < 768px) */
 @media (max-width: 768px) {
     #page-members .table-wrap,
     #page-checkin .table-wrap,
     #page-payments .table-wrap,
     #page-daily .table-wrap {
-        max-height: 350px !important;
-        min-height: 200px !important;
+        max-height: 60vh !important;
+        min-height: 150px !important;
+    }
+    #page-members .table-wrap table,
+    #page-checkin .table-wrap table,
+    #page-payments .table-wrap table,
+    #page-daily .table-wrap table {
+        font-size: 11px !important;
+        min-width: 400px;
+    }
+    #page-members .table-wrap table th,
+    #page-checkin .table-wrap table th,
+    #page-payments .table-wrap table th,
+    #page-daily .table-wrap table th {
+        padding: 4px 5px !important;
+        font-size: 9px !important;
+    }
+    #page-members .table-wrap table td,
+    #page-checkin .table-wrap table td,
+    #page-payments .table-wrap table td,
+    #page-daily .table-wrap table td {
+        padding: 3px 5px !important;
+        font-size: 10px !important;
+    }
+    #page-members .table-wrap table .btn-sm,
+    #page-checkin .table-wrap table .btn-sm,
+    #page-payments .table-wrap table .btn-sm {
+        font-size: 8px !important;
+        padding: 1px 4px !important;
     }
 }
 
-/* ✅ ปรับความสูงสำหรับมือถือ */
+/* ✅ มือถือเล็กมาก (จอ < 480px) */
 @media (max-width: 480px) {
     #page-members .table-wrap,
     #page-checkin .table-wrap,
     #page-payments .table-wrap,
     #page-daily .table-wrap {
-        max-height: 280px !important;
-        min-height: 150px !important;
+        max-height: 55vh !important;
+        min-height: 120px !important;
+    }
+    #page-members .table-wrap table,
+    #page-checkin .table-wrap table,
+    #page-payments .table-wrap table,
+    #page-daily .table-wrap table {
+        font-size: 10px !important;
+        min-width: 320px;
+    }
+    #page-members .table-wrap table th,
+    #page-checkin .table-wrap table th,
+    #page-payments .table-wrap table th,
+    #page-daily .table-wrap table th {
+        padding: 3px 4px !important;
+        font-size: 8px !important;
+    }
+    #page-members .table-wrap table td,
+    #page-checkin .table-wrap table td,
+    #page-payments .table-wrap table td,
+    #page-daily .table-wrap table td {
+        padding: 2px 4px !important;
+        font-size: 9px !important;
+    }
+    #page-members .table-wrap table .btn-sm,
+    #page-checkin .table-wrap table .btn-sm,
+    #page-payments .table-wrap table .btn-sm {
+        font-size: 7px !important;
+        padding: 1px 3px !important;
+    }
+    /* ✅ ซ่อนคอลัมน์ที่ไม่จำเป็น */
+    #page-members .table-wrap .hide-phone,
+    #page-checkin .table-wrap .hide-phone,
+    #page-payments .table-wrap .hide-phone {
+        display: none !important;
     }
 }
+        
         
 /* ============================================================
    TOP 8 TABLE — ดีไซน์หรูหรา พร้อมเลื่อน
