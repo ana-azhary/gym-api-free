@@ -4437,203 +4437,6 @@
         font-size: 10px;
     }
 }
-
-/* ============================================================
-   TODAY CHECK-IN TABLE — ชิดกัน ระยะห่างพอดี
-   ============================================================ */
-
-/* ✅ ตั้งค่าตารางหลัก */
-#tempModal .table-wrap {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border-color);
-    max-height: 400px;
-    overflow-y: auto;
-}
-
-#tempModal .table-wrap table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 12px;
-    min-width: 280px;
-    table-layout: fixed; /* ✅ ทำให้คอลัมน์ยืดหยุ่น */
-}
-
-#tempModal .table-wrap table thead {
-    position: sticky;
-    top: 0;
-    z-index: 5;
-}
-
-#tempModal .table-wrap table thead th {
-    background: var(--bg-body);
-    padding: 4px 4px !important;
-    text-align: center;
-    font-weight: 700;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.2px;
-    color: var(--text-muted);
-    border-bottom: 2px solid var(--border-color);
-    white-space: nowrap;
-}
-
-#tempModal .table-wrap table tbody td {
-    padding: 3px 4px !important;
-    text-align: center;
-    border-bottom: 1px solid var(--border-color);
-    vertical-align: middle;
-    font-size: 11px;
-    white-space: nowrap;
-}
-
-/* ✅ กำหนดความกว้างคอลัมน์ (4 คอลัมน์: #, Name, Time, WhatsApp) */
-#tempModal .table-wrap table td:first-child,
-#tempModal .table-wrap table th:first-child {
-    width: 26px;
-    text-align: center;
-}
-
-#tempModal .table-wrap table td:nth-child(2),
-#tempModal .table-wrap table th:nth-child(2) {
-    width: auto;
-    text-align: right;
-    font-weight: 600;
-    padding-left: 8px !important;
-    padding-right: 8px !important;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 140px;
-}
-
-#tempModal .table-wrap table td:nth-child(3),
-#tempModal .table-wrap table th:nth-child(3) {
-    width: auto;
-    text-align: center;
-    padding-left: 4px !important;
-    padding-right: 4px !important;
-    min-width: 60px;
-}
-
-#tempModal .table-wrap table td:last-child,
-#tempModal .table-wrap table th:last-child {
-    width: 32px;
-    text-align: center;
-}
-
-/* ✅ Badge เวลา — เล็กลง กระชับ */
-#tempModal .table-wrap .badge-time {
-    background: var(--success);
-    color: #fff;
-    font-size: 10px;
-    font-weight: 600;
-    padding: 1px 6px;
-    border-radius: 30px;
-    display: inline-block;
-    white-space: nowrap;
-    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.12);
-}
-
-/* ✅ ปุ่ม WhatsApp เล็ก */
-#tempModal .table-wrap .btn-whatsapp {
-    padding: 1px 4px !important;
-    font-size: 9px !important;
-    line-height: 1.4;
-}
-
-/* ✅ Responsive: มือถือ */
-@media (max-width: 480px) {
-    #tempModal .table-wrap table {
-        font-size: 10px;
-        min-width: 210px;
-    }
-    #tempModal .table-wrap table thead th {
-        padding: 2px 2px !important;
-        font-size: 8px;
-    }
-    #tempModal .table-wrap table tbody td {
-        padding: 2px 2px !important;
-        font-size: 9px;
-    }
-    #tempModal .table-wrap table td:nth-child(2),
-    #tempModal .table-wrap table th:nth-child(2) {
-        max-width: 80px;
-        font-size: 9px;
-        padding-left: 4px !important;
-        padding-right: 4px !important;
-    }
-    #tempModal .table-wrap table td:nth-child(3),
-    #tempModal .table-wrap table th:nth-child(3) {
-        min-width: 50px;
-    }
-    #tempModal .table-wrap .badge-time {
-        font-size: 8px;
-        padding: 1px 4px;
-    }
-    #tempModal .table-wrap .btn-whatsapp {
-        font-size: 8px !important;
-        padding: 1px 3px !important;
-    }
-}
-        
-       /* ============================================================
-   TODAY PAYMENTS — RESPONSIVE
-   ============================================================ */
-
-/* ✅ ซ่อน "الرقم" บนมือถือ (ใช้ class hide-phone แล้ว) */
-
-/* ✅ ตารางให้เลื่อนแนวนอน */
-#tempModal .table-wrap {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border-color);
-}
-
-#tempModal .table-wrap table {
-    font-size: 12px;
-    min-width: 500px;
-}
-
-#tempModal .table-wrap table thead th,
-#tempModal .table-wrap table tbody td {
-    padding: 4px 6px;
-    white-space: nowrap;
-}
-
-#tempModal .table-wrap .badge-time {
-    background: var(--success);
-    color: #fff;
-    font-size: 10px;
-    font-weight: 600;
-    padding: 1px 8px;
-    border-radius: 30px;
-    display: inline-block;
-    white-space: nowrap;
-    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.15);
-}
-
-/* ✅ Responsive: มือถือ */
-@media (max-width: 480px) {
-    #tempModal .table-wrap table {
-        font-size: 10px;
-        min-width: 350px;
-    }
-    #tempModal .table-wrap table thead th,
-    #tempModal .table-wrap table tbody td {
-        padding: 3px 4px;
-    }
-    #tempModal .table-wrap .badge-time {
-        font-size: 8px;
-        padding: 1px 5px;
-    }
-    #tempModal .table-wrap .btn-whatsapp {
-        font-size: 8px !important;
-        padding: 1px 4px !important;
-    }
-}
         
 
     </style>
@@ -6210,146 +6013,125 @@ async function showStatDetail(type) {
 
     try {
         switch (type) {
-case 'todayCheckins': {
-    title = '✅ دخول اليوم (TODAY)';
-    const todayStr = getTodayStr();
-    
-    // ✅ แสดง Loading
-    content = '<div style="text-align:center;padding:20px;"><i class="fas fa-spinner fa-spin"></i> جارٍ التحميل...</div>';
-    openModal(title, content);
-    
-    try {
-        const res = await apiCall('/checkin');
-        const allCheckinsFresh = res.data || [];
-        const todayCheckins = allCheckinsFresh.filter(c => normalizeDate(c.checkin_date) === todayStr);
-        
-        // ✅ เรียงตามเวลา (ล่าสุดบนสุด)
-        todayCheckins.sort((a, b) => {
-            const ta = a.checkin_time || '00:00:00';
-            const tb = b.checkin_time || '00:00:00';
-            return ta < tb ? 1 : -1;
-        });
-        
-        // ✅ อัปเดต lastData (ถ้ามี)
-        if (lastData) {
-            if (!lastData.summary) lastData.summary = {};
-            lastData.summary.today_checkins = todayCheckins.length;
-            lastData.checkins = todayCheckins.slice(0, 20);
-            updateDashboardCards(lastData.summary);
-        }
-        $('statTodayCheckins').textContent = todayCheckins.length;
-        
-        if (!todayCheckins.length) {
-            content = `
-                <div style="text-align:center;padding:30px 0;color:var(--text-muted);">
-                    <div style="font-size:48px;margin-bottom:12px;">📭</div>
-                    <p style="font-size:16px;font-weight:500;">لا يوجد دخول اليوم</p>
-                    <p style="font-size:13px;margin-top:4px;">لم يقم أي عضو بتسجيل الدخول حتى الآن</p>
-                </div>
-            `;
-        } else {
-            // ✅ สรุปสถิติ
-            const totalMembers = allMembers.length;
-            const uniqueMembers = new Set(todayCheckins.map(c => c.member_id)).size;
-            const percentage = totalMembers > 0 ? Math.round((uniqueMembers / totalMembers) * 100) : 0;
-            
-            let summaryHtml = `
-                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;">
-                    <div style="background:rgba(16,185,129,0.08);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(16,185,129,0.1);">
-                        <div style="font-size:18px;font-weight:700;color:var(--success);">${todayCheckins.length}</div>
-                        <div style="font-size:9px;color:var(--text-muted);"><i class="fas fa-clipboard-check" style="color:var(--success);"></i> إجمالي الدخول</div>
-                    </div>
-                    <div style="background:rgba(59,130,246,0.08);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(59,130,246,0.1);">
-                        <div style="font-size:18px;font-weight:700;color:var(--info);">${uniqueMembers}</div>
-                        <div style="font-size:9px;color:var(--text-muted);"><i class="fas fa-users" style="color:var(--info);"></i> الأعضاء</div>
-                    </div>
-                    <div style="background:rgba(245,158,11,0.08);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(245,158,11,0.1);">
-                        <div style="font-size:18px;font-weight:700;color:var(--warning);">${percentage}%</div>
-                        <div style="font-size:9px;color:var(--text-muted);"><i class="fas fa-percent" style="color:var(--warning);"></i> نسبة الحضور</div>
-                    </div>
-                    <div style="background:rgba(148,163,184,0.08);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(148,163,184,0.1);">
-                        <div style="font-size:18px;font-weight:700;color:var(--text-muted);">${totalMembers}</div>
-                        <div style="font-size:9px;color:var(--text-muted);"><i class="fas fa-users-slash" style="color:var(--text-muted);"></i> إجمالي الأعضاء</div>
-                    </div>
-                </div>
-            `;
-            
-            // ✅ สร้างตาราง (ไม่มีคอลัมน์ "الرقم", เรียงชื่อก่อน)
-            let table = `
-                ${summaryHtml}
-                <div class="table-wrap" style="border-radius:var(--radius-sm);border:1px solid var(--border-color);">
-                    <table class="rank-table" style="min-width:400px;">
-                        <thead>
-                            <tr>
-                                <th style="width:30px;">#</th>
-                                <th style="min-width:120px;text-align:right;">الاسم</th>
-                                <th style="min-width:90px;">الوقت</th>
-                                <th style="width:40px;">اتصال</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
-            
-            todayCheckins.slice(0, 50).forEach((c, idx) => {
-                const member = allMembers.find(m => m.member_id === c.member_id);
-                const name = member ? member.full_name : '-';
-                const phone = member ? member.phone : '';
-                const wa = formatPhoneForWhatsApp(phone);
-                const waLink = wa ? `https://wa.me/${wa}?text=${encodeURIComponent('👋 مرحباً ' + name + '! سعدنا برؤيتك في Pro Gym اليوم! 💪')}` : '#';
-                
-                // ✅ Badge เวลาสีเขียว
-                const timeBadge = c.checkin_time 
-                    ? `<span class="badge-time"><i class="fas fa-clock"></i> ${c.checkin_time}</span>` 
-                    : '-';
-                
-                table += `
-                    <tr>
-                        <td style="color:var(--text-muted);font-size:12px;">${idx + 1}</td>
-                        <td style="text-align:right;font-weight:600;font-size:13px;">${name}</td>
-                        <td>${timeBadge}</td>
-                        <td>${wa ? `<a href="${waLink}" target="_blank" class="btn btn-whatsapp btn-sm" style="padding:2px 8px;font-size:10px;"><i class="fab fa-whatsapp"></i></a>` : '-'}</td>
-                    </tr>
-                `;
-            });
-            
-            table += `
-                        </tbody>
-                    </table>
-                </div>
-            `;
-            
-            content = `
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
-                    <span style="font-size:14px;font-weight:700;">
-                        <i class="fas fa-calendar-check" style="color:var(--success);"></i>
-                        دخول اليوم: <strong style="color:var(--primary);">${todayCheckins.length}</strong> مرة
-                        <span style="font-size:12px;color:var(--text-muted);font-weight:400;">(عرض ${Math.min(50, todayCheckins.length)})</span>
-                    </span>
-                    <span style="font-size:11px;color:var(--text-muted);">
-                        <i class="fas fa-calendar-alt"></i> ${formatDate(todayStr)}
-                    </span>
-                </div>
-                ${table}
-            `;
-        }
-        
-        // ✅ อัปเดต Modal
-        const modalContent = document.querySelector('#tempModal .modal-box > div');
-        if (modalContent) modalContent.innerHTML = content;
-        else openModal(title, content);
-        
-    } catch (e) {
-        console.error('Error loading todayCheckins:', e);
-        content = '❌ فشل تحميل البيانات: ' + e.message;
-        const modalContent = document.querySelector('#tempModal .modal-box > div');
-        if (modalContent) modalContent.innerHTML = content;
-        else openModal(title, content);
-    }
-    break;
-}
-
-
-                
+            case 'todayCheckins': {
+                title = '✅ دخول اليوم (TODAY)';
+                try {
+                    const res = await apiCall('/checkin');
+                    const allCheckinsFresh = res.data || [];
+                    const todayCheckins = allCheckinsFresh.filter(c => normalizeDate(c.checkin_date) === todayStr);
+                    
+                    todayCheckins.sort((a, b) => {
+                        const ta = a.checkin_time || '00:00:00';
+                        const tb = b.checkin_time || '00:00:00';
+                        return ta < tb ? 1 : -1;
+                    });
+                    
+                    if (lastData) {
+                        if (!lastData.summary) lastData.summary = {};
+                        lastData.summary.today_checkins = todayCheckins.length;
+                        lastData.checkins = todayCheckins.slice(0, 20);
+                        updateDashboardCards(lastData.summary);
+                    }
+                    $('statTodayCheckins').textContent = todayCheckins.length;
+                    
+                    if (!todayCheckins.length) {
+                        content = `
+                            <div style="text-align:center;padding:30px 0;color:var(--text-muted);">
+                                <div style="font-size:48px;margin-bottom:12px;">📭</div>
+                                <p style="font-size:16px;font-weight:500;">لا يوجد دخول اليوم</p>
+                                <p style="font-size:13px;margin-top:4px;">لم يقم أي عضو بتسجيل الدخول حتى الآن</p>
+                            </div>
+                        `;
+                    } else {
+                        const totalMembers = allMembers.length;
+                        const uniqueMembers = new Set(todayCheckins.map(c => c.member_id)).size;
+                        const percentage = totalMembers > 0 ? Math.round((uniqueMembers / totalMembers) * 100) : 0;
+                        
+                        let summaryHtml = `
+                            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;">
+                                <div style="background:rgba(16,185,129,0.08);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(16,185,129,0.1);">
+                                    <div style="font-size:18px;font-weight:700;color:var(--success);">${todayCheckins.length}</div>
+                                    <div style="font-size:9px;color:var(--text-muted);"><i class="fas fa-clipboard-check" style="color:var(--success);"></i> إجمالي الدخول</div>
+                                </div>
+                                <div style="background:rgba(59,130,246,0.08);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(59,130,246,0.1);">
+                                    <div style="font-size:18px;font-weight:700;color:var(--info);">${uniqueMembers}</div>
+                                    <div style="font-size:9px;color:var(--text-muted);"><i class="fas fa-users" style="color:var(--info);"></i> الأعضاء</div>
+                                </div>
+                                <div style="background:rgba(245,158,11,0.08);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(245,158,11,0.1);">
+                                    <div style="font-size:18px;font-weight:700;color:var(--warning);">${percentage}%</div>
+                                    <div style="font-size:9px;color:var(--text-muted);"><i class="fas fa-percent" style="color:var(--warning);"></i> نسبة الحضور</div>
+                                </div>
+                                <div style="background:rgba(148,163,184,0.08);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(148,163,184,0.1);">
+                                    <div style="font-size:18px;font-weight:700;color:var(--text-muted);">${totalMembers}</div>
+                                    <div style="font-size:9px;color:var(--text-muted);"><i class="fas fa-users-slash" style="color:var(--text-muted);"></i> إجمالي الأعضاء</div>
+                                </div>
+                            </div>
+                        `;
+                        
+                        let table = `
+                            ${summaryHtml}
+                            <div class="table-wrap" style="border-radius:var(--radius-sm);border:1px solid var(--border-color);">
+                                <table class="rank-table" style="min-width:500px;">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:30px;">#</th>
+                                            <th style="min-width:80px;">الرقم</th>
+                                            <th style="min-width:100px;">الاسم</th>
+                                            <th style="min-width:80px;">الوقت</th>
+                                            <th style="width:40px;">اتصال</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                        `;
+                        
+                        todayCheckins.slice(0, 50).forEach((c, idx) => {
+                            const member = allMembers.find(m => m.member_id === c.member_id);
+                            const name = member ? member.full_name : '-';
+                            const phone = member ? member.phone : '';
+                            const wa = formatPhoneForWhatsApp(phone);
+                            const waLink = wa ? `https://wa.me/${wa}?text=${encodeURIComponent('👋 مرحباً ' + name + '! سعدنا برؤيتك في Pro Gym اليوم! 💪')}` : '#';
+                            
+                            const timeBadge = c.checkin_time 
+                                ? `<span class="badge-time"><i class="fas fa-clock"></i> ${c.checkin_time}</span>` 
+                                : '-';
+                            
+                            table += `
+                                <tr>
+                                    <td style="color:var(--text-muted);font-size:12px;">${idx + 1}</td>
+                                    <td style="font-family:monospace;font-size:12px;">${c.member_id}</td>
+                                    <td><strong>${name}</strong></td>
+                                    <td>${timeBadge}</td>
+                                    <td>${wa ? `<a href="${waLink}" target="_blank" class="btn btn-whatsapp btn-sm" style="padding:2px 8px;font-size:10px;"><i class="fab fa-whatsapp"></i></a>` : '-'}</td>
+                                </tr>
+                            `;
+                        });
+                        
+                        table += `
+                                    </tbody>
+                                </table>
+                            </div>
+                        `;
+                        
+                        content = `
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
+                                <span style="font-size:14px;font-weight:700;">
+                                    <i class="fas fa-calendar-check" style="color:var(--success);"></i>
+                                    دخول اليوم: <strong style="color:var(--primary);">${todayCheckins.length}</strong> مرة
+                                    <span style="font-size:12px;color:var(--text-muted);font-weight:400;">(عرض ${Math.min(50, todayCheckins.length)})</span>
+                                </span>
+                                <span style="font-size:11px;color:var(--text-muted);">
+                                    <i class="fas fa-calendar-alt"></i> ${formatDate(todayStr)}
+                                </span>
+                            </div>
+                            ${table}
+                        `;
+                    }
+                } catch (e) {
+                    console.error('Error loading todayCheckins:', e);
+                    content = '❌ فشل تحميل البيانات: ' + e.message;
+                }
+                break;
+            }
 
 case 'todayPayments': {
     title = '💳 مدفوعات اليوم (TODAY)';
@@ -6495,10 +6277,214 @@ case 'todayPayments': {
     }
     break;
 }
+
+
+
+
+
+
+
+
+
+
+        
+
+            case 'newMembers': {
+                title = '➕ الأعضاء الجدد هذا الشهر';
+                const thisMonth = todayStr.slice(0, 7);
+                const allMembersFresh = await fetchMembersWithExpiry();
+                const newMembers = allMembersFresh.filter(m => m.start_date && normalizeDate(m.start_date).slice(0, 7) === thisMonth);
                 
+                newMembers.sort((a, b) => {
+                    const da = normalizeDate(a.start_date);
+                    const db = normalizeDate(b.start_date);
+                    if (!da && !db) return 0;
+                    if (!da) return 1;
+                    if (!db) return -1;
+                    return da < db ? 1 : -1;
+                });
                 
+                if (lastData) {
+                    if (!lastData.summary) lastData.summary = {};
+                    lastData.summary.new_members_this_month = newMembers.length;
+                    lastData.members = allMembersFresh;
+                    updateDashboardCards(lastData.summary);
+                }
+                $('statNewMembers').textContent = newMembers.length;
                 
-                
+                if (!newMembers.length) {
+                    content = `
+                        <div style="text-align:center;padding:30px 0;color:var(--text-muted);">
+                            <div style="font-size:48px;margin-bottom:12px;">📭</div>
+                            <p style="font-size:16px;font-weight:500;">لا يوجد أعضاء جدد هذا الشهر</p>
+                        </div>
+                    `;
+                } else {
+                    function getMemberStatus(m) {
+                        const hasPayment = allPayments.some(p => p.member_id === m.member_id);
+                        if (!m.expiry_date || m.expiry_date === '') return 'no_payment';
+                        if (m.start_date && normalizeDate(m.start_date) === normalizeDate(m.expiry_date)) return 'no_payment';
+                        if (!hasPayment) return 'no_payment';
+                        return m.status || 'no_payment';
+                    }
+                    
+                    const activeCount = newMembers.filter(m => getMemberStatus(m) === 'active').length;
+                    const noPaymentCount = newMembers.filter(m => getMemberStatus(m) === 'no_payment').length;
+                    
+                    let summaryHtml = `
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;max-width:400px;margin-left:auto;margin-right:auto;">
+                            <div style="background:rgba(16,185,129,0.08);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(16,185,129,0.1);">
+                                <div style="font-size:18px;font-weight:700;color:var(--success);">${activeCount}</div>
+                                <div style="font-size:10px;color:var(--text-muted);"><i class="fas fa-check-circle" style="color:var(--success);"></i> نشط</div>
+                            </div>
+                            <div style="background:rgba(148,163,184,0.08);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(148,163,184,0.1);">
+                                <div style="font-size:18px;font-weight:700;color:var(--text-muted);">${noPaymentCount}</div>
+                                <div style="font-size:10px;color:var(--text-muted);"><i class="fas fa-triangle-exclamation" style="color:var(--text-muted);"></i> غير مدفوع</div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    const statusBadgeMap = {
+                        'active': '<span class="status-badge active"><i class="fas fa-check-circle"></i> نشط</span>',
+                        'expired': '<span class="status-badge expired"><i class="fas fa-circle-xmark"></i> منتهي</span>',
+                        'expiring_soon': '<span class="status-badge expiring"><i class="fas fa-clock"></i> ينتهي قريباً</span>',
+                        'no_payment': '<span class="status-badge no-payment"><i class="fas fa-triangle-exclamation"></i> غير مدفوع</span>'
+                    };
+                    
+                    function generateNewMemberMessage(member) {
+                        const hasPayment = allPayments.some(p => p.member_id === member.member_id);
+                        let template = '';
+                        
+                        if (hasPayment) {
+                            const payments = allPayments.filter(p => p.member_id === member.member_id);
+                            const latest = payments.length > 0 ? payments[payments.length - 1] : null;
+                            
+                            template = `مرحباً ${member.full_name} 👋،
+نحن سعداء بوجودك معنا في صالة Gym Pro الرياضية! 🏋️
+
+📋 بيانات عضويتك:
+━━━━━━━━━━━━━━━━
+• الاسم الكامل: ${member.full_name}
+• رقم العضو: ${member.member_id}
+• تاريخ التسجيل: ${formatDate(member.start_date)}
+• نوع العضوية: ${member.membership_type || 'عادي'}
+• تاريخ انتهاء العضوية: ${formatDate(member.expiry_date) || 'غير محدد'}
+• كلمة المرور: ${member.password || '1234'}
+
+💰 آخر دفعة:
+• المبلغ: ${latest?.amount || '0'} ج.م
+• تاريخ الدفع: ${formatDate(latest?.payment_date) || ''}
+
+💪 ننصحك بممارسة الرياضة يومياً لتحقيق أهدافك!
+نحن هنا لدعمك وتقديم الاستشارة في أي وقت.
+
+مع خالص التحية،
+إدارة صالة Gym Pro 🏋️`;
+                        } else {
+                            template = `مرحباً ${member.full_name} 👋،
+نرحب بك في صالة Gym Pro الرياضية! 🏋️
+نحن سعداء بانضمامك إلى عائلتنا الرياضية.
+
+📋 بيانات عضويتك:
+━━━━━━━━━━━━━━━━
+• الاسم الكامل: ${member.full_name}
+• رقم العضو: ${member.member_id}
+• تاريخ التسجيل: ${formatDate(member.start_date)}
+• نوع العضوية: ${member.membership_type || 'عادي'}
+• كلمة المرور: ${member.password || '1234'}
+
+⚠️ تنبيه هام:
+لم يتم تسجيل أي دفعة لك حتى الآن.
+نرجو منك التوجه إلى الاستقبال لإتمام إجراءات الدفع.
+
+💪 نحن في انتظارك بكل ترحيب وحب!
+نتمنى لك رحلة رياضية موفقة وممتعة!
+
+مع خالص التحية،
+إدارة صالة Gym Pro 🏋️`;
+                        }
+                        return template;
+                    }
+                    
+                    let table = `
+                        ${summaryHtml}
+                        <div class="table-wrap" style="border-radius:var(--radius-sm);border:1px solid var(--border-color);">
+                            <table class="rank-table" style="min-width:550px;">
+                                <thead>
+                                    <tr>
+                                        <th style="width:30px;">#</th>
+                                        <th style="min-width:100px;">الاسم</th>
+                                        <th style="min-width:80px;">الرقم</th>
+                                        <th style="min-width:90px;">تاريخ التسجيل</th>
+                                        <th style="min-width:70px;">النوع</th>
+                                        <th style="min-width:110px;">الحالة</th>
+                                        <th style="min-width:80px;">انتهاء الصلاحية</th>
+                                        <th style="width:40px;">اتصال</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                    `;
+                    
+                    newMembers.slice(0, 50).forEach((m, idx) => {
+                        const status = getMemberStatus(m);
+                        const statusBadge = statusBadgeMap[status] || status;
+                        const phone = m.phone || '';
+                        const wa = formatPhoneForWhatsApp(phone);
+                        const newMsg = generateNewMemberMessage(m);
+                        const msg = encodeURIComponent(newMsg);
+                        const waLink = wa ? `https://wa.me/${wa}?text=${msg}` : '#';
+                        
+                        let expiryDisplay = 'غير مدفوع';
+                        if (m.expiry_date && m.expiry_date !== '' && status !== 'no_payment') {
+                            expiryDisplay = formatDate(m.expiry_date);
+                        }
+                        
+                        const isExpired = (status === 'expired');
+                        const rowClass = isExpired ? 'member-row-expired' : '';
+                        
+                        const typeMap = {
+                            'عادي': '🏋️ عادي',
+                            'متوسط': '⭐ متوسط',
+                            'مميز': '👑 مميز'
+                        };
+                        const typeDisplay = typeMap[m.membership_type] || m.membership_type || '-';
+                        
+                        table += `
+                            <tr class="${rowClass}" style="${isExpired ? 'background:rgba(239,68,68,0.04);' : ''}">
+                                <td style="color:var(--text-muted);font-size:12px;">${idx + 1}</td>
+                                <td><strong>${m.full_name}</strong></td>
+                                <td style="font-family:monospace;font-size:12px;">${m.member_id}</td>
+                                <td style="font-size:12px;">${formatDate(m.start_date)}</td>
+                                <td style="font-size:12px;">${typeDisplay}</td>
+                                <td>${statusBadge}</td>
+                                <td style="font-size:12px;${status === 'no_payment' ? 'color:var(--text-muted);' : ''}">${expiryDisplay}</td>
+                                <td>${wa ? `<a href="${waLink}" target="_blank" class="btn btn-whatsapp btn-sm" style="padding:2px 8px;font-size:10px;"><i class="fab fa-whatsapp"></i></a>` : '-'}</td>
+                            </tr>
+                        `;
+                    });
+                    
+                    table += `
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    
+                    content = `
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
+                            <span style="font-size:14px;font-weight:700;">
+                                <i class="fas fa-users" style="color:var(--accent);"></i>
+                                العدد: <strong style="color:var(--primary);">${newMembers.length}</strong> عضو
+                                <span style="font-size:12px;color:var(--text-muted);font-weight:400;">(عرض ${Math.min(50, newMembers.length)})</span>
+                            </span>
+                            <span style="font-size:11px;color:var(--text-muted);">
+                                <i class="fas fa-calendar-alt"></i> ${formatDate(todayStr.slice(0,7)+'-01')} - ${formatDate(todayStr)}
+                            </span>
+                        </div>
+                        ${table}
+                    `;
+                }
+                break;
+            }
 
             case 'expired': {
                 title = '🚫 الأعضاء منتهي الصلاحية';
