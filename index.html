@@ -6786,7 +6786,7 @@ case 'members': {
         break;
     }
 
-    // ✅ ฟังก์ชันหาสถานะของสมาชิก (เฉพาะ active/expired/expiring_soon/no_payment)
+    // ✅ ฟังก์ชันหาสถานะของสมาชิก (เฉพาะใช้สำหรับ WhatsApp และอื่น ๆ)
     function getMemberStatus(member) {
         const memberId = member.member_id;
         if (!memberId) return 'no_payment';
@@ -6816,90 +6816,57 @@ case 'members': {
         return 'active';
     }
 
-    // ✅ ฟังก์ชันสร้างข้อความ WhatsApp ตามสถานะ
-    function getWhatsAppMessage(member, status) {
+    // ✅ ฟังก์ชันสร้างข้อความ WhatsApp
+    function getWhatsAppMessage(member, isNew) {
         const name = member.full_name || 'عضو';
         const memberId = member.member_id || '';
-        const expiry = member.expiry_date ? formatDate(member.expiry_date) : 'غير محدد';
-        const daysLeft = member.expiry_date ? daysBetween(todayStr, normalizeDate(member.expiry_date)) : 0;
+        const phone = member.phone || '';
+        const age = member.age || '';
+        const membershipType = member.membership_type || 'عادي';
+        const startDate = member.start_date ? formatDate(member.start_date) : 'غير محدد';
+        const expiryDate = member.expiry_date ? formatDate(member.expiry_date) : 'غير محدد';
+        const password = member.password || '1234';
 
-        switch (status) {
-            case 'expired':
-                return `مرحباً ${name} 👋،
+        if (isNew) {
+            return `🎉 مرحباً ${name}،
 
-📢 ملاحظة هامة:
-لاحظنا أن عضويتك في صالة Gym Pro الرياضية قد انتهت (بتاريخ ${expiry}).
+نرحب بك بحرارة في صالة Gym Pro الرياضية! 🏋️
+نحن سعداء جداً بانضمامك إلى عائلتنا الرياضية.
 
-💪 ندعوك بحرارة للعودة وممارسة الرياضة من جديد!
-صحتك تهمنا، ونحن هنا لمساعدتك على تحقيق أهدافك اللياقية.
-
-🏋️ مميزات العودة إلينا:
-• أحدث الأجهزة الرياضية
-• مدربين محترفين
-• برامج تدريبية مخصصة
-• بيئة رياضية محفزة
-
-📞 للتواصل والاستفسار يرجى الاتصال بنا.
-
-نتمنى لك دوام الصحة والعافية، ونحن في انتظارك!
-
-مع خالص التحية،
-إدارة صالة Gym Pro 🏋️`;
-
-            case 'expiring_soon':
-                return `مرحباً ${name} 👋،
-
-📢 تنبيه هام:
-نود إعلامك بأن عضويتك في صالة Gym Pro الرياضية ستنتهي خلال ${daysLeft} يوم بتاريخ ${expiry}.
-
-⏳ الوقت المتبقي: ${daysLeft} يوم
-
-💪 ننصحك بالتوجه إلى الاستقبال لتجديد العضوية والاستمرار في الاستفادة من خدماتنا المميزة.
-نحن في انتظارك لمواصلة رحلتك الرياضية!
-
-مع خالص التحية،
-إدارة صالة Gym Pro 🏋️`;
-
-            case 'no_payment':
-                return `مرحباً ${name} 👋،
-
-نرحب بك في صالة Gym Pro الرياضية! 🏋️
-نحن سعداء بانضمامك إلى عائلتنا الرياضية.
-
-📋 بيانات عضويتك:
-━━━━━━━━━━━━━━━━
+📋 بيانات عضويتك (احتفظ بها للرجوع إليها):
+━━━━━━━━━━━━━━━━━━━━━━━━━━
 • الاسم الكامل: ${name}
 • رقم العضو: ${memberId}
-• تاريخ التسجيل: ${member.start_date ? formatDate(member.start_date) : 'غير محدد'}
+• رقم الهاتف: ${phone || 'غير مسجل'}
+• العمر: ${age || 'غير مسجل'}
+• نوع العضوية: ${membershipType}
+• تاريخ التسجيل: ${startDate}
+• تاريخ انتهاء العضوية: ${expiryDate}
+• كلمة المرور: ${password} (يمكنك تغييرها لاحقاً)
 
-⚠️ تنبيه هام:
-لم يتم تسجيل أي دفعة لك حتى الآن.
-نرجو منك التوجه إلى الاستقبال لإتمام إجراءات الدفع.
+💪 ننصحك بممارسة الرياضة بانتظام لتحقيق أهدافك.
+فريقنا جاهز لدعمك وتقديم الاستشارات في أي وقت.
 
-💪 نحن في انتظارك بكل ترحيب وحب!
-نتمنى لك رحلة رياضية موفقة وممتعة!
+📌 تذكر:
+• يمكنك استخدام رقم العضو وكلمة المرور لتسجيل الدخول إلى النظام
+• العضوية قابلة للتجديد عبر التواصل مع الإدارة
 
-مع خالص التحية،
-إدارة صالة Gym Pro 🏋️`;
-
-            default:
-                return `مرحباً ${name} 👋،
-
-نحن سعداء بوجودك معنا في صالة Gym Pro الرياضية! 🏋️
-
-📋 بيانات عضويتك:
-━━━━━━━━━━━━━━━━
-• الاسم الكامل: ${name}
-• رقم العضو: ${memberId}
-• تاريخ التسجيل: ${member.start_date ? formatDate(member.start_date) : 'غير محدد'}
-• تاريخ انتهاء العضوية: ${expiry}
-
-💪 ننصحك بممارسة الرياضة يومياً لتحقيق أهدافك!
-نحن هنا لدعمك وتقديم الاستشارة في أي وقت.
+نتمنى لك رحلة رياضية ممتعة ومفيدة! 🌟
 
 مع خالص التحية،
 إدارة صالة Gym Pro 🏋️`;
         }
+
+        return `👋 مرحباً ${name}،
+
+نتمنى لك يوماً رياضياً رائعاً! 💪
+نحن سعداء بوجودك معنا في صالة Gym Pro.
+
+استمر في ممارسة الرياضة وحقق أهدافك!
+فريقنا دائماً هنا لمساعدتك.
+
+مع خالص التحية،
+إدارة صالة Gym Pro 🏋️`;
     }
 
     // ✅ เรียงลำดับ (ล่าสุดบนสุด)
@@ -6912,7 +6879,7 @@ case 'members': {
         return da < db ? 1 : -1;
     });
 
-    // ✅ ===== สรุปสถิติด้านบน (2 การ์ดเท่านั้น) =====
+    // ✅ ===== สรุปสถิติด้านบน (2 การ์ด) =====
     const totalCount = members.length;
     const newCount = members.filter(m => m.start_date && normalizeDate(m.start_date).slice(0, 7) === thisMonth).length;
 
@@ -6922,14 +6889,14 @@ case 'members': {
                 <div style="font-size:22px;font-weight:800;color:var(--primary);">${totalCount}</div>
                 <div style="font-size:10px;color:var(--text-muted);"><i class="fas fa-users" style="color:var(--primary);"></i> إجمالي الأعضاء</div>
             </div>
-            <div style="background:rgba(245,158,11,0.08);border-radius:10px;padding:10px;text-align:center;border:1px solid rgba(245,158,11,0.08);">
-                <div style="font-size:22px;font-weight:800;color:#f59e0b;">${newCount}</div>
-                <div style="font-size:10px;color:var(--text-muted);"><i class="fas fa-sparkles" style="color:#f59e0b;"></i> جديد هذا الشهر</div>
+            <div style="background:rgba(16,185,129,0.08);border-radius:10px;padding:10px;text-align:center;border:1px solid rgba(16,185,129,0.08);">
+                <div style="font-size:22px;font-weight:800;color:var(--success);">${newCount}</div>
+                <div style="font-size:10px;color:var(--text-muted);"><i class="fas fa-sparkles" style="color:var(--success);"></i> جديد هذا الشهر</div>
             </div>
         </div>
     `;
 
-    // ✅ ===== สร้างตาราง =====
+    // ✅ ===== สร้างตาราง (เฉพาะ Badge "جديد" สีเขียว) =====
     let table = `
         ${summaryHtml}
         <div class="table-wrap" style="border-radius:var(--radius-sm);border:1px solid var(--border-color);max-height:450px;overflow-y:auto;overflow-x:auto;">
@@ -6948,37 +6915,26 @@ case 'members': {
     `;
 
     members.forEach((m, idx) => {
-        const status = getMemberStatus(m);
         const phone = m.phone || '';
         const wa = formatPhoneForWhatsApp(phone);
-        const message = getWhatsAppMessage(m, status);
+        const isNew = m.start_date && normalizeDate(m.start_date).slice(0, 7) === thisMonth;
+        const status = getMemberStatus(m); // ใช้สำหรับการจัดเรียงหรือการตัดสินใจอื่น ๆ
+        const message = getWhatsAppMessage(m, isNew);
         const encodedMsg = encodeURIComponent(message);
         const waLink = wa ? `https://wa.me/${wa}?text=${encodedMsg}` : '#';
 
-        // ✅ ตรวจสอบว่าเป็นสมาชิกใหม่เดือนนี้หรือไม่
-        const isNew = m.start_date && normalizeDate(m.start_date).slice(0, 7) === thisMonth;
-
-        // ✅ Badge สถานะ
+        // ✅ เฉพาะ Badge "جديد" สีเขียว
         let statusBadge = '';
-        if (status === 'active') {
-            if (isNew) {
-                statusBadge = `<span class="status-badge" style="background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#0f172a;font-weight:700;padding:2px 10px;border-radius:30px;font-size:10px;display:inline-flex;align-items:center;gap:4px;"><i class="fas fa-sparkles"></i> جديد</span>`;
-            } else {
-                statusBadge = `<span class="status-badge active"><i class="fas fa-check-circle"></i> نشط</span>`;
-            }
-        } else if (status === 'expired') {
-            statusBadge = `<span class="status-badge expired"><i class="fas fa-circle-xmark"></i> منتهي</span>`;
-        } else if (status === 'expiring_soon') {
-            statusBadge = `<span class="status-badge expiring"><i class="fas fa-clock"></i> ينتهي قريباً</span>`;
+        if (isNew) {
+            statusBadge = `<span class="status-badge" style="background:linear-gradient(135deg,#10b981,#34d399);color:#fff;font-weight:700;padding:2px 10px;border-radius:30px;font-size:10px;display:inline-flex;align-items:center;gap:4px;"><i class="fas fa-sparkles"></i> جديد</span>`;
         } else {
-            statusBadge = `<span class="status-badge no-payment"><i class="fas fa-triangle-exclamation"></i> غير مدفوع</span>`;
+            // ไม่แสดง Badge อื่น ๆ (เว้นว่าง)
+            statusBadge = `<span style="color:var(--text-muted);font-size:11px;">—</span>`;
         }
 
-        // ✅ กำหนดสีแถวตามสถานะ
+        // ✅ กำหนดสีแถวตามสถานะ (เฉพาะแถวใหม่ให้มีไฮไลต์เล็กน้อย)
         let rowStyle = '';
-        if (status === 'expired') rowStyle = 'background:rgba(239,68,68,0.04);';
-        else if (status === 'no_payment') rowStyle = 'background:rgba(148,163,184,0.04);';
-        else if (isNew) rowStyle = 'background:rgba(245,158,11,0.04);';
+        if (isNew) rowStyle = 'background:rgba(16,185,129,0.04);';
 
         table += `
             <tr style="${rowStyle}">
@@ -7028,6 +6984,7 @@ case 'members': {
     $('statTotalMembers').textContent = members.length;
     break;
 }
+        
 
 
 
