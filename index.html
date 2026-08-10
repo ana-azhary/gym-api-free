@@ -8797,67 +8797,110 @@ function showCardDetail(type) {
 
     switch (type) {
 
-        // ============================================================
-        // member_revenue — Minimal & Clean
-        // ============================================================
-        case 'member_revenue': {
-            const allPaymentsHistory = profilePayments;
-            const monthPayments = allPaymentsHistory.filter(p => 
-                p.payment_date && normalizeDate(p.payment_date).slice(0, 7) === thisMonth
-            );
-            const totalMonth = monthPayments.reduce((s, p) => s + parseFloat(p.amount || 0), 0);
-            const totalAll = allPaymentsHistory.reduce((s, p) => s + parseFloat(p.amount || 0), 0);
-
-            title = '💰 سجل المدفوعات';
-            let html = `
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
-                    <div ${cardStyle('var(--bg-body)')}>
-                        <div style="font-size:12px;color:var(--text-muted);font-weight:500;">هذا الشهر</div>
-                        <div style="font-size:24px;font-weight:700;color:var(--primary);margin-top:4px;">${toEGP(totalMonth)}</div>
-                    </div>
-                    <div ${cardStyle('var(--bg-body)')}>
-                        <div style="font-size:12px;color:var(--text-muted);font-weight:500;">الإجمالي</div>
-                        <div style="font-size:24px;font-weight:700;color:var(--success);margin-top:4px;">${toEGP(totalAll)}</div>
-                    </div>
-                </div>
+case 'member_revenue': {
+    const allPaymentsHistory = profilePayments;
+    // เรียงลำดับจากล่าสุดไปเก่าสุด
+    const sortedPayments = [...allPaymentsHistory].sort((a, b) => {
+        const da = normalizeDate(a.payment_date);
+        const db = normalizeDate(b.payment_date);
+        if (!da && !db) return 0;
+        if (!da) return 1;
+        if (!db) return -1;
+        return da < db ? 1 : -1;
+    });
+    
+    const totalAll = sortedPayments.reduce((s, p) => s + parseFloat(p.amount || 0), 0);
+    const avgPayment = sortedPayments.length > 0 ? totalAll / sortedPayments.length : 0;
+    
+    // ดึงเดือนปัจจุบัน
+    const thisMonth = today.slice(0, 7);
+    const monthPayments = sortedPayments.filter(p => 
+        p.payment_date && normalizeDate(p.payment_date).slice(0, 7) === thisMonth
+    );
+    const totalMonth = monthPayments.reduce((s, p) => s + parseFloat(p.amount || 0), 0);
+    const monthCount = monthPayments.length;
+    
+    title = '💰 سجل المدفوعات';
+    
+    // สรุปการ์ด (4 ใบ)
+    let summaryHtml = `
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;">
+            <div style="background:linear-gradient(135deg, rgba(15,59,94,0.06), rgba(56,189,248,0.04));border-radius:8px;padding:10px;text-align:center;border:1px solid rgba(15,59,94,0.06);">
+                <div style="font-size:10px;color:var(--text-muted);">إجمالي المدفوعات</div>
+                <div style="font-size:20px;font-weight:700;color:var(--primary);">${toEGP(totalAll)}</div>
+            </div>
+            <div style="background:linear-gradient(135deg, rgba(16,185,129,0.06), rgba(16,185,129,0.02));border-radius:8px;padding:10px;text-align:center;border:1px solid rgba(16,185,129,0.06);">
+                <div style="font-size:10px;color:var(--text-muted);">عدد العمليات</div>
+                <div style="font-size:20px;font-weight:700;color:var(--success);">${sortedPayments.length}</div>
+            </div>
+            <div style="background:linear-gradient(135deg, rgba(245,158,11,0.06), rgba(245,158,11,0.02));border-radius:8px;padding:10px;text-align:center;border:1px solid rgba(245,158,11,0.06);">
+                <div style="font-size:10px;color:var(--text-muted);">هذا الشهر</div>
+                <div style="font-size:20px;font-weight:700;color:var(--warning);">${toEGP(totalMonth)}</div>
+                <div style="font-size:10px;color:var(--text-muted);">(${monthCount} عملية)</div>
+            </div>
+            <div style="background:linear-gradient(135deg, rgba(139,92,246,0.06), rgba(139,92,246,0.02));border-radius:8px;padding:10px;text-align:center;border:1px solid rgba(139,92,246,0.06);">
+                <div style="font-size:10px;color:var(--text-muted);">متوسط الدفعة</div>
+                <div style="font-size:20px;font-weight:700;color:#8b5cf6;">${toEGP(avgPayment)}</div>
+            </div>
+        </div>
+    `;
+    
+    if (sortedPayments.length === 0) {
+        content = `
+            ${summaryHtml}
+            <div style="text-align:center;padding:30px 0;color:var(--text-muted);border:1px dashed var(--border-color);border-radius:var(--radius-sm);">
+                <div style="font-size:48px;margin-bottom:12px;">📭</div>
+                <p style="font-size:16px;font-weight:500;">لا يوجد سجل مدفوعات</p>
+                <p style="font-size:13px;margin-top:4px;">لم تقم بأي عملية دفع حتى الآن</p>
+            </div>
+        `;
+    } else {
+        // ตรวจสอบว่าเดือนนี้มีข้อมูลไหม เพื่อใส่ Badge
+        let rows = sortedPayments.map((p, i) => {
+            const isThisMonth = p.payment_date && normalizeDate(p.payment_date).slice(0, 7) === thisMonth;
+            const badge = isThisMonth ? '<span class="badge-today" style="font-size:8px;background:var(--success);color:#fff;padding:0 8px;border-radius:30px;line-height:16px;display:inline-block;margin-right:4px;">هذا الشهر</span>' : '';
+            return `
+                <tr style="${isThisMonth ? 'background:rgba(16,185,129,0.04);' : ''}">
+                    <td style="color:var(--text-muted);font-size:12px;">${i+1}</td>
+                    <td style="font-weight:700;color:var(--success);">${toEGP(p.amount)}</td>
+                    <td style="font-size:12px;">${formatDate(p.payment_date)} ${badge}</td>
+                    <td style="font-size:12px;text-align:center;">${p.months_paid || 1} شهر</td>
+                    <td style="font-size:12px;">${formatDate(p.expiry_date)}</td>
+                </tr>
             `;
-
-            if (allPaymentsHistory.length === 0) {
-                html += `<p class="text-muted text-center" style="padding:20px 0;font-size:14px;">📭 لا يوجد سجل مدفوعات</p>`;
-            } else {
-                let rows = allPaymentsHistory.map((p, i) => `
-                    <tr style="border-bottom:1px solid rgba(0,0,0,0.04);">
-                        <td style="padding:8px 0;font-size:13px;color:var(--text-secondary);">${i+1}</td>
-                        <td style="padding:8px 0;font-size:13px;font-weight:600;color:var(--text-primary);">${toEGP(p.amount)}</td>
-                        <td style="padding:8px 0;font-size:12px;color:var(--text-muted);">${formatDate(p.payment_date)}</td>
-                        <td style="padding:8px 0;font-size:12px;color:var(--text-muted);">${p.months_paid || 1} شهر</td>
-                        <td style="padding:8px 0;font-size:12px;color:var(--text-muted);">${formatDate(p.expiry_date)}</td>
-                    </tr>
-                `).join('');
-
-                html += `
-                    <div style="max-height:280px;overflow-y:auto;margin-top:4px;">
-                        <table style="width:100%;border-collapse:collapse;font-size:13px;">
-<thead>
-    <tr>
-        <th style="min-width:80px;text-align:center;">رقم العضو</th>
-        <th style="min-width:100px;text-align:right;">الاسم الكامل</th>
-        <th style="min-width:90px;text-align:center;">رقم الهاتف</th>
-        <th class="hide-phone" style="min-width:60px;text-align:center;">العمر</th>
-        <th style="min-width:80px;text-align:center;">نوع العضوية</th>
-        <th style="min-width:60px;text-align:center;">النقاط</th>
-        <th style="min-width:60px;text-align:center;">نقاط الاجتهاد</th>
-        <th style="min-width:110px;text-align:center;">إجراءات</th>
-    </tr>
-</thead>
-                            <tbody>${rows}</tbody>
-                        </table>
-                    </div>
-                `;
-            }
-            content = html;
-            break;
-        }
+        }).join('');
+        
+        let tableHtml = `
+            <div style="margin-top:12px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                    <strong style="font-size:14px;">📋 تاريخ المدفوعات</strong>
+                    <span style="font-size:11px;color:var(--text-muted);">(${sortedPayments.length} عملية)</span>
+                </div>
+                <div class="table-wrap" style="max-height:350px;border-radius:var(--radius-sm);border:1px solid var(--border-color);">
+                    <table class="rank-table" style="min-width:450px;">
+                        <thead style="position:sticky;top:0;z-index:5;background:var(--bg-body);">
+                            <tr>
+                                <th style="width:40px;">#</th>
+                                <th style="text-align:center;">المبلغ</th>
+                                <th style="text-align:center;">التاريخ</th>
+                                <th style="text-align:center;">الأشهر</th>
+                                <th style="text-align:center;">انتهاء الصلاحية</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+        
+        content = `
+            ${summaryHtml}
+            ${tableHtml}
+        `;
+    }
+    break;
+}
+            
 
         // ============================================================
         // member_xp — Minimal
