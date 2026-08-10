@@ -6577,8 +6577,19 @@ case 'todayCheckins': {
 
 case 'todayPayments': {
     title = '💳 مدفوعات اليوم (TODAY)';
+    
+    // ✅ เปิด Modal พร้อม Loading ทันที
+    const loadingContent = `
+        <div style="text-align:center;padding:40px 0;color:var(--text-muted);">
+            <div style="font-size:48px;margin-bottom:16px;"><i class="fas fa-spinner fa-spin"></i></div>
+            <p style="font-size:16px;font-weight:500;">جارٍ تحميل بيانات المدفوعات...</p>
+            <p style="font-size:13px;margin-top:4px;">يرجى الانتظار</p>
+        </div>
+    `;
+    openModal(title, loadingContent);
+    
     try {
-        const res = await apiCall('/payments');
+        const res = await apiCall('/payments?t=' + Date.now());
         const allPaymentsFresh = res.data || [];
         const todayPayers = allPaymentsFresh.filter(p => normalizeDate(p.payment_date) === todayStr);
         
@@ -6717,12 +6728,35 @@ case 'todayPayments': {
                 ${table}
             `;
         }
+        
+        // ✅ อัปเดต Modal ที่เปิดอยู่
+        const modalContent = document.querySelector('#tempModal .modal-box > div');
+        if (modalContent) {
+            modalContent.innerHTML = content;
+        } else {
+            // ถ้า Modal ถูกปิดไปแล้ว ให้เปิดใหม่
+            openModal(title, content);
+        }
+        
     } catch (e) {
         console.error('Error loading todayPayments:', e);
-        content = '❌ فشل تحميل البيانات: ' + e.message;
+        const errorContent = `
+            <div style="text-align:center;padding:30px 0;color:var(--danger);">
+                <div style="font-size:48px;margin-bottom:12px;">❌</div>
+                <p style="font-size:16px;font-weight:500;">فشل تحميل البيانات</p>
+                <p style="font-size:13px;margin-top:4px;color:var(--text-muted);">${e.message}</p>
+            </div>
+        `;
+        const modalContent = document.querySelector('#tempModal .modal-box > div');
+        if (modalContent) {
+            modalContent.innerHTML = errorContent;
+        } else {
+            openModal(title, errorContent);
+        }
     }
     break;
 }
+                
 
                 
 
