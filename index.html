@@ -4177,9 +4177,29 @@
 }
         
 /* ============================================================
-   EXPIRY BADGES — สถานะการหมดอายุ
+   EXPIRING SOON — CSS ที่เกี่ยวข้อง
    ============================================================ */
 
+/* ✅ ซ่อนบนมือถือ */
+@media (max-width: 768px) {
+    .hide-phone {
+        display: none !important;
+    }
+    
+    /* ✅ ปรับตารางให้กระชับบนมือถือ */
+    .modal-box .table-wrap table {
+        min-width: 280px !important;
+        font-size: 12px !important;
+    }
+    .modal-box .table-wrap th,
+    .modal-box .table-wrap td {
+        padding: 4px 6px !important;
+    }
+}
+
+/* ============================================================
+   EXPIRY BADGE — สถานะการหมดอายุ
+   ============================================================ */
 .expiry-badge {
     display: inline-flex;
     align-items: center;
@@ -4189,34 +4209,173 @@
     font-size: 12px;
     font-weight: 700;
     border: 1px solid transparent;
-    white-space: nowrap;
-    transition: all 0.2s ease;
 }
-
 .expiry-badge i {
     font-size: 13px;
 }
 
-/* 🔴 หมดอายุวันนี้ */
+/* 🔴 หมดอายุวันนี้ / เหลือ 0-1 วัน */
 .expiry-badge.expired-today {
     background: rgba(220, 38, 38, 0.12);
     color: #dc2626;
     border-color: rgba(220, 38, 38, 0.2);
 }
 
-/* 🟠 หมดอายุ 1-7 วัน */
-.expiry-badge.expired-week {
+/* 🟠 เหลือ 2-3 วัน */
+.expiry-badge.expired-yesterday {
+    background: rgba(249, 115, 22, 0.12);
+    color: #f97316;
+    border-color: rgba(249, 115, 22, 0.2);
+}
+
+/* 🟡 เหลือ 4-7 วัน หรือเดิม */
+.expiry-badge.expiring {
     background: rgba(245, 158, 11, 0.12);
     color: #f59e0b;
     border-color: rgba(245, 158, 11, 0.2);
 }
 
-/* ⚪ หมดอายุ 8+ วัน */
+/* ⚪ หมดอายุนานแล้ว (8+ วัน) */
 .expiry-badge.expired-long {
     background: rgba(107, 114, 128, 0.12);
     color: #6b7280;
     border-color: rgba(107, 114, 128, 0.2);
 }
+
+/* ============================================================
+   STATUS BADGE — สถานะทั่วไป (ถ้ายังไม่มี)
+   ============================================================ */
+.status-badge {
+    padding: 2px 12px;
+    border-radius: 30px;
+    font-size: 10px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    letter-spacing: 0.2px;
+}
+.status-badge.active {
+    background: rgba(16, 185, 129, 0.12);
+    color: #10b981;
+}
+.status-badge.expired {
+    background: rgba(239, 68, 68, 0.12);
+    color: #ef4444;
+}
+.status-badge.expiring {
+    background: rgba(245, 158, 11, 0.12);
+    color: #f59e0b;
+}
+.status-badge.no-payment {
+    background: rgba(148, 163, 184, 0.12);
+    color: #94a3b8;
+}
+
+/* ============================================================
+   MODAL TABLES — พื้นฐาน
+   ============================================================ */
+.modal-box .table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+}
+
+.modal-box .table-wrap table {
+    width: 100%;
+    min-width: 450px;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+.modal-box .table-wrap th {
+    padding: 8px 12px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    background: var(--bg-body);
+    border-bottom: 2px solid var(--border-color);
+}
+.modal-box .table-wrap td {
+    padding: 6px 12px;
+    text-align: center;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+}
+.modal-box .table-wrap tr:hover td {
+    background: rgba(15, 59, 94, 0.03);
+}
+
+/* ============================================================
+   SUMMARY CARDS — การ์ดสรุป 3 อันดับ
+   ============================================================ */
+.summary-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+    max-width: 360px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.summary-card {
+    border-radius: 8px;
+    padding: 8px;
+    text-align: center;
+    border: 1px solid transparent;
+}
+.summary-card .number {
+    font-size: 18px;
+    font-weight: 700;
+}
+.summary-card .label {
+    font-size: 9px;
+    color: var(--text-muted);
+}
+.summary-card.danger {
+    background: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.1);
+}
+.summary-card.danger .number {
+    color: var(--danger);
+}
+.summary-card.warning {
+    background: rgba(245, 158, 11, 0.08);
+    border-color: rgba(245, 158, 11, 0.1);
+}
+.summary-card.warning .number {
+    color: var(--warning);
+}
+.summary-card.info {
+    background: rgba(59, 130, 246, 0.08);
+    border-color: rgba(59, 130, 246, 0.1);
+}
+.summary-card.info .number {
+    color: var(--info);
+}
+
+/* ============================================================
+   DARK MODE SUPPORT
+   ============================================================ */
+[data-theme="dark"] .expiry-badge.expired-today {
+    background: rgba(248, 113, 113, 0.15);
+    color: #f87171;
+}
+[data-theme="dark"] .expiry-badge.expired-yesterday {
+    background: rgba(251, 146, 60, 0.15);
+    color: #fb923c;
+}
+[data-theme="dark"] .expiry-badge.expiring {
+    background: rgba(251, 191, 36, 0.15);
+    color: #fbbf24;
+}
+[data-theme="dark"] .expiry-badge.expired-long {
+    background: rgba(148, 163, 184, 0.15);
+    color: #94a3b8;
+}
+        
 
 /* ============================================================
    MODAL TABLES — Responsive (ไม่มีเบอร์)
