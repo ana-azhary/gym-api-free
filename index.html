@@ -4897,152 +4897,6 @@
     transform: scale(1.05);
     box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
 }
-
-        /* ============================================================
-   MEMBER DASHBOARD — Restricted Mode
-   ============================================================ */
-
-/* ✅ ซ่อนส่วนที่ไม่จำเป็นในหน้า Profile */
-.restricted-mode .member-stats-grid,
-.restricted-mode #top8Panel,
-.restricted-mode #goalSection,
-.restricted-mode #calendarSection,
-.restricted-mode #weightSection,
-.restricted-mode .card-actions-row {
-    display: none !important;
-}
-
-/* ✅ ซ่อนปุ่ม QR, PDF, Print */
-.restricted-mode .card-actions-row .btn {
-    display: none !important;
-}
-
-/* ✅ แสดงเฉพาะบัตร + ข้อความ */
-.restricted-mode #profileCard {
-    border: 2px solid var(--danger);
-    border-radius: var(--radius-md);
-    padding: 16px;
-    position: relative;
-}
-
-.restricted-mode #profileCard::before {
-    content: '⚠️';
-    position: absolute;
-    top: -12px;
-    right: 16px;
-    font-size: 24px;
-    background: var(--bg-body);
-    padding: 0 8px;
-}
-
-/* ✅ Badge สถานะด้านบน */
-.restricted-mode .member-status-badge {
-    display: flex !important;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 16px;
-    margin-bottom: 16px;
-    border-radius: var(--radius-sm);
-    font-weight: 700;
-    font-size: 14px;
-    border-right: 4px solid;
-}
-
-.restricted-mode .member-status-badge.expired {
-    background: rgba(220, 38, 38, 0.08);
-    color: var(--danger);
-    border-right-color: var(--danger);
-}
-
-.restricted-mode .member-status-badge.no-payment {
-    background: rgba(245, 158, 11, 0.08);
-    color: var(--warning);
-    border-right-color: var(--warning);
-}
-
-/* ✅ ข้อความแจ้งเตือน */
-.restricted-mode .payment-required-msg {
-    text-align: center;
-    padding: 16px 20px;
-    margin: 12px 0 16px;
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.06), rgba(239, 68, 68, 0.04));
-    border-radius: var(--radius-sm);
-    border: 1px dashed rgba(239, 68, 68, 0.2);
-}
-
-.restricted-mode .payment-required-msg .icon {
-    font-size: 40px;
-    display: block;
-    margin-bottom: 8px;
-}
-
-.restricted-mode .payment-required-msg .title {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--text-primary);
-}
-
-.restricted-mode .payment-required-msg .desc {
-    font-size: 14px;
-    color: var(--text-secondary);
-    margin-top: 4px;
-}
-
-.restricted-mode .payment-required-msg .encourage {
-    font-size: 13px;
-    color: var(--text-muted);
-    margin-top: 8px;
-    font-style: italic;
-}
-
-/* ✅ ปุ่ม "ติดต่อ" */
-.restricted-mode .btn-contact {
-    display: inline-flex !important;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 24px;
-    background: linear-gradient(135deg, var(--primary), var(--primary-light));
-    color: #fff;
-    border: none;
-    border-radius: 30px;
-    font-weight: 700;
-    font-size: 15px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 16px rgba(15, 59, 94, 0.2);
-    text-decoration: none;
-    margin: 8px auto;
-}
-
-.restricted-mode .btn-contact:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 24px rgba(15, 59, 94, 0.3);
-}
-
-.restricted-mode .btn-contact i {
-    font-size: 18px;
-}
-
-/* ✅ QR Scanner (ถ้ามี) */
-.restricted-mode .qr-scanner-area {
-    text-align: center;
-    padding: 10px 0;
-}
-
-.restricted-mode .qr-scanner-area .qr-placeholder {
-    width: 120px;
-    height: 120px;
-    margin: 0 auto;
-    border: 2px dashed var(--border-color);
-    border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 48px;
-    color: var(--text-muted);
-    background: var(--bg-body);
-}
-        
         
     </style>
 </head>
@@ -5462,50 +5316,6 @@
 
         <!-- PAGE: PROFILE (Member Dashboard) -->
         <div id="page-profile" class="page-section">
-            <!-- ============================================================
-     RESTRICTED MODE — แสดงเฉพาะบัตร + ข้อความ
-     ============================================================ -->
-<div id="restrictedModeContainer" style="display:none;">
-    
-    <!-- Badge สถานะ -->
-    <div id="memberStatusBadge" class="member-status-badge expired">
-        <i class="fas fa-exclamation-circle"></i>
-        <span id="statusBadgeText">العضوية منتهية الصلاحية</span>
-    </div>
-    
-    <!-- ข้อความแจ้งเตือน + กำลังใจ -->
-    <div class="payment-required-msg">
-        <span class="icon">💳</span>
-        <div class="title" id="restrictedTitle">يرجى تجديد العضوية</div>
-        <div class="desc" id="restrictedDesc">لقد انتهت صلاحية عضويتك، يرجى الاتصال بالإدارة لتجديدها</div>
-        <div class="encourage" id="restrictedEncourage">💪 صحتك تهمنا، نتمنى رؤيتك مجدداً في صالة Gym Pro!</div>
-    </div>
-    
-    <!-- QR Scanner Area -->
-    <div class="qr-scanner-area">
-        <div class="qr-placeholder">
-            <i class="fas fa-qrcode"></i>
-        </div>
-        <p style="font-size:12px;color:var(--text-muted);margin-top:6px;">امسح رمز QR للدفع</p>
-    </div>
-    
-    <!-- ปุ่มติดต่อ -->
-    <div style="text-align:center;">
-        <a href="tel:+201126396951" class="btn-contact">
-            <i class="fas fa-phone-alt"></i> اتصل بنا
-        </a>
-        <button class="btn-contact" style="background:linear-gradient(135deg, #25D366, #1ebe5c);" onclick="openWhatsAppContact()">
-            <i class="fab fa-whatsapp"></i> واتساب
-        </button>
-    </div>
-    
-    <!-- บัตรสมาชิก -->
-    <div style="margin-top:16px;">
-        <div class="member-card-preview" id="memberCardPreview">
-            <!-- บัตรจะถูกสร้างโดย JavaScript -->
-        </div>
-    </div>
-</div>
             <div class="member-stats-grid" id="memberStatsGrid">
                 <div class="stat-card-click" onclick="showCardDetail('member_revenue')"><div class="stat-top"><div class="stat-icon blue"><i class="fas fa-credit-card"></i></div></div><div class="num" id="mStatRevenue">-</div><div class="label">مدفوعات هذا الشهر</div></div>
                 <div class="stat-card-click" onclick="showCardDetail('member_xp')"><div class="stat-top"><div class="stat-icon green"><i class="fas fa-star"></i></div></div><div class="num" id="mStatXp">-</div><div class="label">نقاط الاجتهاد (XP)</div></div>
@@ -9704,50 +9514,38 @@ function generateProfileQR(memberId) {
     const container = document.getElementById('profileQrBox');
     if (!container) return;
     
-    // ✅ ล้าง container
     container.innerHTML = '';
-    
-    // ✅ ลบ instance เดิม
     if (qrCodeInstance) {
         try { qrCodeInstance.clear(); } catch (e) {}
         qrCodeInstance = null;
     }
     
-    // ✅ ตรวจสอบ Library
     if (typeof QRCode === 'undefined') {
-        container.innerHTML = `<span style="color:var(--text-muted);font-size:10px;"><i class="fas fa-exclamation-triangle"></i> QR غير جاهز</span>`;
+        container.innerHTML = `<span style="color:var(--text-muted);font-size:10px;">⚠️ QR غير جاهز</span>`;
         return;
     }
     
     try {
-        // ✅ กำหนดขนาดตามหน้าจอ
-        let qrSize = 56;
-        if (window.innerWidth < 400) qrSize = 36;
-        else if (window.innerWidth < 480) qrSize = 44;
-        
-        // ✅ สร้าง QR Code (ไม่เอียง ไม่มี animation)
+        // ✅ QR แสดงเสมอ (ใช้จ่ายเงิน)
+        let qrSize = window.innerWidth < 480 ? 44 : 56;
         qrCodeInstance = new QRCode(container, {
             text: memberId || 'G-XXXX',
             width: qrSize,
             height: qrSize,
-            colorDark: '#0f172a',      // สีดำ
-            colorLight: '#ffffff',      // สีขาว
-            correctLevel: QRCode.CorrectLevel.H  // ความแม่นยำสูง
+            colorDark: '#0f172a',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.H
         });
         
-        // ✅ ปรับ canvas ให้คมชัด
-        const canvas = container.querySelector('canvas');
-        if (canvas) {
-            canvas.style.width = qrSize + 'px';
-            canvas.style.height = qrSize + 'px';
-            canvas.style.imageRendering = 'pixelated';
-            canvas.style.imageRendering = 'crisp-edges';
-            canvas.style.borderRadius = '4px';
+        // ✅ ถ้าหมดอายุ แสดงข้อความใต้ QR
+        if (isMemberExpired) {
+            const label = document.createElement('div');
+            label.style.cssText = 'font-size:8px;color:#dc2626;font-weight:700;margin-top:2px;';
+            label.textContent = '⚠️ منتهي';
+            container.appendChild(label);
         }
-        
     } catch (e) {
-        console.warn('⚠️ QR Generation error:', e);
-        container.innerHTML = `<span style="color:var(--text-muted);font-size:10px;"><i class="fas fa-exclamation-triangle"></i> لا يمكن إنشاء QR</span>`;
+        container.innerHTML = `<span style="color:var(--text-muted);font-size:10px;">❌ لا يمكن إنشاء QR</span>`;
     }
 }
 
