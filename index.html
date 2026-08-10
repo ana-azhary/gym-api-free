@@ -6249,9 +6249,8 @@ function renderDashPaymentTable(payments) {
     }
     
     const today = getTodayStr();
-    const thisMonth = today.slice(0, 7); // เช่น "2026-08"
+    const thisMonth = today.slice(0, 7);
     
-    // ✅ กรองเฉพาะรายการที่จ่ายในเดือนนี้
     const thisMonthPayments = payments.filter(p => {
         if (!p.payment_date) return false;
         const normalized = normalizeDate(p.payment_date);
@@ -6259,13 +6258,11 @@ function renderDashPaymentTable(payments) {
         return normalized.slice(0, 7) === thisMonth;
     });
     
-    // ถ้าไม่มีข้อมูลในเดือนนี้
     if (!thisMonthPayments.length) {
-        tbody.innerHTML = '<tr><td colspan="6" class="empty-row">📭 لا توجد مدفوعات هذا الشهر</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-row">لا توجد مدفوعات هذا الشهر</td></tr>';
         return;
     }
     
-    // ✅ เรียงลำดับ: วันที่ล่าสุด (วันนี้) อยู่ด้านบนสุด
     const sorted = [...thisMonthPayments].sort((a, b) => {
         const da = normalizeDate(a.payment_date);
         const db = normalizeDate(b.payment_date);
@@ -6275,23 +6272,22 @@ function renderDashPaymentTable(payments) {
         return da < db ? 1 : -1;
     });
     
-    // ✅ แสดงผล
     tbody.innerHTML = sorted.slice(0, 50).map((p, i) => {
         const member = allMembers.find(m => m.member_id === p.member_id);
         const name = member ? member.full_name : '-';
         const isToday = normalizeDate(p.payment_date) === today;
-        const rowClass = isToday ? 'payment-today' : '';
         const todayBadge = isToday ? '<span class="badge-today">اليوم</span>' : '';
-        return `<tr class="${rowClass}">
+        return `<tr>
                     <td>${i+1}</td>
                     <td><strong>${p.member_id||'-'}</strong></td>
-                    <td class="hide-phone">${name} ${todayBadge}</td>
-                    <td>${toEGP(p.amount)}</td>
+                    <td class="hide-phone">${name}</td>
+                    <td>${toEGP(p.amount)} ${todayBadge}</td>   <!-- ✅ Badge อยู่หลังจำนวนเงิน -->
                     <td>${formatDate(p.payment_date)}</td>
                     <td>${formatDate(p.expiry_date)}</td>
                 </tr>`;
     }).join('');
 }
+        
 
         function filterDashMembers() {
             const q = ($('dashMemberSearch').value || '').toLowerCase();
