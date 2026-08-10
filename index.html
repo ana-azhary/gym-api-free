@@ -8025,62 +8025,54 @@ case 'revenue': {
         // ============================================================
         // FETCH PAYMENTS (SORTED LATEST FIRST — TODAY AT TOP)
         // ============================================================
-        async function fetchPayments() {
-            try {
-                const data = await apiCall('/payments?limit=300', {
-                    headers: {
-                        'Cache-Control': 'no-cache, no-store, must-revalidate'
-                    }
-                });
-                allPayments = data.data || [];
-                allPaymentsTotal = data.total || allPayments.length;
+async function fetchPayments() {
+    try {
+        const data = await apiCall('/payments?limit=300', {
+            headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' }
+        });
+        allPayments = data.data || [];
+        allPaymentsTotal = data.total || allPayments.length;
 
-                $('paymentCountBadge').textContent = allPaymentsTotal;
+        $('paymentCountBadge').textContent = allPaymentsTotal;
 
-                const tbody = $('paymentsTableBody');
-                if (!allPayments.length) {
-                    tbody.innerHTML = '<tr><td colspan="6" class="empty-row">لا توجد بيانات</td></tr>';
-                    return;
-                }
-
-                // 🔥 SORT: TODAY at top, then descending date
-                const today = getTodayStr();
-                const sorted = [...allPayments].sort((a, b) => {
-                    const da = normalizeDate(a.payment_date);
-                    const db = normalizeDate(b.payment_date);
-                    // TODAY first
-                    const aToday = da === today ? 1 : 0;
-                    const bToday = db === today ? 1 : 0;
-                    if (aToday !== bToday) return bToday - aToday;
-                    // Then descending date
-                    if (!da && !db) return 0;
-                    if (!da) return 1;
-                    if (!db) return -1;
-                    return da < db ? 1 : -1;
-                });
-
-                tbody.innerHTML = sorted.slice(0, 100).map((p, i) => {
-                    const member = allMembers.find(m => m.member_id === p.member_id);
-                    const name = member ? member.full_name : '-';
-                    const isToday = normalizeDate(p.payment_date) === today;
-                    const rowClass = isToday ? 'payment-today' : '';
-                    const todayBadge = isToday ? '<span class="badge-today">اليوم</span>' : '';
-                    return `<tr class="${rowClass}">
-                                <td>${i+1}</td>
-                                <td><strong>${p.member_id||'-'}</strong></td>
-                                <td>${name} ${todayBadge}</td>
-                                <td>${toEGP(p.amount)}</td>
-                                <td>${formatDate(p.payment_date)}</td>
-                                <td>${formatDate(p.expiry_date)}</td>
-                            </tr>`;
-                }).join('');
-
-                showToast(`✅ تم تحميل ${allPayments.length} عملية من أصل ${allPaymentsTotal}`, 'success');
-
-            } catch (e) {
-                showToast('❌ فشل تحميل المدفوعات: ' + e.message, 'error');
-            }
+        const tbody = $('paymentsTableBody');
+        if (!allPayments.length) {
+            tbody.innerHTML = '<tr><td colspan="6" class="empty-row">لا توجد بيانات</td></tr>';
+            return;
         }
+
+        const today = getTodayStr();
+        const sorted = [...allPayments].sort((a, b) => {
+            const da = normalizeDate(a.payment_date);
+            const db = normalizeDate(b.payment_date);
+            if (!da && !db) return 0;
+            if (!da) return 1;
+            if (!db) return -1;
+            return da < db ? 1 : -1;
+        });
+
+        tbody.innerHTML = sorted.slice(0, 100).map((p, i) => {
+            const member = allMembers.find(m => m.member_id === p.member_id);
+            const name = member ? member.full_name : '-';
+            const isToday = normalizeDate(p.payment_date) === today;
+            const todayBadge = isToday ? '<span class="badge-today">اليوم</span>' : '';
+            return `<tr>
+                        <td>${i+1}</td>
+                        <td><strong>${p.member_id||'-'}</strong></td>
+                        <td>${name}</td>
+                        <td>${toEGP(p.amount)} ${todayBadge}</td>   <!-- ✅ Badge อยู่หลังจำนวนเงิน -->
+                        <td>${formatDate(p.payment_date)}</td>
+                        <td>${formatDate(p.expiry_date)}</td>
+                    </tr>`;
+        }).join('');
+
+        showToast(`✅ تم تحميل ${allPayments.length} عملية من أصل ${allPaymentsTotal}`, 'success');
+
+    } catch (e) {
+        showToast('❌ فشل تحميل المدفوعات: ' + e.message, 'error');
+    }
+}
+        
 
         // ============================================================
         // MEMBERS, CHECKIN, PAYMENTS (Admin)
