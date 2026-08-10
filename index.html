@@ -8876,103 +8876,126 @@ case 'member_xp': {
         xp: getXp(m.member_id)
     })).sort((a, b) => b.xp - a.xp);
     
-    // ✅ เอาแค่ 12 อันดับแรก
-    const top12 = xpList.slice(0, 12);
+    // ✅ เอาแค่ 20 อันดับแรก
+    const top20 = xpList.slice(0, 20);
     
     // ✅ หาอันดับของสมาชิกปัจจุบัน
     const myRank = xpList.findIndex(m => m.id === memberId) + 1;
     const myXp = xp;
+    const totalMembers = xpList.length;
     
-    // ✅ คำนวณว่าจะต้องทำอีกกี่ XP เพื่อขึ้นอันดับถัดไป
-    let nextStep = '';
-    if (myRank > 1 && myRank <= 12) {
-        const prev = xpList[myRank - 2]; // คนที่อยู่เหนือเรา 1 อันดับ
-        if (prev) {
-            const diff = prev.xp - myXp + 1;
-            nextStep = `💪 تحتاج إلى ${diff} XP إضافية لتتجاوز ${prev.name}!`;
-        }
-    } else if (myRank > 12) {
-        const prev = xpList[11]; // คนอันดับที่ 12
-        if (prev) {
-            const diff = prev.xp - myXp + 1;
-            nextStep = `💪 تحتاج إلى ${diff} XP إضافية لدخول أفضل 12!`;
-        }
-    } else if (myRank === 1) {
-        nextStep = '👑 أنت الأول! حافظ على مكانتك!';
+    // ✅ ข้อความกระตุ้นตามอันดับ
+    let encouragementMsg = '';
+    let emoji = '';
+    if (myRank === 1) {
+        encouragementMsg = '🏆 أنت الأفضل! حافظ على مكانتك!';
+        emoji = '👑';
+    } else if (myRank <= 3) {
+        encouragementMsg = '⭐ ممتاز! أنت من أفضل الرياضيين! استمر!';
+        emoji = '🌟';
+    } else if (myRank <= 10) {
+        encouragementMsg = '💪 أنت في العشرة الأوائل! استمر في التحدي!';
+        emoji = '💪';
+    } else if (myRank <= 20) {
+        encouragementMsg = '🔥 أنت في أفضل 20! استمر في التقدم!';
+        emoji = '🔥';
+    } else {
+        encouragementMsg = '🚀 كل تمرين يقربك من القائمة! استمر في الحضور!';
+        emoji = '🚀';
     }
     
-    // ✅ สร้างข้อความให้กำลังใจตามอันดับ
-    let encouragement = '';
-    if (myRank <= 3) {
-        encouragement = '🏆 ممتاز! أنت من أفضل الرياضيين!';
-    } else if (myRank <= 6) {
-        encouragement = '⭐ رائع! استمر في التدريب للوصول إلى القمة!';
-    } else if (myRank <= 12) {
-        encouragement = '💪 أنت في أفضل 12! استمر في التحدي!';
-    } else {
-        encouragement = '🚀 كل تمرين يقربك من القائمة! استمر في الحضور!';
+    // ✅ คำนวณก้าวต่อไป (ถ้าอยู่นอก 20)
+    let nextStep = '';
+    if (myRank > 1 && myRank <= 20) {
+        const prev = xpList[myRank - 2];
+        if (prev && prev.xp > myXp) {
+            const diff = prev.xp - myXp + 1;
+            nextStep = `💪 تحتاج إلى ${diff} XP إضافية لتتجاوز ${prev.name}!`;
+        } else if (prev && prev.xp === myXp) {
+            nextStep = `🤝 أنت متعادل مع ${prev.name}! حافظ على حضورك لتتقدم!`;
+        }
+    } else if (myRank > 20) {
+        const prev = xpList[19];
+        if (prev) {
+            const diff = prev.xp - myXp + 1;
+            nextStep = `🎯 تحتاج إلى ${diff} XP إضافية لدخول أفضل 20!`;
+        }
+    } else if (myRank === 1) {
+        nextStep = '👑 أنت الأول! استمر في التفوق!';
     }
     
     title = '⭐ نقاط الاجتهاد (XP)';
     
-    let tableHtml = `
-        <!-- สรุปสถานะของตัวเอง -->
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;">
-            <div style="background:var(--bg-body);border-radius:8px;padding:10px;text-align:center;border:1px solid rgba(0,0,0,0.04);">
+    // ✅ สรุปสถานะ (4 การ์ด)
+    let summaryHtml = `
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;">
+            <div style="background:linear-gradient(135deg, rgba(15,59,94,0.08), rgba(56,189,248,0.04));border-radius:8px;padding:10px;text-align:center;border:1px solid rgba(15,59,94,0.08);">
                 <div style="font-size:10px;color:var(--text-muted);">مجموع XP</div>
-                <div style="font-size:20px;font-weight:700;color:var(--primary);">${xp}</div>
+                <div style="font-size:22px;font-weight:800;color:var(--primary);">${xp}</div>
             </div>
-            <div style="background:var(--bg-body);border-radius:8px;padding:10px;text-align:center;border:1px solid rgba(0,0,0,0.04);">
+            <div style="background:linear-gradient(135deg, rgba(245,158,11,0.08), rgba(245,158,11,0.02));border-radius:8px;padding:10px;text-align:center;border:1px solid rgba(245,158,11,0.08);">
                 <div style="font-size:10px;color:var(--text-muted);">التسلسل</div>
-                <div style="font-size:20px;font-weight:700;color:var(--accent);">${streak} يوم</div>
+                <div style="font-size:22px;font-weight:800;color:var(--accent);">${streak} يوم</div>
             </div>
-            <div style="background:var(--bg-body);border-radius:8px;padding:10px;text-align:center;border:1px solid rgba(0,0,0,0.04);">
+            <div style="background:linear-gradient(135deg, rgba(16,185,129,0.08), rgba(16,185,129,0.02));border-radius:8px;padding:10px;text-align:center;border:1px solid rgba(16,185,129,0.08);">
                 <div style="font-size:10px;color:var(--text-muted);">الترتيب</div>
-                <div style="font-size:20px;font-weight:700;color:var(--success);">#${myRank}</div>
+                <div style="font-size:22px;font-weight:800;color:var(--success);">#${myRank}</div>
+            </div>
+            <div style="background:linear-gradient(135deg, rgba(139,92,246,0.08), rgba(139,92,246,0.02));border-radius:8px;padding:10px;text-align:center;border:1px solid rgba(139,92,246,0.08);">
+                <div style="font-size:10px;color:var(--text-muted);">غداً</div>
+                <div style="font-size:22px;font-weight:800;color:#8b5cf6;">+${bonusTomorrow} XP</div>
             </div>
         </div>
-        
-        <!-- ข้อความให้กำลังใจ + ก้าวต่อไป -->
-        <div style="background:linear-gradient(135deg, rgba(16,185,129,0.08), rgba(56,189,248,0.08));border-radius:8px;padding:12px 16px;margin-bottom:16px;border-right:4px solid var(--success);">
-            <div style="font-size:14px;font-weight:600;color:var(--text-primary);">${encouragement}</div>
-            <div style="font-size:13px;color:var(--text-secondary);margin-top:4px;">${nextStep}</div>
+    `;
+    
+    // ✅ ข้อความให้กำลังใจ + ก้าวต่อไป
+    let encouragementHtml = `
+        <div style="background:linear-gradient(135deg, rgba(16,185,129,0.06), rgba(56,189,248,0.06));border-radius:8px;padding:12px 16px;margin-bottom:14px;border-right:4px solid var(--success);display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <div style="font-size:32px;">${emoji}</div>
+            <div>
+                <div style="font-size:14px;font-weight:600;color:var(--text-primary);">${encouragementMsg}</div>
+                ${nextStep ? `<div style="font-size:12px;color:var(--text-secondary);margin-top:2px;">${nextStep}</div>` : ''}
+            </div>
         </div>
-        
-        <!-- ตาราง 12 อันดับ -->
+    `;
+    
+    // ✅ ตาราง Top 20
+    let tableHtml = `
         <div style="margin-top:12px;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                <strong style="font-size:14px;">🏆 أفضل 12 عضواً</strong>
-                <span style="font-size:11px;color:var(--text-muted);">(${top12.length} عضو)</span>
+                <strong style="font-size:14px;">🏆 أفضل 20 عضواً</strong>
+                <span style="font-size:11px;color:var(--text-muted);">(${top20.length} عضو)</span>
             </div>
-            <div class="table-wrap" style="max-height:300px;">
-                <table class="rank-table">
-                    <thead>
+            <div class="table-wrap" style="max-height:350px;border-radius:var(--radius-sm);border:1px solid var(--border-color);">
+                <table class="rank-table" style="min-width:400px;">
+                    <thead style="position:sticky;top:0;z-index:5;background:var(--bg-body);">
                         <tr>
-                            <th>#</th>
-                            <th>الاسم</th>
-                            <th>XP</th>
-                            <th>التسلسل</th>
+                            <th style="width:40px;">#</th>
+                            <th style="text-align:right;">الاسم</th>
+                            <th style="text-align:center;">XP</th>
+                            <th style="text-align:center;">التسلسل</th>
                         </tr>
                     </thead>
                     <tbody>
     `;
     
-    top12.forEach((m, idx) => {
+    const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟', 
+                    '11', '12', '13', '14', '15', '16', '17', '18', '19', '20'];
+    
+    top20.forEach((m, idx) => {
         const rank = idx + 1;
         const isMe = m.id === memberId;
-        const streak = getStreak(m.id);
-        const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
+        const memberStreak = getStreak(m.id);
+        const medal = medals[idx] || `#${rank}`;
         const bgStyle = isMe ? 'background:rgba(245,158,11,0.08);border-right:3px solid var(--accent);' : '';
-        
-        // XP Bonus ที่ใช้ในวันนี้ (เพื่อให้เห็นว่าถ้าเข้าใช้จะได้เท่าไหร่)
-        const bonus = calculateXpBonusForStreak(streak);
+        const meBadge = isMe ? ' 👈 أنت' : '';
         
         tableHtml += `
             <tr style="${bgStyle}">
                 <td style="font-weight:700;color:${rank <= 3 ? 'var(--accent)' : 'var(--text-muted)'};">${medal}</td>
-                <td>${m.name}${isMe ? ' 👈 أنت' : ''}</td>
-                <td style="font-weight:700;">${m.xp}</td>
-                <td style="font-size:12px;color:var(--text-muted);">${streak} يوم</td>
+                <td style="text-align:right;font-weight:${isMe ? '700' : '500'};">${m.name}${meBadge}</td>
+                <td style="text-align:center;font-weight:700;color:${rank <= 3 ? 'var(--accent)' : 'var(--text-primary)'};">${m.xp}</td>
+                <td style="text-align:center;font-size:12px;color:var(--text-muted);">${memberStreak} يوم</td>
             </tr>
         `;
     });
@@ -8982,21 +9005,37 @@ case 'member_xp': {
                 </table>
             </div>
         </div>
-        
-        <!-- ระบบ XP -->
-        <div style="margin-top:14px;padding:12px;background:var(--bg-body);border-radius:8px;border:1px solid rgba(0,0,0,0.04);">
-            <div style="font-size:12px;color:var(--text-muted);">
-                <strong>📋 نظام XP:</strong><br>
-                • كل يوم حضور: <strong>+${bonusToday} XP</strong> (حسب التسلسل)<br>
-                • التسلسل الحالي: <strong>${streak} يوم</strong> → غداً: <strong>+${bonusTomorrow} XP</strong><br>
-                • التسلسل لا يُعاد تعيينه إلا بعد غياب 3 أيام متتالية
+    `;
+    
+    // ✅ ระบบ XP (Rules)
+    let rulesHtml = `
+        <div style="margin-top:14px;padding:12px 16px;background:var(--bg-body);border-radius:8px;border:1px solid var(--border-color);">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                <i class="fas fa-info-circle" style="color:var(--accent);"></i>
+                <strong style="font-size:13px;">📋 نظام XP</strong>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 20px;font-size:11px;color:var(--text-muted);">
+                <div>• كل يوم حضور: <strong style="color:var(--primary);">+${bonusToday} XP</strong></div>
+                <div>• التسلسل الحالي: <strong style="color:var(--accent);">${streak} يوم</strong></div>
+                <div>• غداً: <strong style="color:#8b5cf6;">+${bonusTomorrow} XP</strong></div>
+                <div>• التسلسل لا يُعاد تعيينه إلا بعد غياب 3 أيام</div>
+            </div>
+            <div style="margin-top:6px;font-size:10px;color:var(--text-muted);border-top:1px solid var(--border-color);padding-top:6px;">
+                <i class="fas fa-arrow-up" style="color:var(--success);"></i>
+                <span>كلما زاد تسلسلك، زادت نقاط XP اليومية!</span>
             </div>
         </div>
     `;
     
-    content = tableHtml;
+    content = `
+        ${summaryHtml}
+        ${encouragementHtml}
+        ${tableHtml}
+        ${rulesHtml}
+    `;
     break;
 }
+            
 
         // ============================================================
         // member_peak — Minimal + Progress bar
