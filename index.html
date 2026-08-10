@@ -6297,17 +6297,25 @@ case 'todayCheckins': {
 
 case 'todayPayments': {
     title = '💳 مدفوعات اليوم (TODAY)';
+    const todayStr = getTodayStr();
+    
+    // ✅ แสดง Loading
+    content = '<div style="text-align:center;padding:20px;"><i class="fas fa-spinner fa-spin"></i> جارٍ التحميل...</div>';
+    openModal(title, content);
+    
     try {
         const res = await apiCall('/payments');
         const allPaymentsFresh = res.data || [];
         const todayPayers = allPaymentsFresh.filter(p => normalizeDate(p.payment_date) === todayStr);
         
+        // ✅ เรียงตามเวลาจ่าย (ล่าสุดบนสุด)
         todayPayers.sort((a, b) => {
             const ta = a.payment_time || '00:00:00';
             const tb = b.payment_time || '00:00:00';
             return ta < tb ? 1 : -1;
         });
         
+        // ✅ อัปเดต lastData (ถ้ามี)
         if (lastData) {
             if (!lastData.summary) lastData.summary = {};
             lastData.summary.today_payments = todayPayers.length;
@@ -6327,6 +6335,7 @@ case 'todayPayments': {
                 </div>
             `;
         } else {
+            // ✅ สรุปสถิติ
             const totalAmount = todayPayers.reduce((s, p) => s + parseFloat(p.amount || 0), 0);
             const uniqueMembers = new Set(todayPayers.map(p => p.member_id)).size;
             const totalMembers = allMembers.length;
@@ -6369,15 +6378,15 @@ case 'todayPayments': {
                 </div>
             `;
             
-            // ✅ ตาราง (เรียง: #, Name, ID (ซ่อนบนมือถือ), Amount, Time, Expiry, WhatsApp)
+            // ✅ สร้างตาราง (เรียง: #, Name, ID (ซ่อนบนมือถือ), Amount, Time, Expiry, WhatsApp)
             let table = `
                 ${summaryHtml}
                 <div class="table-wrap" style="border-radius:var(--radius-sm);border:1px solid var(--border-color);">
-                    <table class="rank-table" style="min-width:550px;">
+                    <table class="rank-table" style="min-width:500px;">
                         <thead>
                             <tr>
-                                <th style="width:30px;">#</th>
-                                <th style="min-width:120px;text-align:right;">الاسم</th>
+                                <th style="width:30px;text-align:center;">#</th>
+                                <th style="min-width:100px;text-align:right;">الاسم</th>
                                 <th style="min-width:80px;text-align:center;" class="hide-phone">الرقم</th>
                                 <th style="min-width:80px;text-align:center;">المبلغ</th>
                                 <th style="min-width:90px;text-align:center;">الوقت</th>
@@ -6407,7 +6416,7 @@ case 'todayPayments': {
                 
                 table += `
                     <tr>
-                        <td style="color:var(--text-muted);font-size:12px;">${idx + 1}</td>
+                        <td style="color:var(--text-muted);font-size:12px;text-align:center;">${idx + 1}</td>
                         <td style="text-align:right;font-weight:600;font-size:13px;">${name}</td>
                         <td class="hide-phone" style="font-family:monospace;font-size:12px;text-align:center;">${p.member_id || '-'}</td>
                         <td style="text-align:center;">${amountDisplay}</td>
@@ -6438,12 +6447,22 @@ case 'todayPayments': {
                 ${table}
             `;
         }
+        
+        // ✅ อัปเดต Modal
+        const modalContent = document.querySelector('#tempModal .modal-box > div');
+        if (modalContent) modalContent.innerHTML = content;
+        else openModal(title, content);
+        
     } catch (e) {
         console.error('Error loading todayPayments:', e);
         content = '❌ فشل تحميل البيانات: ' + e.message;
+        const modalContent = document.querySelector('#tempModal .modal-box > div');
+        if (modalContent) modalContent.innerHTML = content;
+        else openModal(title, content);
     }
     break;
 }
+                
                 
 
             case 'expired': {
