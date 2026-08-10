@@ -4578,6 +4578,62 @@
     }
 }
         
+       /* ============================================================
+   TODAY PAYMENTS — RESPONSIVE
+   ============================================================ */
+
+/* ✅ ซ่อน "الرقم" บนมือถือ (ใช้ class hide-phone แล้ว) */
+
+/* ✅ ตารางให้เลื่อนแนวนอน */
+#tempModal .table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+}
+
+#tempModal .table-wrap table {
+    font-size: 12px;
+    min-width: 500px;
+}
+
+#tempModal .table-wrap table thead th,
+#tempModal .table-wrap table tbody td {
+    padding: 4px 6px;
+    white-space: nowrap;
+}
+
+#tempModal .table-wrap .badge-time {
+    background: var(--success);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 8px;
+    border-radius: 30px;
+    display: inline-block;
+    white-space: nowrap;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.15);
+}
+
+/* ✅ Responsive: มือถือ */
+@media (max-width: 480px) {
+    #tempModal .table-wrap table {
+        font-size: 10px;
+        min-width: 350px;
+    }
+    #tempModal .table-wrap table thead th,
+    #tempModal .table-wrap table tbody td {
+        padding: 3px 4px;
+    }
+    #tempModal .table-wrap .badge-time {
+        font-size: 8px;
+        padding: 1px 5px;
+    }
+    #tempModal .table-wrap .btn-whatsapp {
+        font-size: 8px !important;
+        padding: 1px 4px !important;
+    }
+}
         
 
     </style>
