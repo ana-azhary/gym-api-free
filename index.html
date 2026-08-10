@@ -10512,103 +10512,151 @@ function renderProfileHeader() {
     console.log('✅ ฉายา:', rankData.emoji, rankData.title);
 }
 
-// ============================================================
-// RENDER PROFILE CARD — แสดงบัตรสมาชิก
-// ============================================================
-function renderProfileCard() {
-    console.log('🔄 renderProfileCard() ถูกเรียก');
-    
-    const m = profileMember;
-    if (!m) {
-        console.warn('⚠️ profileMember ไม่มีข้อมูล');
-        return;
-    }
-    
-    // ✅ คำนวณข้อมูล
-    hasPaymentHistory = profilePayments.length > 0;
-    let expiryDate = null;
-    profileExpiryStr = '-';
-    let isExpired = false;
-    
-    if (profilePayments.length > 0) {
-        const sorted = [...profilePayments].sort((a, b) => {
-            const da = normalizeDate(a.expiry_date || a['تاريخ انتهاء الصلاحية']);
-            const db = normalizeDate(b.expiry_date || b['تاريخ انتهاء الصلاحية']);
-            if (!da && !db) return 0;
-            if (!da) return 1;
-            if (!db) return -1;
-            return da.localeCompare(db);
-        });
-        const latest = sorted[sorted.length - 1];
-        profileExpiryStr = latest.expiry_date || latest['تاريخ انتهاء الصلاحية'] || '-';
-        if (profileExpiryStr && profileExpiryStr !== '-') {
-            expiryDate = new Date(normalizeDate(profileExpiryStr));
-            isExpired = expiryDate <= new Date();
-        }
-    }
-    isMemberExpired = isExpired;
-    
-    const points = getPoints(m.member_id);
-    const xp = getXp(m.member_id);
-    const expiryDisplay = profileExpiryStr && profileExpiryStr !== '-' ? formatDate(profileExpiryStr) : 'غير مدفوع';
-    
-    // ✅ อัปเดตบัตร
-    const previewName = document.getElementById('previewName');
-    const previewId = document.getElementById('previewId');
-    const previewPhone = document.getElementById('previewPhone');
-    const previewType = document.getElementById('previewType');
-    const previewExpiry = document.getElementById('previewExpiry');
-    const previewPoints = document.getElementById('previewPoints');
-    const previewXp = document.getElementById('previewXp');
-    const previewStartDate = document.getElementById('previewStartDate');
-    const previewExpiryFooter = document.getElementById('previewExpiryFooter');
-    
-    if (previewName) previewName.textContent = m.full_name || 'الاسم';
-    if (previewId) previewId.textContent = m.member_id || 'G-XXXX';
-    if (previewPhone) previewPhone.textContent = m.phone || '-';
-    if (previewType) previewType.textContent = m.membership_type || '-';
-    if (previewExpiry) previewExpiry.textContent = expiryDisplay;
-    if (previewPoints) previewPoints.textContent = points;
-    if (previewXp) previewXp.textContent = xp;
-    if (previewStartDate) previewStartDate.textContent = formatDate(m.start_date);
-    if (previewExpiryFooter) {
-        previewExpiryFooter.textContent = expiryDisplay;
-        previewExpiryFooter.className = isExpired ? 'expiry' : '';
-    }
-    
-    // ✅ สถานะ Banner
-    renderMemberStatus(m, isExpired, hasPaymentHistory, profileExpiryStr);
-    
-    // ✅ QR Code
-    generateProfileQR(m.member_id);
-    
-    // ✅ แสดง/ซ่อนส่วนต่างๆ
-    const showFull = !isExpired && hasPaymentHistory;
-    const goalSection = document.getElementById('goalSection');
-    const calendarSection = document.getElementById('calendarSection');
-    const weightSection = document.getElementById('weightSection');
-    const top8Panel = document.getElementById('top8Panel');
-    const expiredOverlay = document.getElementById('profileExpiredOverlay');
-    
-    if (goalSection) goalSection.style.display = showFull ? 'block' : 'none';
-    if (calendarSection) calendarSection.style.display = showFull ? 'block' : 'none';
-    if (weightSection) weightSection.style.display = showFull ? 'block' : 'none';
-    if (top8Panel) top8Panel.style.display = 'block';
-    if (expiredOverlay) expiredOverlay.classList.toggle('show', isExpired);
-    
-    if (showFull) {
-        loadGoalProgress();
-        renderCalendar();
-        loadWeightData();
-        renderWeightChart();
-    }
-    
-    updateMemberDashboard();
-    loadTop8();
-    
-    console.log('✅ บัตรแสดงผลเรียบร้อย');
+/* ============================================================
+   MEMBER DASHBOARD — Restricted Mode
+   ============================================================ */
+
+/* ✅ ซ่อนส่วนที่ไม่จำเป็นในหน้า Profile */
+.restricted-mode .member-stats-grid,
+.restricted-mode #top8Panel,
+.restricted-mode #goalSection,
+.restricted-mode #calendarSection,
+.restricted-mode #weightSection,
+.restricted-mode .card-actions-row {
+    display: none !important;
 }
 
+/* ✅ ซ่อนปุ่ม QR, PDF, Print */
+.restricted-mode .card-actions-row .btn {
+    display: none !important;
+}
+
+/* ✅ แสดงเฉพาะบัตร + ข้อความ */
+.restricted-mode #profileCard {
+    border: 2px solid var(--danger);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    position: relative;
+}
+
+.restricted-mode #profileCard::before {
+    content: '⚠️';
+    position: absolute;
+    top: -12px;
+    right: 16px;
+    font-size: 24px;
+    background: var(--bg-body);
+    padding: 0 8px;
+}
+
+/* ✅ Badge สถานะด้านบน */
+.restricted-mode .member-status-badge {
+    display: flex !important;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    margin-bottom: 16px;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    font-size: 14px;
+    border-right: 4px solid;
+}
+
+.restricted-mode .member-status-badge.expired {
+    background: rgba(220, 38, 38, 0.08);
+    color: var(--danger);
+    border-right-color: var(--danger);
+}
+
+.restricted-mode .member-status-badge.no-payment {
+    background: rgba(245, 158, 11, 0.08);
+    color: var(--warning);
+    border-right-color: var(--warning);
+}
+
+/* ✅ ข้อความแจ้งเตือน */
+.restricted-mode .payment-required-msg {
+    text-align: center;
+    padding: 16px 20px;
+    margin: 12px 0 16px;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.06), rgba(239, 68, 68, 0.04));
+    border-radius: var(--radius-sm);
+    border: 1px dashed rgba(239, 68, 68, 0.2);
+}
+
+.restricted-mode .payment-required-msg .icon {
+    font-size: 40px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.restricted-mode .payment-required-msg .title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.restricted-mode .payment-required-msg .desc {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+}
+
+.restricted-mode .payment-required-msg .encourage {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 8px;
+    font-style: italic;
+}
+
+/* ✅ ปุ่ม "ติดต่อ" */
+.restricted-mode .btn-contact {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 24px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    color: #fff;
+    border: none;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(15, 59, 94, 0.2);
+    text-decoration: none;
+    margin: 8px auto;
+}
+
+.restricted-mode .btn-contact:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(15, 59, 94, 0.3);
+}
+
+.restricted-mode .btn-contact i {
+    font-size: 18px;
+}
+
+/* ✅ QR Scanner (ถ้ามี) */
+.restricted-mode .qr-scanner-area {
+    text-align: center;
+    padding: 10px 0;
+}
+
+.restricted-mode .qr-scanner-area .qr-placeholder {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto;
+    border: 2px dashed var(--border-color);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    color: var(--text-muted);
+    background: var(--bg-body);
+}
+        
   // ============================================================
 // LOAD TOP 8 — อันดับการเข้าใช้สูงสุด 8 อันดับของปี
 // ============================================================
