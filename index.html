@@ -3010,57 +3010,107 @@
             color: var(--danger);
         }
     
-    /* ============================================================
-   DAILY REPORT — COMPACT (consistent with other pages)
+
+        /* ============================================================
+   DAILY REPORT TABLE — แสดงข้อมูลชัดเจน ไม่ทับกัน
    ============================================================ */
 
-/* Daily Stats Cards — ให้เล็กลงเหมือน Dashboard */
-.daily-stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-    margin-bottom: 14px;
+/* ✅ กำหนดให้ตารางใช้พื้นที่เต็มและจัด layout แบบ fixed */
+.daily-detail-table {
+    table-layout: fixed;
+    width: 100%;
+    border-collapse: collapse;
 }
 
-/* ทำให้การ์ดใน Daily Report เล็กลง */
-.daily-stats-grid .stat-card-click {
-    padding: 8px 10px !important;
-    min-height: 60px !important;
-    border-radius: var(--radius-sm) !important;
-}
-
-.daily-stats-grid .stat-card-click .stat-icon {
-    width: 28px !important;
-    height: 28px !important;
-    font-size: 12px !important;
-}
-
-.daily-stats-grid .stat-card-click .num {
-    font-size: 16px !important;
-}
-
-.daily-stats-grid .stat-card-click .label {
-    font-size: 10px !important;
-}
-
-/* Daily Details Table — กระชับ */
+/* ✅ ทุกเซลล์ padding พอเหมาะ และข้อความอยู่ตรงกลาง */
+.daily-detail-table th,
 .daily-detail-table td {
-    padding: 4px 8px !important;
-    font-size: 12px !important;
+    padding: 8px 12px !important;
+    text-align: center;
+    vertical-align: middle;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
-.daily-detail-table .badge-daily {
-    font-size: 10px !important;
-    padding: 1px 8px !important;
+/* ============================================================
+   คอลัมน์ الفئة — กว้างพอเหมาะ (20%)
+   ============================================================ */
+.daily-detail-table th:first-child,
+.daily-detail-table td:first-child {
+    width: 20%;
+    min-width: 90px;
+    text-align: right;
     white-space: nowrap;
+    font-weight: 600;
 }
 
+/* ============================================================
+   คอลัมน์ العدد — กว้างพอเหมาะ (12%) ไม่ทับ
+   ============================================================ */
+.daily-detail-table th:nth-child(2),
+.daily-detail-table td:nth-child(2) {
+    width: 12%;
+    min-width: 60px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+/* ============================================================
+   คอลัมน์ الأسماء — กว้างที่เหลือ แสดงชื่อเต็ม
+   ============================================================ */
+.daily-detail-table th:last-child,
 .daily-detail-table td:last-child {
-    max-width: 140px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    width: auto;
+    text-align: right;
+    white-space: normal !important;        /* ✅ ให้ข้อความขึ้นบรรทัดใหม่ */
+    word-break: break-word;
+    overflow: visible !important;          /* ✅ ไม่ตัดข้อความ */
+    text-overflow: clip !important;        /* ✅ ไม่ใช้ ... */
+    max-width: 350px;
 }
+
+/* ============================================================
+   Responsive: มือถือ
+   ============================================================ */
+@media (max-width: 768px) {
+    .daily-detail-table th:first-child,
+    .daily-detail-table td:first-child {
+        width: 25%;
+        min-width: 60px;
+        font-size: 11px;
+    }
+    .daily-detail-table th:nth-child(2),
+    .daily-detail-table td:nth-child(2) {
+        width: 15%;
+        font-size: 14px;
+    }
+    .daily-detail-table th:last-child,
+    .daily-detail-table td:last-child {
+        font-size: 11px;
+        max-width: 180px;
+    }
+}
+
+@media (max-width: 480px) {
+    .daily-detail-table th:first-child,
+    .daily-detail-table td:first-child {
+        width: 28%;
+        min-width: 50px;
+        font-size: 10px;
+    }
+    .daily-detail-table th:nth-child(2),
+    .daily-detail-table td:nth-child(2) {
+        width: 14%;
+        font-size: 13px;
+    }
+    .daily-detail-table th:last-child,
+    .daily-detail-table td:last-child {
+        font-size: 10px;
+        max-width: 120px;
+    }
+}
+        
 
 /* Responsive: Mobile */
 @media (max-width: 768px) {
