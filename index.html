@@ -6758,112 +6758,281 @@ async function showStatDetail(type) {
                 break;
             }
 
-            case 'members': {
-                title = '👥 إجمالي الأعضاء';
+case 'members': {
+    title = '👥 إجمالي الأعضاء';
 
-                if (!allMembers || allMembers.length === 0) {
-                    const res = await apiCall('/members');
-                    allMembers = res.data || [];
+    if (!allMembers || allMembers.length === 0) {
+        const res = await apiCall('/members');
+        allMembers = res.data || [];
+    }
+    if (!allPayments || allPayments.length === 0) {
+        const res = await apiCall('/payments');
+        allPayments = res.data || [];
+    }
+
+    const members = allMembers;
+    const payments = allPayments;
+    const todayStr = getTodayStr();
+    const thisMonth = todayStr.slice(0, 7);
+
+    if (!members.length) {
+        content = `
+            <div style="text-align:center;padding:30px 0;color:var(--text-muted);">
+                <div style="font-size:48px;margin-bottom:12px;">📭</div>
+                <p style="font-size:16px;font-weight:500;">لا يوجد أعضاء مسجلين</p>
+                <p style="font-size:13px;margin-top:4px;">ابدأ بإضافة الأعضاء الجدد</p>
+            </div>
+        `;
+        break;
+    }
+
+    // ✅ ฟังก์ชันหาสถานะของสมาชิก (เฉพาะ active/expired/expiring_soon/no_payment)
+    function getMemberStatus(member) {
+        const memberId = member.member_id;
+        if (!memberId) return 'no_payment';
+
+        const memberPayments = payments.filter(p => p.member_id === memberId);
+        if (memberPayments.length === 0) return 'no_payment';
+
+        let latestExpiry = null;
+        memberPayments.forEach(p => {
+            if (p.expiry_date) {
+                const exp = normalizeDate(p.expiry_date);
+                if (exp && (!latestExpiry || exp > latestExpiry)) {
+                    latestExpiry = exp;
                 }
-
-                const members = allMembers;
-
-                if (!members.length) {
-                    content = `
-                        <div style="text-align:center;padding:30px 0;color:var(--text-muted);">
-                            <div style="font-size:48px;margin-bottom:12px;">📭</div>
-                            <p style="font-size:16px;font-weight:500;">لا يوجد أعضاء مسجلين</p>
-                            <p style="font-size:13px;margin-top:4px;">ابدأ بإضافة الأعضاء الجدد</p>
-                        </div>
-                    `;
-                    break;
-                }
-
-                members.sort((a, b) => {
-                    const da = normalizeDate(a.start_date);
-                    const db = normalizeDate(b.start_date);
-                    if (!da && !db) return 0;
-                    if (!da) return 1;
-                    if (!db) return -1;
-                    return da < db ? 1 : -1;
-                });
-
-                let table = `
-                    <div class="table-wrap" style="border-radius:var(--radius-sm);border:1px solid var(--border-color);max-height:500px;overflow-y:auto;">
-                        <table class="rank-table" style="min-width:500px;">
-                            <thead style="position:sticky;top:0;z-index:5;background:var(--bg-body);">
-                                <tr>
-                                    <th style="width:30px;">#</th>
-                                    <th style="min-width:80px;">الرقم</th>
-                                    <th style="min-width:110px;">الاسم</th>
-                                    <th style="min-width:80px;">الهاتف</th>
-                                    <th style="min-width:70px;">النوع</th>
-                                    <th style="min-width:90px;">انتهاء الصلاحية</th>
-                                    <th style="width:40px;">اتصال</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                `;
-
-                members.forEach((m, idx) => {
-                    const phone = m.phone || '';
-                    const wa = formatPhoneForWhatsApp(phone);
-                    const waLink = wa ? `https://wa.me/${wa}?text=${encodeURIComponent('👋 مرحباً ' + m.full_name + ' من Pro Gym')}` : '#';
-
-                    let expiryDisplay = 'غير محدد';
-                    if (m.expiry_date && m.expiry_date !== '') {
-                        expiryDisplay = formatDate(m.expiry_date);
-                    }
-
-                    const typeMap = {
-                        'عادي': '🏋️ عادي',
-                        'متوسط': '⭐ متوسط',
-                        'مميز': '👑 مميز'
-                    };
-                    const typeDisplay = typeMap[m.membership_type] || m.membership_type || '-';
-
-                    table += `
-                        <tr>
-                            <td style="color:var(--text-muted);font-size:12px;">${idx + 1}</td>
-                            <td style="font-family:monospace;font-size:12px;">${m.member_id || '-'}</td>
-                            <td><strong>${m.full_name || '-'}</strong></td>
-                            <td style="font-size:12px;">${phone || '-'}</td>
-                            <td style="font-size:12px;">${typeDisplay}</td>
-                            <td style="font-size:12px;">${expiryDisplay}</td>
-                            <td>${wa ? `<a href="${waLink}" target="_blank" class="btn btn-whatsapp btn-sm" style="padding:2px 8px;font-size:10px;"><i class="fab fa-whatsapp"></i></a>` : '-'}</td>
-                        </tr>
-                    `;
-                });
-
-                table += `
-                            </tbody>
-                        </table>
-                    </div>
-                `;
-
-                content = `
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
-                        <span style="font-size:14px;font-weight:700;">
-                            <i class="fas fa-users" style="color:var(--accent);"></i>
-                            إجمالي الأعضاء: <strong style="color:var(--primary);">${members.length}</strong> عضو
-                            <span style="font-size:12px;color:var(--text-muted);font-weight:400;">(جميع الأعضاء)</span>
-                        </span>
-                        <span style="font-size:11px;color:var(--text-muted);">
-                            <i class="fas fa-calendar-alt"></i> ${formatDate(getTodayStr())}
-                        </span>
-                    </div>
-                    ${table}
-                `;
-
-                if (lastData) {
-                    if (!lastData.summary) lastData.summary = {};
-                    lastData.summary.total_members = members.length;
-                    lastData.members = members;
-                    updateDashboardCards(lastData.summary);
-                }
-                $('statTotalMembers').textContent = members.length;
-                break;
             }
+        });
+
+        if (!latestExpiry && member.expiry_date) {
+            latestExpiry = normalizeDate(member.expiry_date);
+        }
+
+        if (!latestExpiry) return 'no_payment';
+
+        const diff = daysBetween(todayStr, latestExpiry);
+        if (diff <= 0) return 'expired';
+        if (diff <= 7) return 'expiring_soon';
+        return 'active';
+    }
+
+    // ✅ ฟังก์ชันสร้างข้อความ WhatsApp ตามสถานะ
+    function getWhatsAppMessage(member, status) {
+        const name = member.full_name || 'عضو';
+        const memberId = member.member_id || '';
+        const expiry = member.expiry_date ? formatDate(member.expiry_date) : 'غير محدد';
+        const daysLeft = member.expiry_date ? daysBetween(todayStr, normalizeDate(member.expiry_date)) : 0;
+
+        switch (status) {
+            case 'expired':
+                return `مرحباً ${name} 👋،
+
+📢 ملاحظة هامة:
+لاحظنا أن عضويتك في صالة Gym Pro الرياضية قد انتهت (بتاريخ ${expiry}).
+
+💪 ندعوك بحرارة للعودة وممارسة الرياضة من جديد!
+صحتك تهمنا، ونحن هنا لمساعدتك على تحقيق أهدافك اللياقية.
+
+🏋️ مميزات العودة إلينا:
+• أحدث الأجهزة الرياضية
+• مدربين محترفين
+• برامج تدريبية مخصصة
+• بيئة رياضية محفزة
+
+📞 للتواصل والاستفسار يرجى الاتصال بنا.
+
+نتمنى لك دوام الصحة والعافية، ونحن في انتظارك!
+
+مع خالص التحية،
+إدارة صالة Gym Pro 🏋️`;
+
+            case 'expiring_soon':
+                return `مرحباً ${name} 👋،
+
+📢 تنبيه هام:
+نود إعلامك بأن عضويتك في صالة Gym Pro الرياضية ستنتهي خلال ${daysLeft} يوم بتاريخ ${expiry}.
+
+⏳ الوقت المتبقي: ${daysLeft} يوم
+
+💪 ننصحك بالتوجه إلى الاستقبال لتجديد العضوية والاستمرار في الاستفادة من خدماتنا المميزة.
+نحن في انتظارك لمواصلة رحلتك الرياضية!
+
+مع خالص التحية،
+إدارة صالة Gym Pro 🏋️`;
+
+            case 'no_payment':
+                return `مرحباً ${name} 👋،
+
+نرحب بك في صالة Gym Pro الرياضية! 🏋️
+نحن سعداء بانضمامك إلى عائلتنا الرياضية.
+
+📋 بيانات عضويتك:
+━━━━━━━━━━━━━━━━
+• الاسم الكامل: ${name}
+• رقم العضو: ${memberId}
+• تاريخ التسجيل: ${member.start_date ? formatDate(member.start_date) : 'غير محدد'}
+
+⚠️ تنبيه هام:
+لم يتم تسجيل أي دفعة لك حتى الآن.
+نرجو منك التوجه إلى الاستقبال لإتمام إجراءات الدفع.
+
+💪 نحن في انتظارك بكل ترحيب وحب!
+نتمنى لك رحلة رياضية موفقة وممتعة!
+
+مع خالص التحية،
+إدارة صالة Gym Pro 🏋️`;
+
+            default:
+                return `مرحباً ${name} 👋،
+
+نحن سعداء بوجودك معنا في صالة Gym Pro الرياضية! 🏋️
+
+📋 بيانات عضويتك:
+━━━━━━━━━━━━━━━━
+• الاسم الكامل: ${name}
+• رقم العضو: ${memberId}
+• تاريخ التسجيل: ${member.start_date ? formatDate(member.start_date) : 'غير محدد'}
+• تاريخ انتهاء العضوية: ${expiry}
+
+💪 ننصحك بممارسة الرياضة يومياً لتحقيق أهدافك!
+نحن هنا لدعمك وتقديم الاستشارة في أي وقت.
+
+مع خالص التحية،
+إدارة صالة Gym Pro 🏋️`;
+        }
+    }
+
+    // ✅ เรียงลำดับ (ล่าสุดบนสุด)
+    members.sort((a, b) => {
+        const da = normalizeDate(a.start_date);
+        const db = normalizeDate(b.start_date);
+        if (!da && !db) return 0;
+        if (!da) return 1;
+        if (!db) return -1;
+        return da < db ? 1 : -1;
+    });
+
+    // ✅ ===== สรุปสถิติด้านบน (2 การ์ดเท่านั้น) =====
+    const totalCount = members.length;
+    const newCount = members.filter(m => m.start_date && normalizeDate(m.start_date).slice(0, 7) === thisMonth).length;
+
+    const summaryHtml = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;max-width:400px;margin-left:auto;margin-right:auto;">
+            <div style="background:rgba(15,59,94,0.08);border-radius:10px;padding:10px;text-align:center;border:1px solid rgba(15,59,94,0.08);">
+                <div style="font-size:22px;font-weight:800;color:var(--primary);">${totalCount}</div>
+                <div style="font-size:10px;color:var(--text-muted);"><i class="fas fa-users" style="color:var(--primary);"></i> إجمالي الأعضاء</div>
+            </div>
+            <div style="background:rgba(245,158,11,0.08);border-radius:10px;padding:10px;text-align:center;border:1px solid rgba(245,158,11,0.08);">
+                <div style="font-size:22px;font-weight:800;color:#f59e0b;">${newCount}</div>
+                <div style="font-size:10px;color:var(--text-muted);"><i class="fas fa-sparkles" style="color:#f59e0b;"></i> جديد هذا الشهر</div>
+            </div>
+        </div>
+    `;
+
+    // ✅ ===== สร้างตาราง =====
+    let table = `
+        ${summaryHtml}
+        <div class="table-wrap" style="border-radius:var(--radius-sm);border:1px solid var(--border-color);max-height:450px;overflow-y:auto;overflow-x:auto;">
+            <table style="width:100%;border-collapse:collapse;font-size:13px;min-width:400px;">
+                <thead style="position:sticky;top:0;z-index:5;background:var(--bg-body);">
+                    <tr>
+                        <th style="width:30px;padding:4px 6px;text-align:center;">#</th>
+                        <th style="min-width:90px;padding:4px 6px;text-align:right;">الاسم</th>
+                        <th style="min-width:80px;padding:4px 6px;text-align:center;">الرقم</th>
+                        <th class="hide-phone" style="min-width:70px;padding:4px 6px;text-align:center;">الهاتف</th>
+                        <th style="min-width:100px;padding:4px 6px;text-align:center;">الحالة</th>
+                        <th style="width:40px;padding:4px 4px;text-align:center;">اتصال</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    members.forEach((m, idx) => {
+        const status = getMemberStatus(m);
+        const phone = m.phone || '';
+        const wa = formatPhoneForWhatsApp(phone);
+        const message = getWhatsAppMessage(m, status);
+        const encodedMsg = encodeURIComponent(message);
+        const waLink = wa ? `https://wa.me/${wa}?text=${encodedMsg}` : '#';
+
+        // ✅ ตรวจสอบว่าเป็นสมาชิกใหม่เดือนนี้หรือไม่
+        const isNew = m.start_date && normalizeDate(m.start_date).slice(0, 7) === thisMonth;
+
+        // ✅ Badge สถานะ
+        let statusBadge = '';
+        if (status === 'active') {
+            if (isNew) {
+                statusBadge = `<span class="status-badge" style="background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#0f172a;font-weight:700;padding:2px 10px;border-radius:30px;font-size:10px;display:inline-flex;align-items:center;gap:4px;"><i class="fas fa-sparkles"></i> جديد</span>`;
+            } else {
+                statusBadge = `<span class="status-badge active"><i class="fas fa-check-circle"></i> نشط</span>`;
+            }
+        } else if (status === 'expired') {
+            statusBadge = `<span class="status-badge expired"><i class="fas fa-circle-xmark"></i> منتهي</span>`;
+        } else if (status === 'expiring_soon') {
+            statusBadge = `<span class="status-badge expiring"><i class="fas fa-clock"></i> ينتهي قريباً</span>`;
+        } else {
+            statusBadge = `<span class="status-badge no-payment"><i class="fas fa-triangle-exclamation"></i> غير مدفوع</span>`;
+        }
+
+        // ✅ กำหนดสีแถวตามสถานะ
+        let rowStyle = '';
+        if (status === 'expired') rowStyle = 'background:rgba(239,68,68,0.04);';
+        else if (status === 'no_payment') rowStyle = 'background:rgba(148,163,184,0.04);';
+        else if (isNew) rowStyle = 'background:rgba(245,158,11,0.04);';
+
+        table += `
+            <tr style="${rowStyle}">
+                <td style="color:var(--text-muted);font-size:12px;text-align:center;padding:4px 6px;">${idx + 1}</td>
+                <td style="text-align:right;padding:4px 6px;">
+                    <span style="font-weight:600;font-size:13px;">${m.full_name || '-'}</span>
+                </td>
+                <td style="font-family:monospace;font-size:12px;text-align:center;padding:4px 6px;">
+                    <span style="display:inline-block;font-weight:600;">${m.member_id || '-'}</span>
+                </td>
+                <td class="hide-phone" style="font-size:12px;text-align:center;padding:4px 6px;color:var(--text-secondary);">${phone || '-'}</td>
+                <td style="text-align:center;padding:4px 6px;">${statusBadge}</td>
+                <td style="text-align:center;padding:4px 6px;">
+                    ${wa ? `<a href="${waLink}" target="_blank" class="btn btn-whatsapp btn-sm" style="padding:2px 6px;font-size:10px;display:inline-flex;align-items:center;gap:4px;"><i class="fab fa-whatsapp"></i></a>` : '-'}
+                </td>
+            </tr>
+        `;
+    });
+
+    table += `
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    content = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
+            <span style="font-size:14px;font-weight:700;">
+                <i class="fas fa-users" style="color:var(--accent);"></i>
+                إجمالي الأعضاء: <strong style="color:var(--primary);">${members.length}</strong> عضو
+                <span style="font-size:12px;color:var(--text-muted);font-weight:400;">(جميع الأعضاء)</span>
+            </span>
+            <span style="font-size:11px;color:var(--text-muted);">
+                <i class="fas fa-calendar-alt"></i> ${formatDate(todayStr)}
+            </span>
+        </div>
+        ${table}
+    `;
+
+    // ✅ อัปเดต lastData และการ์ดหลัก
+    if (lastData) {
+        if (!lastData.summary) lastData.summary = {};
+        lastData.summary.total_members = members.length;
+        lastData.members = members;
+        updateDashboardCards(lastData.summary);
+    }
+    $('statTotalMembers').textContent = members.length;
+    break;
+}
+
+
+
+
+                
 
             case 'revenue': {
                 title = '💰 الإيرادات (آخر 3 أشهر)';
