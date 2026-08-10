@@ -9086,7 +9086,7 @@ case 'member_rank': {
     
     title = '🏅 اللقب الشهري';
 
-    // ✅ คำนวณ Top 5 ของเดือนนี้ (ใช้ allCheckins ของทุกคน)
+    // ✅ คำนวณ Top 20 ของเดือนนี้ (ใช้ allCheckins ของทุกคน)
     const memberCounts = {};
     allCheckins.filter(c => 
         c.checkin_date && normalizeDate(c.checkin_date).slice(0, 7) === thisMonth
@@ -9096,11 +9096,13 @@ case 'member_rank': {
         }
     });
     
-    const top5 = Object.entries(memberCounts)
+    // ✅ เปลี่ยนจาก 5 เป็น 20
+    const top20 = Object.entries(memberCounts)
         .sort((a, b) => b[1] - a[1])
-        .slice(0, 5);
+        .slice(0, 20);
 
-    if (top5.length === 0) {
+    // ✅ ถ้าไม่มีข้อมูลของใครเลย (0 คน) ให้แสดงข้อความ
+    if (top20.length === 0) {
         content = `
             <div style="text-align:center;padding:20px 0;color:var(--text-muted);">
                 <div style="font-size:48px;margin-bottom:10px;">📊</div>
@@ -9109,6 +9111,77 @@ case 'member_rank': {
         `;
         break;
     }
+
+    // ✅ แสดงผล (ปรับเป็น 20 คน)
+    let rankHtml = `
+        <div style="text-align:center;padding:16px 0;background:linear-gradient(135deg, rgba(245,158,11,0.08), transparent);border-radius:var(--radius-sm);margin-bottom:14px;">
+            <div style="font-size:56px;line-height:1.2;filter:drop-shadow(0 4px 16px rgba(245,158,11,0.2));">${emoji}</div>
+            <div style="font-size:24px;font-weight:800;color:var(--accent);margin-top:6px;">${rank}</div>
+            <div style="font-size:14px;color:var(--text-muted);margin-top:2px;">${myCount} مرة هذا الشهر</div>
+            <div style="margin-top:8px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap;">
+                <span style="background:rgba(16,185,129,0.1);padding:2px 14px;border-radius:30px;font-size:12px;color:var(--success);">
+                    <i class="fas fa-calendar-check"></i> ${myCount} يوم
+                </span>
+            </div>
+        </div>
+        <div style="margin-top:10px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <strong style="font-size:14px;">🏆 أفضل 20 عضو هذا الشهر</strong>
+                <span style="font-size:11px;color:var(--text-muted);">(${top20.length} عضو)</span>
+            </div>
+            <div class="table-wrap" style="max-height:350px;border-radius:var(--radius-sm);border:1px solid var(--border-color);">
+                <table class="rank-table" style="min-width:400px;">
+                    <thead style="position:sticky;top:0;z-index:5;background:var(--bg-body);">
+                        <tr>
+                            <th style="width:40px;">#</th>
+                            <th style="text-align:right;">الاسم</th>
+                            <th style="text-align:center;">عدد الدخول</th>
+                            <th style="text-align:center;">اللقب</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+    `;
+    
+    const rankTitles = ['الملك', 'المقاتل', 'المجتهد', 'جيد', 'مبتدئ'];
+    const rankEmojis = ['👑', '💪', '🏃', '👍', '🌱'];
+    const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟', 
+                    '11', '12', '13', '14', '15', '16', '17', '18', '19', '20'];
+    
+    top20.forEach(([id, count], idx) => {
+        const member = allMembers.find(m => m.member_id === id);
+        const name = member ? member.full_name : id;
+        let rTitle = 'مبتدئ';
+        let rEmoji = '🌱';
+        if (count >= 25) { rTitle = 'الملك'; rEmoji = '👑'; }
+        else if (count >= 20) { rTitle = 'المقاتل'; rEmoji = '💪'; }
+        else if (count >= 15) { rTitle = 'المجتهد'; rEmoji = '🏃'; }
+        else if (count >= 10) { rTitle = 'جيد'; rEmoji = '👍'; }
+        else if (count >= 5) { rTitle = 'مبتدئ'; rEmoji = '🌱'; }
+        
+        const medal = medals[idx] || (idx+1);
+        const isMe = id === profileMemberId;
+        const bgStyle = isMe ? 'background:rgba(245,158,11,0.06);border-right:3px solid var(--accent);' : '';
+        
+        rankHtml += `
+            <tr style="${bgStyle}">
+                <td style="font-weight:700;color:${idx < 3 ? 'var(--accent)' : 'var(--text-muted)'};">${medal}</td>
+                <td style="text-align:right;">${name}${isMe ? ' 👈 أنت' : ''}</td>
+                <td style="text-align:center;font-weight:700;">${count}</td>
+                <td style="text-align:center;">${rEmoji} ${rTitle}</td>
+            </tr>
+        `;
+    });
+    
+    rankHtml += `
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    `;
+    content = rankHtml;
+    break;
+}
+            
 
     let rankHtml = `
         <div style="text-align:center;padding:16px 0;background:linear-gradient(135deg, rgba(245,158,11,0.08), transparent);border-radius:var(--radius-sm);margin-bottom:14px;">
