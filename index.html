@@ -9181,55 +9181,7 @@ case 'member_rank': {
     content = rankHtml;
     break;
 }
-            
-
-    let rankHtml = `
-        <div style="text-align:center;padding:16px 0;background:linear-gradient(135deg, rgba(245,158,11,0.08), transparent);border-radius:var(--radius-sm);margin-bottom:14px;">
-            <div style="font-size:56px;line-height:1.2;filter:drop-shadow(0 4px 16px rgba(245,158,11,0.2));">${emoji}</div>
-            <div style="font-size:24px;font-weight:800;color:var(--accent);margin-top:6px;">${rank}</div>
-            <div style="font-size:14px;color:var(--text-muted);margin-top:2px;">${myCount} مرة هذا الشهر</div>
-            <div style="margin-top:8px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap;">
-                <span style="background:rgba(16,185,129,0.1);padding:2px 14px;border-radius:30px;font-size:12px;color:var(--success);">
-                    <i class="fas fa-calendar-check"></i> ${myCount} يوم
-                </span>
-            </div>
-        </div>
-        <div style="margin-top:10px;"><strong>🏆 أفضل 5 أعضاء هذا الشهر:</strong></div>
-        <div class="table-wrap" style="max-height:250px;">
-            <table class="rank-table">
-                <thead><tr><th>#</th><th>الاسم</th><th>عدد الدخول</th><th>اللقب</th></tr></thead>
-                <tbody>
-    `;
-    
-    top5.forEach(([id, count], idx) => {
-        const member = allMembers.find(m => m.member_id === id);
-        const name = member ? member.full_name : id;
         
-        // ✅ กำหนดฉายาตามจำนวนครั้ง (count) ไม่ใช่ลำดับ
-        let rTitle = 'مبتدئ';
-        let rEmoji = '🌱';
-        if (count >= 25) { rTitle = 'الملك'; rEmoji = '👑'; }
-        else if (count >= 20) { rTitle = 'المقاتل'; rEmoji = '💪'; }
-        else if (count >= 15) { rTitle = 'المجتهد'; rEmoji = '🏃'; }
-        else if (count >= 10) { rTitle = 'جيد'; rEmoji = '👍'; }
-        else if (count >= 5) { rTitle = 'مبتدئ'; rEmoji = '🌱'; }
-        
-        const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : (idx+1);
-        const isMe = id === profileMemberId;
-        rankHtml += `
-            <tr style="${isMe ? 'background:rgba(245,158,11,0.06);border-right:3px solid var(--accent);' : ''}">
-                <td>${medal}</td>
-                <td>${name}${isMe ? ' 👈 أنت' : ''}</td>
-                <td>${count}</td>
-                <td>${rEmoji} ${rTitle}</td>
-            </tr>
-        `;
-    });
-    
-    rankHtml += `</tbody></table></div>`;
-    content = rankHtml;
-    break;
-}
 
         // ============================================================
         // member_percent — Minimal
