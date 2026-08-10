@@ -4438,7 +4438,118 @@
     }
 }
         
+/* ============================================================
+   TODAY PAYMENTS — กระชับ ไม่รก
+   ============================================================ */
 
+#tempModal .table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+#tempModal .table-wrap table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    font-size: 12px;
+    min-width: 520px;
+}
+
+#tempModal .table-wrap table thead th {
+    background: var(--bg-body);
+    padding: 4px 4px !important;
+    text-align: center;
+    font-weight: 700;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.2px;
+    color: var(--text-muted);
+    border-bottom: 2px solid var(--border-color);
+    white-space: nowrap;
+}
+
+#tempModal .table-wrap table tbody td {
+    padding: 3px 4px !important;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+/* ✅ Badge เวลา */
+#tempModal .table-wrap .badge-time {
+    background: var(--success);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 30px;
+    display: inline-block;
+    white-space: nowrap;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.12);
+}
+
+/* ✅ ปุ่ม WhatsApp เล็ก */
+#tempModal .table-wrap .btn-whatsapp {
+    padding: 1px 4px !important;
+    font-size: 9px !important;
+    line-height: 1.4;
+}
+
+/* ✅ Responsive: มือถือ */
+@media (max-width: 768px) {
+    #tempModal .table-wrap table {
+        min-width: 380px;
+        font-size: 11px;
+    }
+    #tempModal .table-wrap table thead th,
+    #tempModal .table-wrap table tbody td {
+        padding: 3px 3px !important;
+    }
+    #tempModal .table-wrap table td:nth-child(2),
+    #tempModal .table-wrap table th:nth-child(2) {
+        max-width: 100px;
+        font-size: 11px;
+    }
+    #tempModal .table-wrap .badge-time {
+        font-size: 9px;
+        padding: 1px 5px;
+    }
+    #tempModal .table-wrap .btn-whatsapp {
+        font-size: 9px !important;
+        padding: 1px 4px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    #tempModal .table-wrap table {
+        min-width: 300px;
+        font-size: 10px;
+    }
+    #tempModal .table-wrap table thead th,
+    #tempModal .table-wrap table tbody td {
+        padding: 2px 2px !important;
+    }
+    #tempModal .table-wrap table td:nth-child(2),
+    #tempModal .table-wrap table th:nth-child(2) {
+        max-width: 70px;
+        font-size: 10px;
+    }
+    #tempModal .table-wrap .badge-time {
+        font-size: 8px;
+        padding: 1px 4px;
+    }
+    #tempModal .table-wrap .btn-whatsapp {
+        font-size: 8px !important;
+        padding: 1px 3px !important;
+    }
+}
+        
+        
     </style>
 </head>
 <body>
