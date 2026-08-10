@@ -6140,64 +6140,106 @@ function renderDashPaymentTable(payments) {
             else if (currentPage === 'analytics') loadAnalytics();
         }
 
-        // ============================================================
-        // DAILY REPORT
-        // ============================================================
-        function loadDailyReport() {
-            const today = getTodayStr();
-            document.getElementById('dailyDate').textContent = formatDate(today);
-            const todayCheckins = (lastData && lastData.checkins) ? lastData.checkins : [];
-            document.getElementById('dailyCheckins').textContent = todayCheckins.length;
-            document.getElementById('dailyCheckinsCount').textContent = todayCheckins.length;
-            const checkinNames = todayCheckins.map(c => {
-                const member = allMembers.find(m => m.member_id === c.member_id);
-                return member ? member.full_name : c.member_id;
-            }).join('، ') || 'لا يوجد';
-            document.getElementById('dailyCheckinsList').textContent = checkinNames;
+/* ============================================================
+   DAILY REPORT TABLE — แสดงข้อมูลชัดเจน ไม่ทับกัน
+   ============================================================ */
 
-            const membersFromAPI = (lastData && lastData.members) ? lastData.members : [];
-            const newToday = membersFromAPI.filter(m => m.start_date && normalizeDate(m.start_date) === today);
-            document.getElementById('dailyNewMembers').textContent = newToday.length;
-            document.getElementById('dailyNewMembersCount').textContent = newToday.length;
-            const newNames = newToday.map(m => (m.full_name || m.member_id) + ' (' + m.member_id + ')').join('، ') || 'لا يوجد';
-            document.getElementById('dailyNewMembersList').textContent = newNames;
+/* ✅ กำหนดให้ตารางใช้พื้นที่เต็มและจัด layout แบบ fixed */
+.daily-detail-table {
+    table-layout: fixed;
+    width: 100%;
+    border-collapse: collapse;
+}
 
-            const payToday = (lastData && lastData.today_payers) ? lastData.today_payers : [];
-            document.getElementById('dailyPayments').textContent = payToday.length;
-            document.getElementById('dailyPaymentsCount').textContent = payToday.length;
-            const payDetails = payToday.map(p => {
-                return (p.full_name || p.member_id) + ' (' + toEGP(p.amount) + ')';
-            }).join('، ') || 'لا يوجد';
-            document.getElementById('dailyPaymentsList').textContent = payDetails;
+/* ✅ ทุกเซลล์ padding พอเหมาะ และข้อความอยู่ตรงกลาง */
+.daily-detail-table th,
+.daily-detail-table td {
+    padding: 8px 12px !important;
+    text-align: center;
+    vertical-align: middle;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
 
-            const expiredToday = membersFromAPI.filter(m => m.expiry_date && normalizeDate(m.expiry_date) === today);
-            document.getElementById('dailyExpired').textContent = expiredToday.length;
-            document.getElementById('dailyExpiredCount').textContent = expiredToday.length;
-            const expiredNames = expiredToday.map(m => m.full_name + ' (' + m.member_id + ')').join('، ') || 'لا يوجد';
-            document.getElementById('dailyExpiredList').textContent = expiredNames;
-        }
+/* ============================================================
+   คอลัมน์ الفئة — กว้างพอเหมาะ (20%)
+   ============================================================ */
+.daily-detail-table th:first-child,
+.daily-detail-table td:first-child {
+    width: 20%;
+    min-width: 90px;
+    text-align: right;
+    white-space: nowrap;
+    font-weight: 600;
+}
 
-        function exportDailyReportCSV() {
-            const today = getTodayStr();
-            const headers = ['الفئة', 'العدد', 'الأسماء'];
-            const rows = [
-                ['دخول اليوم', document.getElementById('dailyCheckinsCount').textContent, document.getElementById(
-                    'dailyCheckinsList').textContent],
-                ['أعضاء جدد', document.getElementById('dailyNewMembersCount').textContent, document.getElementById(
-                    'dailyNewMembersList').textContent],
-                ['مدفوعات اليوم', document.getElementById('dailyPaymentsCount').textContent, document.getElementById(
-                    'dailyPaymentsList').textContent],
-                ['منتهي اليوم', document.getElementById('dailyExpiredCount').textContent, document.getElementById(
-                    'dailyExpiredList').textContent]
-            ];
-            downloadCSV(`daily_report_${today}.csv`, headers, rows);
-            showToast('✅ تم تصدير تقرير اليوم CSV', 'success');
+/* ============================================================
+   คอลัมน์ العدد — กว้างพอเหมาะ (12%) ไม่ทับ
+   ============================================================ */
+.daily-detail-table th:nth-child(2),
+.daily-detail-table td:nth-child(2) {
+    width: 12%;
+    min-width: 60px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 16px;
+}
 
-            
-        }
+/* ============================================================
+   คอลัมน์ الأسماء — กว้างที่เหลือ แสดงชื่อเต็ม
+   ============================================================ */
+.daily-detail-table th:last-child,
+.daily-detail-table td:last-child {
+    width: auto;
+    text-align: right;
+    white-space: normal !important;        /* ✅ ให้ข้อความขึ้นบรรทัดใหม่ */
+    word-break: break-word;
+    overflow: visible !important;          /* ✅ ไม่ตัดข้อความ */
+    text-overflow: clip !important;        /* ✅ ไม่ใช้ ... */
+    max-width: 350px;
+}
 
+/* ============================================================
+   Responsive: มือถือ
+   ============================================================ */
+@media (max-width: 768px) {
+    .daily-detail-table th:first-child,
+    .daily-detail-table td:first-child {
+        width: 25%;
+        min-width: 60px;
+        font-size: 11px;
+    }
+    .daily-detail-table th:nth-child(2),
+    .daily-detail-table td:nth-child(2) {
+        width: 15%;
+        font-size: 14px;
+    }
+    .daily-detail-table th:last-child,
+    .daily-detail-table td:last-child {
+        font-size: 11px;
+        max-width: 180px;
+    }
+}
 
-
+@media (max-width: 480px) {
+    .daily-detail-table th:first-child,
+    .daily-detail-table td:first-child {
+        width: 28%;
+        min-width: 50px;
+        font-size: 10px;
+    }
+    .daily-detail-table th:nth-child(2),
+    .daily-detail-table td:nth-child(2) {
+        width: 14%;
+        font-size: 13px;
+    }
+    .daily-detail-table th:last-child,
+    .daily-detail-table td:last-child {
+        font-size: 10px;
+        max-width: 120px;
+    }
+}
+        
 
         
 // ============================================================
