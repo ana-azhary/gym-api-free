@@ -7029,7 +7029,8 @@ case 'expiring': {
             </div>
         `;
     } else {
-        // ✅ สรุปสถิติ
+        // ✅ ใช้ summary แบบง่าย (ไม่แสดงจำนวนสมาชิก)
+        // แสดงแค่ 3 การ์ด เพื่อแจ้งสถานะ (วันเดียว, 2-3วัน, 4-7วัน) โดยไม่มีคำว่า "عدد الأعضاء"
         const todayStr = getTodayStr();
         let summaryHtml = `
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;max-width:360px;margin-left:auto;margin-right:auto;">
@@ -7099,16 +7100,11 @@ case 'expiring': {
             
             // ✅ สีของ Badge ตามจำนวนวันที่เหลือ
             let badgeClass = 'expiring';
-            let badgeEmoji = '🟡';
             if (daysLeft <= 1) {
                 badgeClass = 'expired-today';
-                badgeEmoji = '🔴';
             } else if (daysLeft <= 3) {
                 badgeClass = 'expired-yesterday';
-                badgeEmoji = '🟠';
             }
-            
-            const daysDisplay = daysLeft === 1 ? 'يوم واحد' : `${daysLeft} أيام`;
             
             table += `
                 <tr>
@@ -7148,6 +7144,7 @@ case 'expiring': {
     }
     break;
 }
+                
 
 
 
