@@ -4867,6 +4867,37 @@
 }
         
 
+        /* ============================================================
+   BADGE TODAY — สีเขียว (ใช้ใน Dashboard + Payments)
+   ============================================================ */
+
+/* ✅ Badge "اليوم" สีเขียว */
+.badge-today {
+    background: var(--success) !important;
+    color: #fff !important;
+    font-size: 8px !important;
+    padding: 0 8px !important;
+    border-radius: 30px !important;
+    line-height: 16px !important;
+    display: inline-block !important;
+    margin-right: 4px !important;
+    font-weight: 700 !important;
+    vertical-align: middle !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Dark mode */
+[data-theme="dark"] .badge-today {
+    background: #34d399 !important;
+    color: #0b1120 !important;
+}
+
+/* Hover effect (optional) */
+.badge-today:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+        
     </style>
 </head>
 <body>
