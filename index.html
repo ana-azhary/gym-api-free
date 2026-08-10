@@ -4438,11 +4438,11 @@
     }
 }
 
-        /* ============================================================
-   TODAY CHECK-IN TABLE — กระชับ ชิดกัน
+/* ============================================================
+   TODAY CHECK-IN TABLE — ชิดกัน ระยะห่างพอดี
    ============================================================ */
 
-/* ✅ ตารางใน Modal "دخول اليوم" */
+/* ✅ ตั้งค่าตารางหลัก */
 #tempModal .table-wrap {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -4456,7 +4456,8 @@
     width: 100%;
     border-collapse: collapse;
     font-size: 12px;
-    min-width: 300px; /* ✅ แคบลง */
+    min-width: 280px;
+    table-layout: fixed; /* ✅ ทำให้คอลัมน์ยืดหยุ่น */
 }
 
 #tempModal .table-wrap table thead {
@@ -4467,7 +4468,7 @@
 
 #tempModal .table-wrap table thead th {
     background: var(--bg-body);
-    padding: 4px 6px !important;
+    padding: 4px 4px !important;
     text-align: center;
     font-weight: 700;
     font-size: 10px;
@@ -4487,32 +4488,38 @@
     white-space: nowrap;
 }
 
-/* ✅ กำหนดความกว้างคอลัมน์ (4 คอลัมน์) */
+/* ✅ กำหนดความกว้างคอลัมน์ (4 คอลัมน์: #, Name, Time, WhatsApp) */
 #tempModal .table-wrap table td:first-child,
 #tempModal .table-wrap table th:first-child {
-    width: 28px;
+    width: 26px;
     text-align: center;
 }
 
 #tempModal .table-wrap table td:nth-child(2),
 #tempModal .table-wrap table th:nth-child(2) {
+    width: auto;
     text-align: right;
     font-weight: 600;
-    min-width: 80px;
-    max-width: 130px;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 140px;
 }
 
 #tempModal .table-wrap table td:nth-child(3),
 #tempModal .table-wrap table th:nth-child(3) {
+    width: auto;
     text-align: center;
+    padding-left: 4px !important;
+    padding-right: 4px !important;
     min-width: 60px;
 }
 
 #tempModal .table-wrap table td:last-child,
 #tempModal .table-wrap table th:last-child {
-    width: 36px;
+    width: 32px;
     text-align: center;
 }
 
@@ -4522,17 +4529,17 @@
     color: #fff;
     font-size: 10px;
     font-weight: 600;
-    padding: 1px 8px;
+    padding: 1px 6px;
     border-radius: 30px;
     display: inline-block;
     white-space: nowrap;
-    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.15);
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.12);
 }
 
 /* ✅ ปุ่ม WhatsApp เล็ก */
 #tempModal .table-wrap .btn-whatsapp {
     padding: 1px 4px !important;
-    font-size: 10px !important;
+    font-size: 9px !important;
     line-height: 1.4;
 }
 
@@ -4540,30 +4547,37 @@
 @media (max-width: 480px) {
     #tempModal .table-wrap table {
         font-size: 10px;
-        min-width: 220px;
+        min-width: 210px;
     }
     #tempModal .table-wrap table thead th {
-        padding: 3px 3px !important;
-        font-size: 9px;
+        padding: 2px 2px !important;
+        font-size: 8px;
     }
     #tempModal .table-wrap table tbody td {
-        padding: 2px 3px !important;
-        font-size: 10px;
+        padding: 2px 2px !important;
+        font-size: 9px;
     }
     #tempModal .table-wrap table td:nth-child(2),
     #tempModal .table-wrap table th:nth-child(2) {
         max-width: 80px;
-        font-size: 10px;
+        font-size: 9px;
+        padding-left: 4px !important;
+        padding-right: 4px !important;
+    }
+    #tempModal .table-wrap table td:nth-child(3),
+    #tempModal .table-wrap table th:nth-child(3) {
+        min-width: 50px;
     }
     #tempModal .table-wrap .badge-time {
         font-size: 8px;
-        padding: 1px 5px;
+        padding: 1px 4px;
     }
     #tempModal .table-wrap .btn-whatsapp {
         font-size: 8px !important;
         padding: 1px 3px !important;
     }
 }
+        
         
 
     </style>
