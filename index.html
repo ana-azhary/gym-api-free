@@ -5462,6 +5462,50 @@
 
         <!-- PAGE: PROFILE (Member Dashboard) -->
         <div id="page-profile" class="page-section">
+            <!-- ============================================================
+     RESTRICTED MODE — แสดงเฉพาะบัตร + ข้อความ
+     ============================================================ -->
+<div id="restrictedModeContainer" style="display:none;">
+    
+    <!-- Badge สถานะ -->
+    <div id="memberStatusBadge" class="member-status-badge expired">
+        <i class="fas fa-exclamation-circle"></i>
+        <span id="statusBadgeText">العضوية منتهية الصلاحية</span>
+    </div>
+    
+    <!-- ข้อความแจ้งเตือน + กำลังใจ -->
+    <div class="payment-required-msg">
+        <span class="icon">💳</span>
+        <div class="title" id="restrictedTitle">يرجى تجديد العضوية</div>
+        <div class="desc" id="restrictedDesc">لقد انتهت صلاحية عضويتك، يرجى الاتصال بالإدارة لتجديدها</div>
+        <div class="encourage" id="restrictedEncourage">💪 صحتك تهمنا، نتمنى رؤيتك مجدداً في صالة Gym Pro!</div>
+    </div>
+    
+    <!-- QR Scanner Area -->
+    <div class="qr-scanner-area">
+        <div class="qr-placeholder">
+            <i class="fas fa-qrcode"></i>
+        </div>
+        <p style="font-size:12px;color:var(--text-muted);margin-top:6px;">امسح رمز QR للدفع</p>
+    </div>
+    
+    <!-- ปุ่มติดต่อ -->
+    <div style="text-align:center;">
+        <a href="tel:+201126396951" class="btn-contact">
+            <i class="fas fa-phone-alt"></i> اتصل بنا
+        </a>
+        <button class="btn-contact" style="background:linear-gradient(135deg, #25D366, #1ebe5c);" onclick="openWhatsAppContact()">
+            <i class="fab fa-whatsapp"></i> واتساب
+        </button>
+    </div>
+    
+    <!-- บัตรสมาชิก -->
+    <div style="margin-top:16px;">
+        <div class="member-card-preview" id="memberCardPreview">
+            <!-- บัตรจะถูกสร้างโดย JavaScript -->
+        </div>
+    </div>
+</div>
             <div class="member-stats-grid" id="memberStatsGrid">
                 <div class="stat-card-click" onclick="showCardDetail('member_revenue')"><div class="stat-top"><div class="stat-icon blue"><i class="fas fa-credit-card"></i></div></div><div class="num" id="mStatRevenue">-</div><div class="label">مدفوعات هذا الشهر</div></div>
                 <div class="stat-card-click" onclick="showCardDetail('member_xp')"><div class="stat-top"><div class="stat-icon green"><i class="fas fa-star"></i></div></div><div class="num" id="mStatXp">-</div><div class="label">نقاط الاجتهاد (XP)</div></div>
