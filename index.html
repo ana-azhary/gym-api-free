@@ -7846,35 +7846,45 @@ async function fetchCheckins() {
         const data = await apiCall('/checkin');
         allCheckins = data.data || [];
         $('checkinCountBadge').textContent = allCheckins.length;
+        
         const tbody = $('checkinTableBody');
         if (!allCheckins.length) {
-            tbody.innerHTML = '<tr><td colspan="5" class="empty-row">لا توجد بيانات</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" class="empty-row">لا توجد بيانات</td></tr>';
             return;
         }
-        const today = getTodayStr();
+        
+        // ✅ เรียงลำดับจากล่าสุดไปเก่าสุด
         const sorted = [...allCheckins].sort((a, b) => {
             const da = normalizeDate(a.checkin_date) + ' ' + (a.checkin_time || '00:00');
             const db = normalizeDate(b.checkin_date) + ' ' + (b.checkin_time || '00:00');
             return da < db ? 1 : -1;
         });
+        
+        const today = getTodayStr();
+        
         tbody.innerHTML = sorted.slice(0, 100).map((c, i) => {
             const member = allMembers.find(m => m.member_id === c.member_id);
             const name = member ? member.full_name : '-';
+            
+            // ✅ ตรวจสอบว่าเป็นวันนี้หรือไม่
             const isToday = normalizeDate(c.checkin_date) === today;
             const rowClass = isToday ? 'checkin-today' : '';
             const todayBadge = isToday ? '<span class="badge-today">اليوم</span>' : '';
+            
             return `<tr class="${rowClass}">
                         <td>${i+1}</td>
                         <td><strong>${c.member_id||'-'}</strong></td>
-                        <td>${name} ${todayBadge}</td>
-                        <td>${formatDate(c.checkin_date)}</td>
+                        <td>${name}</td>
+                        <td>${formatDate(c.checkin_date)} ${todayBadge}</td>
                         <td>${c.checkin_time||'-'}</td>
                     </tr>`;
         }).join('');
+        
     } catch (e) {
         showToast('❌ فشل تحميل الدخول: ' + e.message, 'error');
     }
 }
+        
         
         
 
