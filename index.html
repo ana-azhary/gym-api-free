@@ -6011,8 +6011,7 @@ async function showStatDetail(type) {
     const payments = (lastData && lastData.payments) ? lastData.payments : allPayments;
     const checkins = (lastData && lastData.checkins) ? lastData.checkins : allCheckins;
 
-    try {
-        switch (type) {
+   
             case 'todayCheckins': {
                 title = '✅ دخول اليوم (TODAY)';
                 try {
