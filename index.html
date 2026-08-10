@@ -7963,43 +7963,63 @@ async function fetchCheckins() {
             }
         }
 
-        function renderAnalyticsCharts(data) {
-            const isDarkMode = isDark;
-            const textColor = isDarkMode ? '#b0b0cc' : '#4a4a6a';
-            const gridColor = isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
-            const growth = data.growth?.monthly || [];
-            const gLabels = growth.map(d => getMonthLabel(d.month));
-            const gValues = growth.map(d => parseInt(d.count) || 0);
-            renderChart('growthChart', 'bar', gLabels, gValues, 'الأعضاء', '#8b5cf6', textColor, gridColor);
-            const retention = data.growth?.retention || [];
-            const rLabels = retention.map(d => getMonthLabel(d.month));
-            const rValues = retention.map(d => parseFloat(d.rate) || 0);
-            renderChart('retentionChart', 'line', rLabels, rValues, 'معدل الاحتفاظ (%)', '#10b981', textColor, gridColor);
-            const revType = data.revenue?.by_type || [];
-            const rtLabels = revType.map(d => d.type || '-');
-            const rtValues = revType.map(d => parseFloat(d.total) || 0);
-            renderChart('revenueByTypeChart', 'bar', rtLabels, rtValues, 'الإيرادات (ج.م)', '#0ea5e9', textColor, gridColor);
-            const forecast = data.revenue?.forecast || [];
-            const fLabels = forecast.map(d => getMonthLabel(d.month));
-            const fValues = forecast.map(d => parseFloat(d.amount) || 0);
-            renderChart('forecastChart', 'line', fLabels, fValues, 'التوقع (ج.م)', '#ef4444', textColor, gridColor);
-            const weekdays = data.patterns?.by_weekday || [];
-            const wdLabels = weekdays.map(d => d.day || '-');
-            const wdValues = weekdays.map(d => parseInt(d.count) || 0);
-            renderChart('weekdayChart', 'bar', wdLabels, wdValues, 'عدد المرات', '#f59e0b', textColor, gridColor);
-            const hours = data.patterns?.by_hour || [];
-            const hLabels = hours.map(d => d.hour + ':00');
-            const hValues = hours.map(d => parseInt(d.count) || 0);
-            renderChart('hourDistChart', 'bar', hLabels, hValues, 'العدد', '#ef4444', textColor, gridColor);
-            const types = data.distribution?.by_type || [];
-            const tLabels = types.map(d => d.type || '-');
-            const tValues = types.map(d => parseInt(d.count) || 0);
-            renderChart('typeDistChart', 'pie', tLabels, tValues, '', '#8b5cf6', textColor, gridColor);
-            const ages = data.distribution?.by_age || [];
-            const aLabels = ages.map(d => d.group || '-');
-            const aValues = ages.map(d => parseInt(d.count) || 0);
-            renderChart('ageDistChart', 'bar', aLabels, aValues, 'العدد', '#0ea5e9', textColor, gridColor);
-        }
+function renderAnalyticsCharts(data) {
+    const isDarkMode = isDark;
+    const textColor = isDarkMode ? '#b0b0cc' : '#4a4a6a';
+    const gridColor = isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+    
+    // ✅ ใช้สีสันสดใส
+    const colorPalette = ['#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'];
+    
+    // ตัวอย่าง: เปลี่ยนสี growthChart
+    const growth = data.growth?.monthly || [];
+    const gLabels = growth.map(d => getMonthLabel(d.month));
+    const gValues = growth.map(d => parseInt(d.count) || 0);
+    renderChart('growthChart', 'bar', gLabels, gValues, 'الأعضاء', colorPalette[0], textColor, gridColor);
+    
+    // retentionChart
+    const retention = data.growth?.retention || [];
+    const rLabels = retention.map(d => getMonthLabel(d.month));
+    const rValues = retention.map(d => parseFloat(d.rate) || 0);
+    renderChart('retentionChart', 'line', rLabels, rValues, 'معدل الاحتفاظ (%)', colorPalette[1], textColor, gridColor);
+    
+    // revenueByTypeChart
+    const revType = data.revenue?.by_type || [];
+    const rtLabels = revType.map(d => d.type || '-');
+    const rtValues = revType.map(d => parseFloat(d.total) || 0);
+    renderChart('revenueByTypeChart', 'bar', rtLabels, rtValues, 'الإيرادات (ج.م)', colorPalette[2], textColor, gridColor);
+    
+    // forecastChart
+    const forecast = data.revenue?.forecast || [];
+    const fLabels = forecast.map(d => getMonthLabel(d.month));
+    const fValues = forecast.map(d => parseFloat(d.amount) || 0);
+    renderChart('forecastChart', 'line', fLabels, fValues, 'التوقع (ج.م)', colorPalette[3], textColor, gridColor);
+    
+    // weekdayChart
+    const weekdays = data.patterns?.by_weekday || [];
+    const wdLabels = weekdays.map(d => d.day || '-');
+    const wdValues = weekdays.map(d => parseInt(d.count) || 0);
+    renderChart('weekdayChart', 'bar', wdLabels, wdValues, 'عدد المرات', colorPalette[4], textColor, gridColor);
+    
+    // hourDistChart
+    const hours = data.patterns?.by_hour || [];
+    const hLabels = hours.map(d => d.hour + ':00');
+    const hValues = hours.map(d => parseInt(d.count) || 0);
+    renderChart('hourDistChart', 'bar', hLabels, hValues, 'العدد', colorPalette[5], textColor, gridColor);
+    
+    // typeDistChart (pie) — ใช้สีหลายสี
+    const types = data.distribution?.by_type || [];
+    const tLabels = types.map(d => d.type || '-');
+    const tValues = types.map(d => parseInt(d.count) || 0);
+    renderChart('typeDistChart', 'pie', tLabels, tValues, '', colorPalette, textColor, gridColor);
+    
+    // ageDistChart
+    const ages = data.distribution?.by_age || [];
+    const aLabels = ages.map(d => d.group || '-');
+    const aValues = ages.map(d => parseInt(d.count) || 0);
+    renderChart('ageDistChart', 'bar', aLabels, aValues, 'العدد', colorPalette[6], textColor, gridColor);
+}
+        
 
         // ============================================================
         // PROFILE (Member)
