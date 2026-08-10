@@ -7815,54 +7815,41 @@ function renderMemberTable(members) {
             } else if (newPass !== null) showToast('⚠️ كلمة المرور يجب أن تكون >=4 أحرف', 'warning');
         }
 
-        // ============================================================
-        // CHECKIN (Admin)
-        // ============================================================
-        async function fetchCheckins() {
-            try {
-                const data = await apiCall('/checkin');
-                allCheckins = data.data || [];
-                $('checkinCountBadge').textContent = allCheckins.length;
-                const tbody = $('checkinTableBody');
-                if (!allCheckins.length) { tbody.innerHTML =
-                        '<tr><td colspan="5" class="empty-row">لا توجد بيانات</td></tr>'; return; }
-                const sorted = [...allCheckins].sort((a, b) => {
-                    const da = normalizeDate(a.checkin_date) + ' ' + (a.checkin_time || '00:00');
-                    const db = normalizeDate(b.checkin_date) + ' ' + (b.checkin_time || '00:00');
-                    return da < db ? 1 : -1;
-                });
-                tbody.innerHTML = sorted.slice(0, 100).map((c, i) => {
-                    const member = allMembers.find(m => m.member_id === c.member_id);
-                    const name = member ? member.full_name : '-';
-                    return `<tr>
-                                <td>${i+1}</td>
-                                <td><strong>${c.member_id||'-'}</strong></td>
-                                <td>${name}</td>
-                                <td>${formatDate(c.checkin_date)}</td>
-                                <td>${c.checkin_time||'-'}</td>
-                            </tr>`;
-                }).join('');
-            } catch (e) { showToast('❌ فشل تحميل الدخول: ' + e.message, 'error'); }
-        }
-
-async function addCheckin() {
-    const id = $('ciMember').value.trim();
-    if (!id) { showToast('⚠️ يرجى إدخال رقم العضو', 'error'); return; }
+async function fetchCheckins() {
     try {
-        await apiCall('/checkin', { method: 'POST', body: JSON.stringify({ member_id: id }) });
-        showToast(`✅ تم تسجيل دخول ${id}`, 'success');
-
-        // ✅ อัปเดต XP และ Streak
-        const xp = updateMemberXp(id, allCheckins);
-        showToast(`⭐ XP الجديد: ${xp}`, 'info');
-
-        $('checkinAddForm').style.display = 'none';
-        $('ciMember').value = '';
-        await fetchCheckins();
-        await refreshDashboard();
-        if (currentPage === 'profile' && profileMemberId === id) loadProfile();
-    } catch (e) { showToast('❌ ' + e.message, 'error'); }
+        const data = await apiCall('/checkin');
+        allCheckins = data.data || [];
+        $('checkinCountBadge').textContent = allCheckins.length;
+        const tbody = $('checkinTableBody');
+        if (!allCheckins.length) {
+            tbody.innerHTML = '<tr><td colspan="5" class="empty-row">لا توجد بيانات</td></tr>';
+            return;
+        }
+        const today = getTodayStr();
+        const sorted = [...allCheckins].sort((a, b) => {
+            const da = normalizeDate(a.checkin_date) + ' ' + (a.checkin_time || '00:00');
+            const db = normalizeDate(b.checkin_date) + ' ' + (b.checkin_time || '00:00');
+            return da < db ? 1 : -1;
+        });
+        tbody.innerHTML = sorted.slice(0, 100).map((c, i) => {
+            const member = allMembers.find(m => m.member_id === c.member_id);
+            const name = member ? member.full_name : '-';
+            const isToday = normalizeDate(c.checkin_date) === today;
+            const rowClass = isToday ? 'checkin-today' : '';
+            const todayBadge = isToday ? '<span class="badge-today">اليوم</span>' : '';
+            return `<tr class="${rowClass}">
+                        <td>${i+1}</td>
+                        <td><strong>${c.member_id||'-'}</strong></td>
+                        <td>${name} ${todayBadge}</td>
+                        <td>${formatDate(c.checkin_date)}</td>
+                        <td>${c.checkin_time||'-'}</td>
+                    </tr>`;
+        }).join('');
+    } catch (e) {
+        showToast('❌ فشل تحميل الدخول: ' + e.message, 'error');
+    }
 }
+        
         
 
         // ============================================================
