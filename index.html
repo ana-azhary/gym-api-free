@@ -1662,7 +1662,7 @@
         .relative {
             position: relative;
         }
-
+        
 
 .modal-overlay {
     display: none;
@@ -8503,10 +8503,8 @@ function renderProfileData() {
         return;
     }
 
-    console.log('🔄 renderProfileData เริ่มทำงาน');
-
     // ============================================================
-    // 1. คำนวณสถานะสมาชิก (ใหม่ทุกครั้ง)
+    // 1. คำนวณสถานะสมาชิก
     // ============================================================
     hasPaymentHistory = profilePayments.length > 0;
     let expiryDate = null;
@@ -8533,36 +8531,21 @@ function renderProfileData() {
 
     // ✅ ตรวจสอบว่าสามารถใช้ฟีเจอร์เต็มได้หรือไม่
     const showFull = !isExpired && hasPaymentHistory;
-    console.log('📊 showFull:', showFull, '| isExpired:', isExpired, '| hasPaymentHistory:', hasPaymentHistory);
 
     // ============================================================
     // 2. แสดง/ซ่อนส่วนต่าง ๆ ตามสถานะ
     // ============================================================
 
-    // ✅ การ์ดสถิติ 6 ใบ
+    // ✅ การ์ดสถิติ 6 ใบ (memberStatsGrid)
     const statsGrid = document.getElementById('memberStatsGrid');
     if (statsGrid) {
-        if (showFull) {
-            statsGrid.classList.remove('hidden');
-            statsGrid.style.display = 'grid';  // ✅ บังคับให้แสดง
-        } else {
-            statsGrid.classList.add('hidden');
-            statsGrid.style.display = 'none';  // ✅ บังคับให้ซ่อน
-        }
-        console.log('📊 statsGrid:', showFull ? 'แสดง' : 'ซ่อน');
+        statsGrid.style.display = showFull ? 'grid' : 'none';
     }
 
-    // ✅ Top 8
+    // ✅ Top 8 (top8Panel)
     const top8Panel = document.getElementById('top8Panel');
     if (top8Panel) {
-        if (showFull) {
-            top8Panel.classList.remove('hidden');
-            top8Panel.style.display = 'block';
-        } else {
-            top8Panel.classList.add('hidden');
-            top8Panel.style.display = 'none';
-        }
-        console.log('📊 top8Panel:', showFull ? 'แสดง' : 'ซ่อน');
+        top8Panel.style.display = showFull ? 'block' : 'none';
     }
 
     // ✅ เป้าหมาย, ปฏิทิน, BMI
@@ -8574,14 +8557,29 @@ function renderProfileData() {
     if (calendarSection) calendarSection.style.display = showFull ? 'block' : 'none';
     if (weightSection) weightSection.style.display = showFull ? 'block' : 'none';
 
-    // ✅ Overlay หมดอายุ (แสดงเฉพาะตอนหมดอายุ)
+    // ✅ Overlay หมดอายุ — เปลี่ยนเป็นใช้ข้อความแจ้งเตือนแทนการปิดบัตร
     const expiredOverlay = document.getElementById('profileExpiredOverlay');
     if (expiredOverlay) {
-        expiredOverlay.classList.toggle('show', isExpired);
+        // ✅ เปลี่ยนให้แสดงข้อความแจ้งเตือน แทนการปิดบัตร
+        if (isExpired) {
+            expiredOverlay.classList.add('show');
+            expiredOverlay.innerHTML = `
+                <i class="fas fa-exclamation-circle" style="color:var(--danger);font-size:40px;"></i>
+                <h3 style="font-size:18px;font-weight:800;color:#fff;margin-top:8px;">العضوية منتهية الصلاحية</h3>
+                <p style="font-size:13px;color:rgba(255,255,255,0.7);">يرجى الاتصال بالمسؤول لتجديد العضوية</p>
+                <p style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:4px;">(يمكنك استخدام البطاقة ورمز QR أدناه للدفع)</p>
+            `;
+            // ✅ ให้ Overlay โปร่งใส (ไม่ปิดบัตร)
+            expiredOverlay.style.background = 'rgba(0,0,0,0.3)';
+            expiredOverlay.style.backdropFilter = 'blur(2px)';
+            expiredOverlay.style.pointerEvents = 'none'; // คลิกผ่านได้
+        } else {
+            expiredOverlay.classList.remove('show');
+        }
     }
 
     // ============================================================
-    // 3. อัปเดตข้อมูลส่วนหัว (ชื่อ, เบอร์, ฉายา)
+    // 3. อัปเดตข้อมูลส่วนหัว (ชื่อ, เบอร์, ฉายา) — แสดงเสมอ
     // ============================================================
     renderProfileHeader();
 
@@ -8591,33 +8589,24 @@ function renderProfileData() {
     renderProfileCard();
 
     // ============================================================
-    // 5. อัปเดตการ์ดสถิติและฟีเจอร์อื่น ๆ (เฉพาะ showFull)
+    // 5. อัปเดตส่วนอื่น ๆ เฉพาะเมื่อ showFull
     // ============================================================
     if (showFull) {
-        // ✅ อัปเดตการ์ดสถิติ
         updateMemberDashboard();
-        
-        // ✅ โหลดฟีเจอร์เพิ่มเติม
         loadGoalProgress();
         renderCalendar();
         loadWeightData();
         renderWeightChart();
         loadTop8();
-        
-        console.log('✅ โหลดฟีเจอร์ทั้งหมด (showFull = true)');
     } else {
-        // ✅ ถ้าไม่ showFull ให้เคลียร์ค่าการ์ดสถิติ
-        const statIds = ['mStatRevenue', 'mStatXp', 'mStatPeak', 'mStatRank', 'mStatPercent', 'mStatDaysLeft'];
-        statIds.forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.textContent = '-';
-        });
-        console.log('🔒 ซ่อนฟีเจอร์ทั้งหมด (showFull = false)');
+        // ✅ รีเซ็ตค่าในกรณีที่ไม่ showFull (ป้องกันการทำงานผิดพลาด)
+        console.log('🔒 สมาชิกไม่สามารถใช้ฟีเจอร์ได้ (หมดอายุ/ยังไม่จ่าย)');
+        // ✅ ป้องกันการเรียกใช้ฟังก์ชันที่จะใช้ข้อมูลที่ไม่พร้อม
+        // (ไม่ต้องทำอะไรเพิ่ม เพราะ updateMemberDashboard และ loadTop8 จะไม่ถูกเรียก)
     }
 
     console.log('✅ renderProfileData ทำงานเสร็จ (showFull:', showFull, ')');
 }
-        
         
 
 // ============================================================
