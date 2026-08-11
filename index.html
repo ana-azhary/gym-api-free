@@ -1673,37 +1673,7 @@
         .relative {
             position: relative;
         }
-        .expired-overlay {
-            display: none;
-            position: absolute;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.60);
-            backdrop-filter: blur(6px);
-            border-radius: var(--radius-md);
-            z-index: 50;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            color: #fff;
-            text-align: center;
-            padding: 20px;
-        }
-        .expired-overlay.show {
-            display: flex;
-        }
-        .expired-overlay i {
-            font-size: 40px;
-            color: #f87171;
-            margin-bottom: 8px;
-        }
-        .expired-overlay h3 {
-            font-size: 18px;
-            font-weight: 800;
-        }
-        .expired-overlay p {
-            opacity: 0.7;
-            font-size: 13px;
-        }
+
 
 .modal-overlay {
     display: none;
@@ -8607,21 +8577,9 @@ function renderProfileData() {
     if (weightSection) weightSection.style.display = showFull ? 'block' : 'none';
 
     // ✅ Overlay หมดอายุ
-    .expired-overlay {
-    background: transparent !important;
-    backdrop-filter: none !important;
-    pointer-events: none !important;
-}
-.expired-overlay.show {
-    display: flex !important;
-}
-.expired-overlay i,
-.expired-overlay h3,
-.expired-overlay p {
-    opacity: 0.7;
-    color: #fff;
-}
-    
+    const expiredOverlay = document.getElementById('profileExpiredOverlay');
+    if (expiredOverlay) expiredOverlay.classList.toggle('show', isExpired);
+
     // ============================================================
     // 3. อัปเดตข้อมูลส่วนหัว (ชื่อ, เบอร์, ฉายา)
     // ============================================================
