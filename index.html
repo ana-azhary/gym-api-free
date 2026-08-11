@@ -7305,10 +7305,13 @@ case 'expired': {
 
         
 
+// ============================================================
+// EXPIRING (ENSURED ARABIC GRAMMAR)
+// ============================================================
+
 case 'expiring': {
     title = '⏳ الأعضاء على وشك الانتهاء (7 أيام)';
-    
-    // ✅ เปิด Modal พร้อม Loading ทันที
+
     const loadingContent = `
         <div style="text-align:center;padding:40px 0;color:var(--text-muted);">
             <div style="font-size:48px;margin-bottom:16px;"><i class="fas fa-spinner fa-spin"></i></div>
@@ -7317,28 +7320,21 @@ case 'expiring': {
         </div>
     `;
     openModal(title, loadingContent);
-    
+
     try {
-        // ✅ เรียก API สด (ไม่ใช้ Cache)
-        console.log('🔄 [Expiring] กำลังโหลดข้อมูลสมาชิกสดจาก API...');
         const membersRes = await apiCall('/members?t=' + Date.now());
         const allMembersFresh = membersRes.data || [];
-        console.log('✅ [Expiring] ได้ข้อมูลสมาชิก', allMembersFresh.length, 'คน');
-        
-        // ✅ ดึงข้อมูลการชำระเงินสดเพื่อคำนวณวันหมดอายุที่ถูกต้อง
+
         const paymentsRes = await apiCall('/payments?t=' + Date.now());
         const allPaymentsFresh = paymentsRes.data || [];
-        console.log('✅ [Expiring] ได้ข้อมูลการชำระเงิน', allPaymentsFresh.length, 'รายการ');
-        
-        // ✅ คำนวณ expiry_date ล่าสุดจาก payment ของแต่ละคน
+
         const memberExpiryMap = {};
         allPaymentsFresh.forEach(p => {
             if (!memberExpiryMap[p.member_id] || p.payment_date > memberExpiryMap[p.member_id].payment_date) {
                 memberExpiryMap[p.member_id] = p;
             }
         });
-        
-        // ✅ รวมข้อมูล expiry_date เข้าไปในสมาชิก
+
         const membersWithExpiry = allMembersFresh.map(m => {
             const lastPay = memberExpiryMap[m.member_id];
             if (lastPay && lastPay.expiry_date) {
@@ -7356,8 +7352,7 @@ case 'expiring': {
             }
             return m;
         });
-        
-        // ✅ กรองสมาชิกที่ใกล้หมดอายุ (0-7 วัน)
+
         const today = new Date();
         const expiring = membersWithExpiry.filter(m => {
             if (!m.expiry_date) return false;
@@ -7366,8 +7361,7 @@ case 'expiring': {
             const diff = (expDate - today) / (1000 * 60 * 60 * 24);
             return diff > 0 && diff <= 7;
         });
-        
-        // ✅ เรียงตามวันที่ใกล้หมดอายุมากที่สุด
+
         expiring.sort((a, b) => {
             const da = normalizeDate(a.expiry_date);
             const db = normalizeDate(b.expiry_date);
@@ -7376,8 +7370,7 @@ case 'expiring': {
             if (!db) return -1;
             return da < db ? -1 : 1;
         });
-        
-        // ✅ อัปเดต lastData และการ์ดหลัก (ถ้ามี)
+
         if (lastData) {
             if (!lastData.summary) lastData.summary = {};
             lastData.summary.expiring_soon = expiring.length;
@@ -7385,7 +7378,7 @@ case 'expiring': {
             updateDashboardCards(lastData.summary);
         }
         $('statExpiring').textContent = expiring.length;
-        
+
         if (!expiring.length) {
             content = `
                 <div style="text-align:center;padding:30px 0;color:var(--text-muted);">
@@ -7396,6 +7389,16 @@ case 'expiring': {
             `;
         } else {
             const todayStr = getTodayStr();
+
+            // ✅ Helper for Arabic day strings (expiring context: "X days left")
+            function getArabicDaysLeft(days) {
+                if (days === 0) return 'اليوم';
+                if (days === 1) return 'يوم واحد';
+                if (days === 2) return 'يومان';
+                if (days >= 3 && days <= 10) return days + ' أيام';
+                return days + ' يوماً';
+            }
+
             let summaryHtml = `
                 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;max-width:360px;margin-left:auto;margin-right:auto;">
                     <div style="background:rgba(239,68,68,0.08);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(239,68,68,0.1);">
@@ -7421,7 +7424,7 @@ case 'expiring': {
                     </div>
                 </div>
             `;
-            
+
             let table = `
                 ${summaryHtml}
                 <div class="table-wrap" style="border-radius:var(--radius-sm);border:1px solid var(--border-color);">
@@ -7437,37 +7440,40 @@ case 'expiring': {
                         </thead>
                         <tbody>
             `;
-            
+
             expiring.slice(0, 50).forEach((m, idx) => {
                 const expDate = new Date(normalizeDate(m.expiry_date));
                 const diff = (expDate - new Date()) / (1000 * 60 * 60 * 24);
                 const daysLeft = Math.ceil(diff);
                 const phone = m.phone || '';
                 const wa = formatPhoneForWhatsApp(phone);
-                
+
+                // ✅ Arabic day text (grammatically correct)
+                const daysText = getArabicDaysLeft(daysLeft);
+
                 const newMsg = `مرحباً ${m.full_name} 👋،
 
 📢 تنبيه هام:
-نود إعلامك بأن عضويتك في صالة Gym Pro الرياضية ستنتهي خلال ${daysLeft} يوم بتاريخ ${formatDate(m.expiry_date)}.
+نود إعلامك بأن عضويتك في صالة Gym Pro الرياضية ستنتهي خلال ${daysText} بتاريخ ${formatDate(m.expiry_date)}.
 
-⏳ الوقت المتبقي: ${daysLeft} يوم
+⏳ الوقت المتبقي: ${daysText}
 
 💪 ننصحك بالتوجه إلى الاستقبال لتجديد العضوية والاستمرار في الاستفادة من خدماتنا المميزة.
 نحن في انتظارك لمواصلة رحلتك الرياضية!
 
 مع خالص التحية،
 إدارة صالة Gym Pro 🏋️`;
-                
+
                 const encodedMsg = encodeURIComponent(newMsg);
                 const waLink = wa ? `https://wa.me/${wa}?text=${encodedMsg}` : '#';
-                
+
                 let badgeClass = 'expiring';
                 if (daysLeft <= 1) {
                     badgeClass = 'expired-today';
                 } else if (daysLeft <= 3) {
                     badgeClass = 'expired-yesterday';
                 }
-                
+
                 table += `
                     <tr>
                         <td style="color:var(--text-muted);font-size:12px;" class="hide-phone">${idx + 1}</td>
@@ -7476,20 +7482,20 @@ case 'expiring': {
                         <td>
                             <span class="expiry-badge ${badgeClass}">
                                 <i class="fas fa-clock"></i>
-                                ${daysLeft} يوم
+                                ${daysText}
                             </span>
                         </td>
                         <td>${wa ? `<a href="${waLink}" target="_blank" class="btn btn-whatsapp btn-sm" style="padding:2px 8px;font-size:10px;"><i class="fab fa-whatsapp"></i></a>` : '-'}</td>
                     </tr>
                 `;
             });
-            
+
             table += `
                         </tbody>
                     </table>
                 </div>
             `;
-            
+
             content = `
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
                     <span style="font-size:14px;font-weight:700;">
@@ -7504,15 +7510,14 @@ case 'expiring': {
                 ${table}
             `;
         }
-        
-        // ✅ อัปเดต Modal ที่เปิดอยู่
+
         const modalContent = document.querySelector('#tempModal .modal-box > div');
         if (modalContent) {
             modalContent.innerHTML = content;
         } else {
             openModal(title, content);
         }
-        
+
     } catch (e) {
         console.error('❌ [Expiring] Error:', e);
         const errorContent = `
@@ -7531,6 +7536,7 @@ case 'expiring': {
     }
     break;
 }
+        
         
                 
                 
