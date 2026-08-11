@@ -8607,9 +8607,6 @@ function renderProfileData() {
     if (weightSection) weightSection.style.display = showFull ? 'block' : 'none';
 
     // ✅ Overlay หมดอายุ
-    const expiredOverlay = document.getElementById('profileExpiredOverlay');
-    if (expiredOverlay) expiredOverlay.classList.toggle('show', isExpired);
-
     // ============================================================
     // 3. อัปเดตข้อมูลส่วนหัว (ชื่อ, เบอร์, ฉายา)
     // ============================================================
