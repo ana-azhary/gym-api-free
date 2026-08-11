@@ -7307,91 +7307,121 @@ case 'expired': {
 
 case 'expiring': {
     title = '⏳ الأعضاء على وشك الانتهاء (7 أيام)';
-    const allMembersFresh = await fetchMembersWithExpiry();
-    const expiring = allMembersFresh.filter(m => {
-        if (!m.expiry_date) return false;
-        const expDate = new Date(normalizeDate(m.expiry_date));
-        if (isNaN(expDate.getTime())) return false;
-        const diff = (expDate - new Date()) / (1000 * 60 * 60 * 24);
-        return diff > 0 && diff <= 7;
-    });
     
-    // ✅ เรียงตามวันที่ใกล้หมดอายุมากที่สุด
-    expiring.sort((a, b) => {
-        const da = normalizeDate(a.expiry_date);
-        const db = normalizeDate(b.expiry_date);
-        if (!da && !db) return 0;
-        if (!da) return 1;
-        if (!db) return -1;
-        return da < db ? -1 : 1;
-    });
+    // ✅ เปิด Modal พร้อม Loading ทันที
+    const loadingContent = `
+        <div style="text-align:center;padding:40px 0;color:var(--text-muted);">
+            <div style="font-size:48px;margin-bottom:16px;"><i class="fas fa-spinner fa-spin"></i></div>
+            <p style="font-size:16px;font-weight:500;">جارٍ تحميل بيانات الأعضاء...</p>
+            <p style="font-size:13px;margin-top:4px;">يرجى الانتظار</p>
+        </div>
+    `;
+    openModal(title, loadingContent);
     
-    if (!expiring.length) {
-        content = `
-            <div style="text-align:center;padding:30px 0;color:var(--text-muted);">
-                <div style="font-size:48px;margin-bottom:12px;">🎉</div>
-                <p style="font-size:16px;font-weight:500;">لا يوجد أعضاء على وشك الانتهاء</p>
-                <p style="font-size:13px;margin-top:4px;">جميع الأعضاء لديهم عضوية سارية لأكثر من 7 أيام</p>
-            </div>
-        `;
-    } else {
-        // ✅ ใช้ summary แบบง่าย (ไม่แสดงจำนวนสมาชิก)
-        // แสดงแค่ 3 การ์ด เพื่อแจ้งสถานะ (วันเดียว, 2-3วัน, 4-7วัน) โดยไม่มีคำว่า "عدد الأعضاء"
+    try {
+        // ✅ เรียก API สด (ไม่ใช้ Cache)
+        console.log('🔄 [Expiring] กำลังโหลดข้อมูลสมาชิกสดจาก API...');
+        const membersRes = await apiCall('/members?t=' + Date.now());
+        const allMembersFresh = membersRes.data || [];
+        console.log('✅ [Expiring] ได้ข้อมูลสมาชิก', allMembersFresh.length, 'คน');
+        
+        // ✅ ดึงข้อมูลการชำระเงินสดเพื่อคำนวณวันหมดอายุล่าสุด
+        const paymentsRes = await apiCall('/payments?t=' + Date.now());
+        const allPaymentsFresh = paymentsRes.data || [];
+        console.log('✅ [Expiring] ได้ข้อมูลการชำระเงิน', allPaymentsFresh.length, 'รายการ');
+        
+        // ✅ ฟังก์ชันหาวันหมดอายุล่าสุดจากประวัติการจ่าย
+        function getLatestExpiry(memberId) {
+            const payments = allPaymentsFresh.filter(p => p.member_id === memberId);
+            if (payments.length === 0) return null;
+            let latest = null;
+            payments.forEach(p => {
+                if (p.expiry_date) {
+                    const exp = normalizeDate(p.expiry_date);
+                    if (exp && (!latest || exp > latest)) latest = exp;
+                }
+            });
+            return latest;
+        }
+        
+        // ✅ กรองสมาชิกที่กำลังจะหมดอายุ (7 วัน)
         const todayStr = getTodayStr();
-        let summaryHtml = `
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;max-width:360px;margin-left:auto;margin-right:auto;">
-                <div style="background:rgba(239,68,68,0.08);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(239,68,68,0.1);">
-                    <div style="font-size:18px;font-weight:700;color:var(--danger);">${expiring.filter(m => {
-                        const diff = daysBetween(todayStr, normalizeDate(m.expiry_date));
-                        return diff <= 1;
-                    }).length}</div>
-                    <div style="font-size:9px;color:var(--text-muted);"><i class="fas fa-exclamation-circle" style="color:var(--danger);"></i> يوم أو أقل</div>
-                </div>
-                <div style="background:rgba(245,158,11,0.08);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(245,158,11,0.1);">
-                    <div style="font-size:18px;font-weight:700;color:var(--warning);">${expiring.filter(m => {
-                        const diff = daysBetween(todayStr, normalizeDate(m.expiry_date));
-                        return diff > 1 && diff <= 3;
-                    }).length}</div>
-                    <div style="font-size:9px;color:var(--text-muted);"><i class="fas fa-clock" style="color:var(--warning);"></i> 2-3 أيام</div>
-                </div>
-                <div style="background:rgba(59,130,246,0.08);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(59,130,246,0.1);">
-                    <div style="font-size:18px;font-weight:700;color:var(--info);">${expiring.filter(m => {
-                        const diff = daysBetween(todayStr, normalizeDate(m.expiry_date));
-                        return diff > 3 && diff <= 7;
-                    }).length}</div>
-                    <div style="font-size:9px;color:var(--text-muted);"><i class="fas fa-calendar-week" style="color:var(--info);"></i> 4-7 أيام</div>
-                </div>
-            </div>
-        `;
-        
-        // ✅ สร้างตาราง (ซ่อนเบอร์โทรบนมือถือ)
-        let table = `
-            ${summaryHtml}
-            <div class="table-wrap" style="border-radius:var(--radius-sm);border:1px solid var(--border-color);">
-                <table class="rank-table" style="min-width:450px;">
-                    <thead>
-                        <tr>
-                            <th style="width:30px;" class="hide-phone">#</th>
-                            <th style="min-width:100px;">الاسم</th>
-                            <th style="min-width:80px;" class="hide-phone">الهاتف</th>
-                            <th style="min-width:80px;">متبقي</th>
-                            <th style="width:40px;">اتصال</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-        `;
-        
-        expiring.slice(0, 50).forEach((m, idx) => {
-            const expDate = new Date(normalizeDate(m.expiry_date));
-            const diff = (expDate - new Date()) / (1000 * 60 * 60 * 24);
-            const daysLeft = Math.ceil(diff);
-            const phone = m.phone || '';
-            const wa = formatPhoneForWhatsApp(phone);
+        const expiring = [];
+        allMembersFresh.forEach(m => {
+            let expiry = getLatestExpiry(m.member_id);
+            if (!expiry) expiry = m.expiry_date ? normalizeDate(m.expiry_date) : null;
+            if (!expiry) return;
             
-            const newMsg = `مرحباً ${m.full_name} 👋،
+            const diff = daysBetween(todayStr, expiry);
+            if (diff > 0 && diff <= 7) {
+                expiring.push({
+                    ...m,
+                    daysLeft: diff,
+                    expiry: expiry
+                });
+            }
+        });
+        
+        // ✅ เรียงตามวันที่ใกล้หมดอายุมากที่สุด
+        expiring.sort((a, b) => a.daysLeft - b.daysLeft);
+        
+        if (!expiring.length) {
+            content = `
+                <div style="text-align:center;padding:30px 0;color:var(--text-muted);">
+                    <div style="font-size:48px;margin-bottom:12px;">🎉</div>
+                    <p style="font-size:16px;font-weight:500;">لا يوجد أعضاء على وشك الانتهاء</p>
+                    <p style="font-size:13px;margin-top:4px;">جميع الأعضاء لديهم عضوية سارية لأكثر من 7 أيام</p>
+                </div>
+            `;
+        } else {
+            // ✅ สรุปสถิติ (1วัน, 2-3วัน, 4-7วัน)
+            const day1 = expiring.filter(m => m.daysLeft <= 1).length;
+            const day2_3 = expiring.filter(m => m.daysLeft >= 2 && m.daysLeft <= 3).length;
+            const day4_7 = expiring.filter(m => m.daysLeft >= 4 && m.daysLeft <= 7).length;
+            
+            let summaryHtml = `
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;max-width:360px;margin-left:auto;margin-right:auto;">
+                    <div style="background:rgba(239,68,68,0.08);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(239,68,68,0.1);">
+                        <div style="font-size:18px;font-weight:700;color:var(--danger);">${day1}</div>
+                        <div style="font-size:9px;color:var(--text-muted);"><i class="fas fa-exclamation-circle" style="color:var(--danger);"></i> يوم أو أقل</div>
+                    </div>
+                    <div style="background:rgba(245,158,11,0.08);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(245,158,11,0.1);">
+                        <div style="font-size:18px;font-weight:700;color:var(--warning);">${day2_3}</div>
+                        <div style="font-size:9px;color:var(--text-muted);"><i class="fas fa-clock" style="color:var(--warning);"></i> 2-3 أيام</div>
+                    </div>
+                    <div style="background:rgba(59,130,246,0.08);border-radius:8px;padding:8px;text-align:center;border:1px solid rgba(59,130,246,0.1);">
+                        <div style="font-size:18px;font-weight:700;color:var(--info);">${day4_7}</div>
+                        <div style="font-size:9px;color:var(--text-muted);"><i class="fas fa-calendar-week" style="color:var(--info);"></i> 4-7 أيام</div>
+                    </div>
+                </div>
+            `;
+            
+            // ✅ สร้างตาราง
+            let table = `
+                ${summaryHtml}
+                <div class="table-wrap" style="border-radius:var(--radius-sm);border:1px solid var(--border-color);max-height:450px;overflow-y:auto;overflow-x:auto;">
+                    <table class="rank-table" style="min-width:450px;width:100%;font-size:12px;table-layout:auto;">
+                        <thead style="position:sticky;top:0;z-index:5;background:var(--bg-body);">
+                            <tr>
+                                <th style="width:30px;padding:4px 4px;text-align:center;" class="hide-phone">#</th>
+                                <th style="min-width:100px;padding:4px 6px;text-align:right;">الاسم</th>
+                                <th style="min-width:80px;padding:4px 6px;text-align:center;" class="hide-phone">الهاتف</th>
+                                <th style="min-width:80px;padding:4px 6px;text-align:center;">متبقي</th>
+                                <th style="width:36px;padding:4px 4px;text-align:center;">اتصال</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            expiring.slice(0, 50).forEach((m, idx) => {
+                const daysLeft = m.daysLeft;
+                const phone = m.phone || '';
+                const wa = formatPhoneForWhatsApp(phone);
+                
+                const newMsg = `مرحباً ${m.full_name} 👋،
 
 📢 تنبيه هام:
-نود إعلامك بأن عضويتك في صالة Gym Pro الرياضية ستنتهي خلال ${daysLeft} يوم بتاريخ ${formatDate(m.expiry_date)}.
+نود إعلامك بأن عضويتك في صالة Gym Pro الرياضية ستنتهي خلال ${daysLeft} يوم بتاريخ ${formatDate(m.expiry)}.
 
 ⏳ الوقت المتبقي: ${daysLeft} يوم
 
@@ -7400,56 +7430,96 @@ case 'expiring': {
 
 مع خالص التحية،
 إدارة صالة Gym Pro 🏋️`;
-            
-            const encodedMsg = encodeURIComponent(newMsg);
-            const waLink = wa ? `https://wa.me/${wa}?text=${encodedMsg}` : '#';
-            
-            // ✅ สีของ Badge ตามจำนวนวันที่เหลือ
-            let badgeClass = 'expiring';
-            if (daysLeft <= 1) {
-                badgeClass = 'expired-today';
-            } else if (daysLeft <= 3) {
-                badgeClass = 'expired-yesterday';
-            }
+                
+                const encodedMsg = encodeURIComponent(newMsg);
+                const waLink = wa ? `https://wa.me/${wa}?text=${encodedMsg}` : '#';
+                
+                // ✅ สีของ Badge ตามจำนวนวันที่เหลือ
+                let badgeClass = 'expiring';
+                let emoji = '🟡';
+                if (daysLeft <= 1) {
+                    badgeClass = 'expired-today';
+                    emoji = '🔴';
+                } else if (daysLeft <= 3) {
+                    badgeClass = 'expired-yesterday';
+                    emoji = '🟠';
+                }
+                
+                let bgRow = '';
+                if (daysLeft <= 1) bgRow = 'background:rgba(220,38,38,0.03);';
+                else if (daysLeft <= 3) bgRow = 'background:rgba(245,158,11,0.03);';
+                
+                table += `
+                    <tr style="${bgRow}">
+                        <td style="color:var(--text-muted);font-size:11px;text-align:center;" class="hide-phone">${idx + 1}</td>
+                        <td style="font-weight:600;font-size:12px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px;">${m.full_name}</td>
+                        <td style="font-size:11px;text-align:center;" class="hide-phone">${phone || '-'}</td>
+                        <td style="text-align:center;">
+                            <span class="expiry-badge ${badgeClass}">
+                                ${emoji} ${daysLeft} يوم
+                            </span>
+                        </td>
+                        <td style="text-align:center;">${wa ? `<a href="${waLink}" target="_blank" class="btn btn-whatsapp btn-sm" style="padding:1px 6px;font-size:10px;"><i class="fab fa-whatsapp"></i></a>` : '-'}</td>
+                    </tr>
+                `;
+            });
             
             table += `
-                <tr>
-                    <td style="color:var(--text-muted);font-size:12px;" class="hide-phone">${idx + 1}</td>
-                    <td><strong>${m.full_name}</strong></td>
-                    <td style="font-size:12px;" class="hide-phone">${phone || '-'}</td>
-                    <td>
-                        <span class="expiry-badge ${badgeClass}">
-                            <i class="fas fa-clock"></i>
-                            ${daysLeft} يوم
-                        </span>
-                    </td>
-                    <td>${wa ? `<a href="${waLink}" target="_blank" class="btn btn-whatsapp btn-sm" style="padding:2px 8px;font-size:10px;"><i class="fab fa-whatsapp"></i></a>` : '-'}</td>
-                </tr>
+                        </tbody>
+                    </table>
+                </div>
             `;
-        });
+            
+            content = `
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
+                    <span style="font-size:14px;font-weight:700;">
+                        <i class="fas fa-clock" style="color:var(--warning);"></i>
+                        على وشك الانتهاء: <strong style="color:var(--primary);">${expiring.length}</strong> عضو
+                        <span style="font-size:12px;color:var(--text-muted);font-weight:400;">(عرض ${Math.min(50, expiring.length)})</span>
+                    </span>
+                    <span style="font-size:11px;color:var(--text-muted);">
+                        <i class="fas fa-calendar-alt"></i> ${formatDate(todayStr)}
+                    </span>
+                </div>
+                ${table}
+            `;
+        }
         
-        table += `
-                    </tbody>
-                </table>
+        // ✅ อัปเดต Modal ที่เปิดอยู่
+        const modalContent = document.querySelector('#tempModal .modal-box > div');
+        if (modalContent) {
+            modalContent.innerHTML = content;
+        } else {
+            openModal(title, content);
+        }
+        
+        // ✅ อัปเดต lastData (ถ้ามี)
+        if (lastData) {
+            if (!lastData.summary) lastData.summary = {};
+            lastData.summary.expiring_soon = expiring.length;
+            updateDashboardCards(lastData.summary);
+        }
+        $('statExpiring').textContent = expiring.length;
+        
+    } catch (e) {
+        console.error('❌ [Expiring] Error:', e);
+        const errorContent = `
+            <div style="text-align:center;padding:30px 0;color:var(--danger);">
+                <div style="font-size:48px;margin-bottom:12px;">❌</div>
+                <p style="font-size:16px;font-weight:500;">فشل تحميل البيانات</p>
+                <p style="font-size:13px;margin-top:4px;color:var(--text-muted);">${e.message}</p>
             </div>
         `;
-        
-        content = `
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
-                <span style="font-size:14px;font-weight:700;">
-                    <i class="fas fa-clock" style="color:var(--warning);"></i>
-                    على وشك الانتهاء: <strong style="color:var(--primary);">${expiring.length}</strong> عضو
-                    <span style="font-size:12px;color:var(--text-muted);font-weight:400;">(عرض ${Math.min(50, expiring.length)})</span>
-                </span>
-                <span style="font-size:11px;color:var(--text-muted);">
-                    <i class="fas fa-calendar-alt"></i> ${formatDate(getTodayStr())}
-                </span>
-            </div>
-            ${table}
-        `;
+        const modalContent = document.querySelector('#tempModal .modal-box > div');
+        if (modalContent) {
+            modalContent.innerHTML = errorContent;
+        } else {
+            openModal(title, errorContent);
+        }
     }
     break;
 }
+                
                 
 
 
