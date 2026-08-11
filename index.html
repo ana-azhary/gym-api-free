@@ -987,9 +987,20 @@
             margin-bottom: 2px;
         }
 
-/* ============================================================
-   MEMBER CARD — พรีเมียม เรียบหรู มีมาตรฐาน
+        /* ============================================================
+   HIDE STATS FOR EXPIRED/NO PAYMENT
    ============================================================ */
+
+/* ✅ ซ่อนการ์ดสถิติเมื่อสมาชิกหมดอายุหรือยังไม่จ่าย */
+.member-stats-grid.hidden {
+    display: none !important;
+}
+
+/* ✅ ซ่อน Top 8 เมื่อสมาชิกหมดอายุหรือยังไม่จ่าย */
+#top8Panel.hidden {
+    display: none !important;
+}
+
 
 /* ============================================================
    MEMBER CARD — เหมือนบัตรจริง (Premium Look)
@@ -1662,6 +1673,41 @@
         .relative {
             position: relative;
         }
+/* ============================================================
+   EXPIRED OVERLAY — โปร่งใส ไม่ปิดบัตร
+   ============================================================ */
+.expired-overlay {
+    display: none;
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-md);
+    z-index: 10; /* อยู่เหนือบัตร */
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+    pointer-events: none; /* คลิกผ่านไปยังบัตรได้ */
+}
+.expired-overlay.show {
+    display: flex !important;
+}
+.expired-overlay i {
+    font-size: 40px;
+    color: #f87171;
+    margin-bottom: 8px;
+}
+.expired-overlay h3 {
+    font-size: 18px;
+    font-weight: 800;
+    margin: 4px 0;
+}
+.expired-overlay p {
+    opacity: 0.8;
+    font-size: 13px;
+    margin: 2px 0;
+}
         
 
 .modal-overlay {
@@ -9484,50 +9530,38 @@ function generateProfileQR(memberId) {
     const container = document.getElementById('profileQrBox');
     if (!container) return;
     
-    // ✅ ล้าง container
     container.innerHTML = '';
-    
-    // ✅ ลบ instance เดิม
     if (qrCodeInstance) {
         try { qrCodeInstance.clear(); } catch (e) {}
         qrCodeInstance = null;
     }
     
-    // ✅ ตรวจสอบ Library
     if (typeof QRCode === 'undefined') {
-        container.innerHTML = `<span style="color:var(--text-muted);font-size:10px;"><i class="fas fa-exclamation-triangle"></i> QR غير جاهز</span>`;
+        container.innerHTML = `<span style="color:var(--text-muted);font-size:10px;">⚠️ QR غير جاهز</span>`;
         return;
     }
     
     try {
-        // ✅ กำหนดขนาดตามหน้าจอ
-        let qrSize = 56;
-        if (window.innerWidth < 400) qrSize = 36;
-        else if (window.innerWidth < 480) qrSize = 44;
-        
-        // ✅ สร้าง QR Code (ไม่เอียง ไม่มี animation)
+        // ✅ QR แสดงเสมอ (ใช้จ่ายเงิน)
+        let qrSize = window.innerWidth < 480 ? 44 : 56;
         qrCodeInstance = new QRCode(container, {
             text: memberId || 'G-XXXX',
             width: qrSize,
             height: qrSize,
-            colorDark: '#0f172a',      // สีดำ
-            colorLight: '#ffffff',      // สีขาว
-            correctLevel: QRCode.CorrectLevel.H  // ความแม่นยำสูง
+            colorDark: '#0f172a',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.H
         });
         
-        // ✅ ปรับ canvas ให้คมชัด
-        const canvas = container.querySelector('canvas');
-        if (canvas) {
-            canvas.style.width = qrSize + 'px';
-            canvas.style.height = qrSize + 'px';
-            canvas.style.imageRendering = 'pixelated';
-            canvas.style.imageRendering = 'crisp-edges';
-            canvas.style.borderRadius = '4px';
+        // ✅ ถ้าหมดอายุ แสดงข้อความใต้ QR
+        if (isMemberExpired) {
+            const label = document.createElement('div');
+            label.style.cssText = 'font-size:8px;color:#dc2626;font-weight:700;margin-top:2px;';
+            label.textContent = '⚠️ منتهي';
+            container.appendChild(label);
         }
-        
     } catch (e) {
-        console.warn('⚠️ QR Generation error:', e);
-        container.innerHTML = `<span style="color:var(--text-muted);font-size:10px;"><i class="fas fa-exclamation-triangle"></i> لا يمكن إنشاء QR</span>`;
+        container.innerHTML = `<span style="color:var(--text-muted);font-size:10px;">❌ لا يمكن إنشاء QR</span>`;
     }
 }
 
