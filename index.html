@@ -8607,6 +8607,21 @@ function renderProfileData() {
     if (weightSection) weightSection.style.display = showFull ? 'block' : 'none';
 
     // ✅ Overlay หมดอายุ
+    .expired-overlay {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    pointer-events: none !important;
+}
+.expired-overlay.show {
+    display: flex !important;
+}
+.expired-overlay i,
+.expired-overlay h3,
+.expired-overlay p {
+    opacity: 0.7;
+    color: #fff;
+}
+    
     // ============================================================
     // 3. อัปเดตข้อมูลส่วนหัว (ชื่อ, เบอร์, ฉายา)
     // ============================================================
