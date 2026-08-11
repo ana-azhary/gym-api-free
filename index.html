@@ -1673,7 +1673,37 @@
         .relative {
             position: relative;
         }
-
+        .expired-overlay {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.60);
+            backdrop-filter: blur(6px);
+            border-radius: var(--radius-md);
+            z-index: 50;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+        }
+        .expired-overlay.show {
+            display: flex;
+        }
+        .expired-overlay i {
+            font-size: 40px;
+            color: #f87171;
+            margin-bottom: 8px;
+        }
+        .expired-overlay h3 {
+            font-size: 18px;
+            font-weight: 800;
+        }
+        .expired-overlay p {
+            opacity: 0.7;
+            font-size: 13px;
+        }
 
 .modal-overlay {
     display: none;
