@@ -8643,11 +8643,17 @@ function renderProfileData() {
 // UPDATE MEMBER DASHBOARD — อัปเดต 6 การ์ดในหน้า Profile
 // ============================================================
 function updateMemberDashboard() {
+    // ✅ ถ้าสมาชิกหมดอายุหรือยังไม่จ่าย → ไม่ต้องอัปเดตอะไร
+    if (isMemberExpired || !hasPaymentHistory) {
+        console.log('🔒 updateMemberDashboard: ข้าม (สมาชิกหมดอายุ/ยังไม่จ่าย)');
+        return;
+    }
+
     if (!profileMember) {
         console.warn('⚠️ updateMemberDashboard: ไม่มี profileMember');
         return;
     }
-    
+
     const m = profileMember;
     const today = getTodayStr();
     const thisMonth = today.slice(0, 7);
