@@ -8647,6 +8647,45 @@ function renderProfileData() {
 }
         
 
+
+// ============================================================
+// UPDATE MEMBER DASHBOARD — อัปเดต 6 การ์ดในหน้า Profile
+// ============================================================
+function updateMemberDashboard() {
+    if (!profileMember) {
+        console.warn('⚠️ updateMemberDashboard: ไม่มี profileMember');
+        return;
+    }
+    
+    const m = profileMember;
+    const today = getTodayStr();
+    const thisMonth = today.slice(0, 7);
+
+
+    
+    // ✅ ฟังก์ชันช่วยอัปเดต element อย่างปลอดภัย
+    function safeSetText(id, value, defaultValue = '-') {
+        const el = document.getElementById(id);
+        if (el) {
+            el.textContent = value !== undefined && value !== null && value !== '' ? value : defaultValue;
+            return true;
+        } else {
+            console.warn(`⚠️ Element not found: #${id}`);
+            return false;
+        }
+    }
+
+    function safeSetHTML(id, html) {
+        const el = document.getElementById(id);
+        if (el) {
+            el.innerHTML = html;
+            return true;
+        } else {
+            console.warn(`⚠️ Element not found: #${id}`);
+            return false;
+        }
+    }
+
     // ============================================================
     // 1. ยอดชำระเดือนนี้ (mStatRevenue)
     // ============================================================
