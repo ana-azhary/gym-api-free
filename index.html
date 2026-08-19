@@ -2266,4 +2266,60 @@
                     $('sentenceNotStarted').classList.remove('hidden');
                     $('sentenceGameArea').classList.add('hidden');
                     $('sentenceDanContainer').classList.add('hidden');
-                    if (sentenceLevels.length) loadSentenceLevel(sentenceLevels[
+                    if (sentenceLevels.length) loadSentenceLevel(sentenceLevels[0]?.level || 1);
+                }
+                if (btn.dataset.tab === 'readingTab') {
+                    $('readingNotStarted').classList.remove('hidden');
+                    $('readingArticleArea').classList.add('hidden');
+                    $('readingDanContainer').classList.add('hidden');
+                    if (readingLevels.length) loadReadingLevel(readingLevels[0]?.level || 1);
+                }
+            });
+        });
+
+        // ==============================================================
+        //  INIT
+        // ==============================================================
+        document.addEventListener('click', () => {
+            getAudioContext();
+        }, { once: true });
+
+        initGoogleLogin();
+
+        $('soundToggle').checked = soundEnabled;
+        $('vibrationToggle').checked = vibrationEnabled;
+        $('soundStatus').textContent = soundEnabled ? '🔊' : '🔇';
+
+        // 绑定导出按钮事件
+        document.getElementById('exportCSV').addEventListener('click', exportCSV);
+        document.getElementById('exportPDF').addEventListener('click', exportPDF);
+
+        document.addEventListener('click', function(e) {
+            const popup = $('dictionaryPopup');
+            if (popup.classList.contains('show')) {
+                const rect = popup.getBoundingClientRect();
+                const inside = (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom);
+                if (!inside && e.target.closest('.reading-word') === null && !e.target.closest('.close-btn')) {
+                    closeDictionary();
+                }
+            }
+            const settingsPopup = $('settingsPopup');
+            if (settingsPopup.classList.contains('show')) {
+                const rect = settingsPopup.getBoundingClientRect();
+                const inside = (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom);
+                if (!inside && !e.target.closest('.btn-settings')) {
+                    settingsPopup.classList.remove('show');
+                }
+            }
+        });
+
+        console.log('🚀 ศึกษา ต่างถิ่น v4.4 — เรียนภาษาอาหรับ');
+        console.log('⭐ ระบบดาว: ใบ้ 1⭐, ปลดล็อกบทความ Level x5⭐ (สูงสุด 30⭐), โบนัสเลเวล 20⭐, ปลดล็อก Level 100⭐');
+        console.log('🔊 เสียง/สั่น: ปรับได้ที่ปุ่ม ⚙️');
+        console.log('🔄 ดับเบิลคลิกที่ด่าน = เริ่มเกมทันที');
+        console.log('📚 คำศัพท์: แบ่งตาม Level อัตโนมัติ 100 คำต่อ Level (จากข้อมูลในชีท)');
+        console.log('📤 ส่งออก CSV/PDF ตาม Level ที่เลือก');
+        console.log('🏆 ลีดเดอร์บอร์ดแสดง 20 อันดับพร้อมกำลังใจจากอุสตะเฮง');
+    </script>
+</body>
+</html>
