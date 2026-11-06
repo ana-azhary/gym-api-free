@@ -155,6 +155,19 @@
   .row{display:flex;gap:10px;flex-wrap:wrap}
   .row.center{justify-content:center;margin-top:14px}
 
+  /* ★ ปุ่ม auto toggle ในโหมดแฟลช */
+  .auto-btn{
+    font-family:inherit;cursor:pointer;border-radius:14px;font-size:.85rem;
+    padding:12px 18px;border:1px solid rgba(34,211,166,.5);font-weight:700;
+    background:rgba(34,211,166,.2);color:var(--accent2);transition:.15s
+  }
+  .auto-btn:hover{background:rgba(34,211,166,.32)}
+  .auto-btn.off{
+    background:rgba(255,255,255,.05);color:var(--muted);
+    border-color:var(--line)
+  }
+  .auto-btn.off:hover{background:rgba(255,255,255,.1)}
+
   .game-top{display:flex;align-items:center;gap:12px;margin-bottom:6px}
   .progress{flex:1;height:8px;border-radius:99px;background:rgba(255,255,255,.09);overflow:hidden}
   .progress .bar{height:100%;border-radius:99px;
@@ -276,9 +289,6 @@
     border-color:rgba(240,165,0,.5)
   }
   .post-btn.review:hover{border-color:var(--special)}
-  .post-btn.review:disabled{
-    opacity:.35;cursor:not-allowed;transform:none
-  }
 
   .wtable{width:100%;border-collapse:collapse;font-size:.85rem;margin-top:14px}
   .wtable th,.wtable td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
@@ -453,7 +463,6 @@ const WORDS = [
   {w:"believe",  ipa:"/bɪˈliːv/",    th:"บิลีฟว์",   m:"เชื่อ",        ex:"I believe you."},
   {w:"truth",    ipa:"/truːθ/",      th:"ทรูธ",      m:"ความจริง",     ex:"Tell me the truth."},
   {w:"lie",      ipa:"/laɪ/",        th:"ไล",        m:"โกหก",         ex:"Do not lie."},
-  {w:"worry",    ipa:"/ˈwʌr.i/",     th:"เวอร์รี",   m:"กังวล",        ex:"Do not worry."},
   {w:"sudden",   ipa:"/ˈsʌd.ən/",    th:"ซัดเดน",    m:"กะทันหัน",     ex:"A sudden call."},
   {w:"strange",  ipa:"/streɪndʒ/",   th:"สเตรนจ์",   m:"แปลก",         ex:"A strange voice."},
   {w:"familiar", ipa:"/fəˈmɪl.i.ər/",th:"ฟะมิลเลียร์",m:"คุ้นเคย",     ex:"A familiar voice."},
@@ -513,61 +522,18 @@ const WORDS = [
    1.5) ข้อมูลด่าน (LEVELS)
    ========================================================= */
 const LEVELS = [
-  {
-    id: 1,
-    name: "ด่านที่ 1",
-    desc: "คำศัพท์พื้นฐาน 20 คำ (กิจวัตร สถานที่)",
-    wordStart: 0,   wordEnd: 20,
-    poolStart: 0,   poolEnd: 20,
-    questionsPerRound: 20,
-    locked: false
-  },
-  {
-    id: 2,
-    name: "ด่านที่ 2",
-    desc: "คำศัพท์ 40 คำ (กิจวัตร + รองเท้า & การกระทำ)",
-    wordStart: 0,   wordEnd: 40,
-    poolStart: 0,   poolEnd: 40,
-    questionsPerRound: 20,
-    locked: false
-  },
-  {
-    id: 3,
-    name: "ด่านที่ 3",
-    desc: "คำศัพท์ร้านอาหาร 40 คำ (สั่งอาหาร/เมนู/รสชาติ)",
-    wordStart: 60,  wordEnd: 100,
-    poolStart: 60,  poolEnd: 100,
-    questionsPerRound: 20,
-    locked: false
-  },
-  {
-    id: 4,
-    name: "ด่านที่ 4",
-    desc: "คำศัพท์การสื่อสาร & ครอบครัว 40 คำ",
-    wordStart: 100, wordEnd: 140,
-    poolStart: 100, poolEnd: 140,
-    questionsPerRound: 20,
-    locked: false
-  },
-  {
-    id: 5,
-    name: "ด่านที่ 5",
-    desc: "คำศัพท์อาหาร & มารยาททางสังคม 40 คำ",
-    wordStart: 140, wordEnd: 180,
-    poolStart: 140, poolEnd: 180,
-    questionsPerRound: 20,
-    locked: false
-  },
-  {
-    id: 6,
-    name: "ด่านพิเศษ",
-    desc: "รวมทุกคำศัพท์ 180 คำ — ท้าทายสุด ๆ!",
-    wordStart: 0,   wordEnd: 180,
-    poolStart: 0,   poolEnd: 180,
-    questionsPerRound: 30,
-    locked: false,
-    special: true
-  }
+  { id:1, name:"ด่านที่ 1", desc:"คำศัพท์พื้นฐาน 20 คำ (กิจวัตร สถานที่)",
+    wordStart:0,   wordEnd:20,  poolStart:0,   poolEnd:20,  questionsPerRound:20, locked:false },
+  { id:2, name:"ด่านที่ 2", desc:"คำศัพท์ 40 คำ (กิจวัตร + รองเท้า & การกระทำ)",
+    wordStart:0,   wordEnd:40,  poolStart:0,   poolEnd:40,  questionsPerRound:20, locked:false },
+  { id:3, name:"ด่านที่ 3", desc:"คำศัพท์ร้านอาหาร 40 คำ (สั่งอาหาร/เมนู/รสชาติ)",
+    wordStart:60,  wordEnd:100, poolStart:60,  poolEnd:100, questionsPerRound:20, locked:false },
+  { id:4, name:"ด่านที่ 4", desc:"คำศัพท์การสื่อสาร & ครอบครัว 40 คำ",
+    wordStart:100, wordEnd:140, poolStart:100, poolEnd:140, questionsPerRound:20, locked:false },
+  { id:5, name:"ด่านที่ 5", desc:"คำศัพท์อาหาร & มารยาททางสังคม 40 คำ",
+    wordStart:140, wordEnd:180, poolStart:140, poolEnd:180, questionsPerRound:20, locked:false },
+  { id:6, name:"ด่านพิเศษ", desc:"รวมทุกคำศัพท์ 180 คำ — ท้าทายสุด ๆ!",
+    wordStart:0,   wordEnd:180, poolStart:0,   poolEnd:180, questionsPerRound:30, locked:false, special:true }
 ];
 
 let currentLevel = null;
@@ -622,13 +588,10 @@ function hlEx(item){
   return item.ex.replace(new RegExp('(' + escRe(item.w) + ')', 'gi'), '<b>$1</b>');
 }
 
-function getLevelPool(level){
-  return WORDS.slice(level.poolStart, level.poolEnd);
-}
-function getLevelWords(level){
-  return WORDS.slice(level.wordStart, level.wordEnd);
-}
+function getLevelPool(level){ return WORDS.slice(level.poolStart, level.poolEnd); }
+function getLevelWords(level){ return WORDS.slice(level.wordStart, level.wordEnd); }
 
+/* ---- เสียงพูด ---- */
 let voice = null;
 function pickVoice(){
   const vs = speechSynthesis.getVoices();
@@ -652,6 +615,7 @@ function speak(text, rate = 0.85){
   }catch(e){}
 }
 
+/* ---- เสียงเอฟเฟกต์ ---- */
 let actx = null;
 function beep(freq, dur, type = 'sine', vol = 0.12){
   if (!soundEnabled) return;
@@ -675,45 +639,87 @@ function autoSpeakWord(word, delay = 350){
   setTimeout(() => speak(word, 0.85), delay);
 }
 
-/* ---- ตัวแปรเก็บ timer ของ auto-flip เพื่อยกเลิกได้ ---- */
-let flashAutoTimer1 = null;
-let flashAutoTimer2 = null;
+/* =========================================================
+   ★★★ ระบบ Flash Auto (พลิก + เลื่อนอัตโนมัติ) ★★★
+   ========================================================= */
+let flashAutoTimer1 = null;  // 1) หน้า → หลัง
+let flashAutoTimer2 = null;  // 2) หลัง → หน้า
+let flashAutoTimer3 = null;  // 3) หน้า → เลื่อนอัตโนมัติ
 
-function clearFlashAutoFlip(){
+let flashAutoEnabled = localStorage.getItem('wq_flash_auto') !== 'off';
+
+/* ปรับเวลาได้ที่นี่ */
+const FLASH_TIMING = {
+  frontMs: 1000,   // แสดงด้านหน้าคำศัพท์ 1 วินาที
+  backMs:  3500,   // แสดงด้านหลัง (ความหมาย) 3.5 วินาที
+  gapMs:   800     // แสดงด้านหน้าอีกครั้งก่อนเลื่อน 0.8 วินาที
+};
+
+function clearFlashAuto(){
   if (flashAutoTimer1){ clearTimeout(flashAutoTimer1); flashAutoTimer1 = null; }
   if (flashAutoTimer2){ clearTimeout(flashAutoTimer2); flashAutoTimer2 = null; }
+  if (flashAutoTimer3){ clearTimeout(flashAutoTimer3); flashAutoTimer3 = null; }
 }
 
-/* ---- auto flip: หน้า → หลัง (สักครู่) → หน้า ---- */
-function startFlashAutoFlip(cardEl){
-  clearFlashAutoFlip();
-  // 1) หน่วง 200ms แล้วพลิกไปด้านหลัง
+function startFlashAuto(cardEl){
+  clearFlashAuto();
+  if (!flashAutoEnabled) return;
+
+  // 1) แสดงด้านหน้า 1 วินาที → พลิกไปด้านหลัง
   flashAutoTimer1 = setTimeout(() => {
     if (!document.body.contains(cardEl)) return;
+    if (!flashAutoEnabled) return;
     cardEl.classList.add('flipped');
-    // 2) หน่วง 1800ms แล้วพลิกกลับมาด้านหน้า
+
+    // 2) แสดงด้านหลัง 3.5 วินาที → พลิกกลับมาด้านหน้า
     flashAutoTimer2 = setTimeout(() => {
       if (!document.body.contains(cardEl)) return;
+      if (!flashAutoEnabled) return;
       cardEl.classList.remove('flipped');
-    }, 1800);
-  }, 200);
+
+      // 3) แสดงด้านหน้าสักครู่ → เลื่อนไปการ์ดถัดไปอัตโนมัติ
+      flashAutoTimer3 = setTimeout(() => {
+        if (!document.body.contains(cardEl)) return;
+        if (!flashAutoEnabled) return;
+        if (state.screen !== 'flash') return;
+
+        if (state.index < state.queue.length - 1){
+          state.index++;
+          renderFlash(true);   // → เริ่มรอบ auto ใหม่ที่การ์ดถัดไป
+        } else {
+          renderFlashDone();   // จบชุด
+        }
+      }, FLASH_TIMING.gapMs);
+    }, FLASH_TIMING.backMs);
+  }, FLASH_TIMING.frontMs);
+}
+
+function toggleFlashAuto(){
+  flashAutoEnabled = !flashAutoEnabled;
+  localStorage.setItem('wq_flash_auto', flashAutoEnabled ? 'on' : 'off');
+
+  const btn = document.getElementById('btnAutoToggle');
+  const card = document.getElementById('flipCard');
+
+  if (flashAutoEnabled){
+    if (btn){ btn.classList.remove('off'); btn.textContent = '⏸ ปิดออโต้'; }
+    if (card){
+      card.classList.remove('flipped');
+      startFlashAuto(card);
+    }
+  } else {
+    if (btn){ btn.classList.add('off'); btn.textContent = '▶ เปิดออโต้'; }
+    clearFlashAuto();
+  }
 }
 
 /* =========================================================
    3) สถานะเกม
    ========================================================= */
 const state = {
-  screen: 'home',
-  mode: null,
-  queue: [],
-  index: 0,
-  score: 0,
-  correct: 0,
-  wrong: 0,
-  streak: 0,
-  bestStreak: 0,
-  answered: false,
-  missed: []
+  screen: 'home', mode: null, queue: [], index: 0,
+  score: 0, correct: 0, wrong: 0, streak: 0, bestStreak: 0,
+  answered: false, missed: []
 };
 
 function updateStats(){
@@ -731,7 +737,7 @@ function updateStats(){
    4) หน้าหลัก — เลือกด่าน
    ========================================================= */
 function renderHome(){
-  clearFlashAutoFlip();
+  clearFlashAuto();
   state.screen = 'home';
   state.mode = null;
   currentLevel = null;
@@ -791,14 +797,13 @@ function renderHome(){
    4.5) เลือกโหมดหลังเลือกด่าน
    ========================================================= */
 function renderModeSelect(){
-  clearFlashAutoFlip();
+  clearFlashAuto();
   state.screen = 'mode-select';
   state.mode = null;
   updateStats();
   const lv = currentLevel;
   const count = lv.wordEnd - lv.wordStart;
   const poolCount = lv.poolEnd - lv.poolStart;
-
   const hdrCls = lv.special ? 'level-header special fade' : 'level-header fade';
 
   screenEl.innerHTML = `
@@ -858,13 +863,11 @@ function renderModeSelect(){
    5) รายการคำศัพท์
    ========================================================= */
 function renderList(onlyLevel = false){
-  clearFlashAutoFlip();
+  clearFlashAuto();
   state.screen = 'list';
   updateStats();
 
-  const list = onlyLevel && currentLevel
-    ? getLevelWords(currentLevel)
-    : WORDS;
+  const list = onlyLevel && currentLevel ? getLevelWords(currentLevel) : WORDS;
 
   const rows = list.map((x, i) => `
     <tr>
@@ -912,6 +915,7 @@ function startFlash(){
 }
 
 function renderFlash(autoSpeak = false){
+  clearFlashAuto();   // ← ล้าง timer เก่าก่อนเสมอ
   state.screen = 'flash';
   state.answered = false;
   const item = state.queue[state.index];
@@ -942,15 +946,18 @@ function renderFlash(autoSpeak = false){
 
     <div class="row center">
       <button class="ghost" id="btnPrev" ${state.index === 0 ? 'disabled' : ''}>← ก่อนหน้า</button>
+      <button class="auto-btn ${flashAutoEnabled ? '' : 'off'}" id="btnAutoToggle">
+        ${flashAutoEnabled ? '⏸ ปิดออโต้' : '▶ เปิดออโต้'}
+      </button>
       <button class="primary" id="btnNext">ถัดไป →</button>
     </div>
   `;
 
   const card = document.getElementById('flipCard');
 
-  // ผู้เล่นกดการ์ดเอง → ยกเลิก auto flip และ toggle ตามที่กด
+  // ★ ผู้เล่นกดการ์ดเอง → หยุด auto cycle (ผู้เล่นควบคุมเอง)
   card.onclick = () => {
-    clearFlashAutoFlip();
+    clearFlashAuto();
     card.classList.toggle('flipped');
   };
 
@@ -960,12 +967,14 @@ function renderFlash(autoSpeak = false){
   };
 
   document.getElementById('btnPrev').onclick = () => {
+    clearFlashAuto();
     if (state.index > 0){
       state.index--;
       renderFlash(true);
     }
   };
   document.getElementById('btnNext').onclick = () => {
+    clearFlashAuto();
     if (state.index < state.queue.length - 1){
       state.index++;
       renderFlash(true);
@@ -974,8 +983,10 @@ function renderFlash(autoSpeak = false){
     }
   };
 
+  document.getElementById('btnAutoToggle').onclick = toggleFlashAuto;
+
   document.getElementById('btnBack').onclick = () => {
-    clearFlashAutoFlip();
+    clearFlashAuto();
     renderModeSelect();
   };
   updateStats();
@@ -983,12 +994,12 @@ function renderFlash(autoSpeak = false){
   // ออกเสียงอัตโนมัติ
   if (autoSpeak) autoSpeakWord(item.w, 120);
 
-  // ★★ auto flip: หน้า → หลัง (200ms) → หน้า (1800ms) ★★
-  startFlashAutoFlip(card);
+  // ★ เริ่ม auto cycle: หน้า 1s → หลัง 3.5s → หน้า 0.8s → ถัดไป
+  startFlashAuto(card);
 }
 
 function renderFlashDone(){
-  clearFlashAutoFlip();
+  clearFlashAuto();
   state.screen = 'result';
   updateStats();
   screenEl.innerHTML = `
@@ -1014,22 +1025,15 @@ function renderFlashDone(){
    ========================================================= */
 function startQuizWithPool(mode, items){
   if (!currentLevel) return renderHome();
-  clearFlashAutoFlip();
+  clearFlashAuto();
   state.mode = mode;
   state.queue = shuffle(items).slice(0, currentLevel.questionsPerRound);
   state.index = 0;
-  state.score = 0;
-  state.correct = 0;
-  state.wrong = 0;
-  state.streak = 0;
-  state.bestStreak = 0;
-  state.missed = [];
+  state.score = 0; state.correct = 0; state.wrong = 0;
+  state.streak = 0; state.bestStreak = 0; state.missed = [];
   nextQuestion();
 }
-
-function startQuiz(mode){
-  startQuizWithPool(mode, getLevelPool(currentLevel));
-}
+function startQuiz(mode){ startQuizWithPool(mode, getLevelPool(currentLevel)); }
 
 function nextQuestion(){
   if (state.index >= state.queue.length){ renderResult(); return; }
@@ -1048,7 +1052,6 @@ function topBar(){
       <div class="counter">${state.index + 1}/${state.queue.length}</div>
     </div>`;
 }
-
 function bindBack(){
   const b = document.getElementById('btnBack');
   if (b) b.onclick = () => { if (confirm('ออกจากโหมดนี้?')) renderModeSelect(); };
@@ -1083,7 +1086,6 @@ function renderSpell(){
   const fb = document.getElementById('feedback');
   const btnCheck = document.getElementById('btnCheck');
   const btnHint = document.getElementById('btnHint');
-
   input.focus();
 
   document.getElementById('btnSpeak').onclick = () => speak(item.w, 0.8);
@@ -1112,8 +1114,7 @@ function renderSpell(){
       const ok = (val === norm(item.w));
 
       if (ok){
-        state.correct++;
-        state.streak++;
+        state.correct++; state.streak++;
         state.bestStreak = Math.max(state.bestStreak, state.streak);
         state.score += 10 + (hintUsed ? 0 : 5) + state.streak * 2;
         input.classList.add('ok');
@@ -1121,8 +1122,7 @@ function renderSpell(){
         fb.innerHTML = `ถูกต้อง! 🎉 <span class="corr">${item.w}</span> ${item.ipa}`;
         sfxOk();
       } else {
-        state.wrong++;
-        state.streak = 0;
+        state.wrong++; state.streak = 0;
         state.missed.push(item);
         input.classList.add('bad');
         fb.className = 'feedback bad';
@@ -1130,17 +1130,14 @@ function renderSpell(){
         sfxBad();
         speak(item.w, 0.75);
       }
-
       input.disabled = true;
       btnHint.disabled = true;
       btnCheck.textContent = 'ถัดไป →';
       updateStats();
     } else {
-      state.index++;
-      nextQuestion();
+      state.index++; nextQuestion();
     }
   };
-
   bindBack();
 }
 
@@ -1186,8 +1183,7 @@ function renderChoice(){
       });
 
       if (ok){
-        state.correct++;
-        state.streak++;
+        state.correct++; state.streak++;
         state.bestStreak = Math.max(state.bestStreak, state.streak);
         state.score += 10 + state.streak * 2;
         fb.className = 'feedback ok';
@@ -1195,8 +1191,7 @@ function renderChoice(){
         sfxOk();
       } else {
         b.classList.add('bad');
-        state.wrong++;
-        state.streak = 0;
+        state.wrong++; state.streak = 0;
         state.missed.push(item);
         fb.className = 'feedback bad';
         fb.innerHTML = `ผิด — คำตอบที่ถูกคือ <span class="corr">${item.w}</span> ${item.ipa}`;
@@ -1213,7 +1208,6 @@ function renderChoice(){
       updateStats();
     };
   });
-
   bindBack();
 }
 
@@ -1272,8 +1266,7 @@ function renderListen(){
       const ok = (val === norm(item.w));
 
       if (ok){
-        state.correct++;
-        state.streak++;
+        state.correct++; state.streak++;
         state.bestStreak = Math.max(state.bestStreak, state.streak);
         state.score += 10 + (hintUsed ? 0 : 5) + state.streak * 2;
         input.classList.add('ok');
@@ -1281,34 +1274,30 @@ function renderListen(){
         fb.innerHTML = `ถูกต้อง! 🎉 <span class="corr">${item.w}</span> ${item.ipa}`;
         sfxOk();
       } else {
-        state.wrong++;
-        state.streak = 0;
+        state.wrong++; state.streak = 0;
         state.missed.push(item);
         input.classList.add('bad');
         fb.className = 'feedback bad';
         fb.innerHTML = `ยังไม่ถูก — คำตอบคือ <span class="corr">${item.w}</span> ${item.ipa}`;
         sfxBad();
       }
-
       input.disabled = true;
       btnHint.disabled = true;
       btnCheck.textContent = 'ถัดไป →';
       speak(item.w, 0.7);
       updateStats();
     } else {
-      state.index++;
-      nextQuestion();
+      state.index++; nextQuestion();
     }
   };
-
   bindBack();
 }
 
 /* =========================================================
-   8) สรุปผล — มี 2 ปุ่ม: เริ่มใหม่ / แก้ไขคำที่ผิด
+   8) สรุปผล
    ========================================================= */
 function renderResult(){
-  clearFlashAutoFlip();
+  clearFlashAuto();
   state.screen = 'result';
   const total = state.correct + state.wrong;
   const acc = total ? Math.round((state.correct / total) * 100) : 0;
@@ -1376,15 +1365,10 @@ function renderResult(){
 
   if (hasMissed){
     document.getElementById('btnReview').onclick = () => {
-      state.mode = state.mode;
       state.queue = shuffle(state.missed.slice());
       state.index = 0;
-      state.score = 0;
-      state.correct = 0;
-      state.wrong = 0;
-      state.streak = 0;
-      state.bestStreak = 0;
-      state.missed = [];
+      state.score = 0; state.correct = 0; state.wrong = 0;
+      state.streak = 0; state.bestStreak = 0; state.missed = [];
       nextQuestion();
     };
   }
